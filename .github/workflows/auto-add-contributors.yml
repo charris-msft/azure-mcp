@@ -1,0 +1,148 @@
+name: Auto-Add Contributors
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  add-contributors:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get release information
+        id: release_info
+        run: |
+          echo "tag_name=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          echo "release_name=${{ github.event.release.name }}" >> $GITHUB_OUTPUT
+
+      - name: Get contributors for this release
+        id: contributors
+        run: |
+          CURRENT_TAG="${{ steps.release_info.outputs.tag_name }}"
+          PREVIOUS_TAG=$(git tag --sort=-version:refname | grep -A1 "^${CURRENT_TAG}$" | tail -n1)
+          
+          if [ -z "$PREVIOUS_TAG" ] || [ "$PREVIOUS_TAG" = "$CURRENT_TAG" ]; then
+            ALL_TAGS=$(git tag --sort=-version:refname)
+            PREVIOUS_TAG=$(echo "$ALL_TAGS" | grep -A1 "^${CURRENT_TAG}$" | tail -n1)
+            
+            if [ -z "$PREVIOUS_TAG" ] || [ "$PREVIOUS_TAG" = "$CURRENT_TAG" ]; then
+              PREVIOUS_TAG=$(git log --since="30 days ago" --format="%H" | tail -n1)
+              if [ -z "$PREVIOUS_TAG" ]; then
+                PREVIOUS_TAG=$(git rev-list --max-parents=0 HEAD)
+              fi
+            fi
+          fi
+          
+          echo "Current tag: $CURRENT_TAG"
+          echo "Previous tag: $PREVIOUS_TAG"
+          
+          CONTRIBUTORS=$(git log --format='%an <%ae>' ${PREVIOUS_TAG}..${CURRENT_TAG} | sort -u | while IFS= read -r line; do
+            if [ -n "$line" ]; then
+              EMAIL=$(echo "$line" | sed 's/.*<\(.*\)>.*/\1/')
+              if [[ ! "$EMAIL" =~ ^[0-9]+\+.*@users\.noreply\.github\.com$ ]] && \
+                 [[ ! "$EMAIL" =~ [Bb]ot.*@.* ]] && \
+                 [[ ! "$EMAIL" =~ .*[Bb]ot@.* ]] && \
+                 [[ ! "$EMAIL" =~ no-reply@github\.com ]] && \
+                 [[ ! "$EMAIL" =~ noreply@github\.com ]]; then
+                echo "$line"
+              fi
+            fi
+          done)
+          
+          CONTRIBUTORS=$(echo "$CONTRIBUTORS" | grep -v '^$' | sort -u)
+          
+          if [ -n "$CONTRIBUTORS" ]; then
+            echo "### Contributors" > contributors.txt
+            echo "" >> contributors.txt
+            echo "Thank you to the following contributors for their work on this release:" >> contributors.txt
+            echo "" >> contributors.txt
+            while IFS= read -r contributor; do
+              if [ -n "$contributor" ]; then
+                NAME=$(echo "$contributor" | sed 's/ <.*//')
+                echo "- $NAME" >> contributors.txt
+              fi
+            done <<< "$CONTRIBUTORS"
+            echo "has_contributors=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_contributors=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update CHANGELOG with contributors
+        if: steps.contributors.outputs.has_contributors == 'true'
+        run: |
+          CONTRIBUTOR_TEXT=$(cat contributors.txt)
+          VERSION="${{ steps.release_info.outputs.tag_name }}"
+          VERSION=${VERSION#v}
+          
+          cp CHANGELOG.md CHANGELOG.md.bak
+          
+          awk -v version="$VERSION" '
+          BEGIN { 
+            in_version_section = 0
+            added_contributors = 0
+          }
+          
+          /^## / {
+            if ($0 ~ version && added_contributors == 0) {
+              print $0
+              in_version_section = 1
+              next
+            } else {
+              if (in_version_section && added_contributors == 0) {
+                print ""
+                while ((getline line < "contributors.txt") > 0) {
+                  print line
+                }
+                close("contributors.txt")
+                added_contributors = 1
+              }
+              in_version_section = 0
+              print $0
+              next
+            }
+          }
+          
+          {
+            print $0
+          }
+          
+          END {
+            if (in_version_section && added_contributors == 0) {
+              print ""
+              while ((getline line < "contributors.txt") > 0) {
+                print line
+              }
+              close("contributors.txt")
+            }
+          }
+          ' CHANGELOG.md > CHANGELOG.md.new
+          
+          mv CHANGELOG.md.new CHANGELOG.md
+
+      - name: Create pull request with contributor updates
+        if: steps.contributors.outputs.has_contributors == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Add contributors to CHANGELOG for release ${{ steps.release_info.outputs.tag_name }}"
+          title: "Add contributors to CHANGELOG for release ${{ steps.release_info.outputs.tag_name }}"
+          body: |
+            This PR automatically adds contributor acknowledgments to the CHANGELOG for release ${{ steps.release_info.outputs.tag_name }}.
+            
+            The contributors section has been added to recognize community members who contributed to this release.
+          branch: auto-contributors-${{ steps.release_info.outputs.tag_name }}
+          delete-branch: true
+
+      - name: Clean up temporary files
+        if: always()
+        run: |
+          rm -f contributors.txt
+          rm -f CHANGELOG.md.bak

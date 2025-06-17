@@ -281,6 +281,16 @@ Packages published to the dev feed will use:
 - `@dev` for the latest CI build of main
 - `@pre` for any arbitrary pipeline run or feature branch build
 
+### Contributor Recognition
+
+When a GitHub release is published, an automated workflow will:
+1. Identify all contributors who made commits since the previous release
+2. Filter out automated bot accounts and system emails
+3. Add a "Contributors" section to the CHANGELOG.md for that release
+4. Create a pull request with the contributor acknowledgments
+
+This ensures community contributors are properly recognized for their contributions to each release.
+
 ### PR Validation
 
 To run live tests for a PR, inspect the PR code for any suspicious changes, then add the comment `/azp run azure - mcp` to the pull request.  This will queue a PR triggered run which will build, run unit tests, deploy test resources and run live tests.
