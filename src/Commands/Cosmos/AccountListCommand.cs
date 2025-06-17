@@ -41,8 +41,9 @@ public sealed class AccountListCommand(ILogger<AccountListCommand> logger) : Sub
                 options.Tenant,
                 options.RetryPolicy);
 
-            context.Response.Results = ResponseResult.Create(
-                new AccountListCommandResult(accounts ?? []),
+            context.Response.Results = CreateListResult(
+                accounts,
+                acc => new AccountListCommandResult(acc),
                 CosmosJsonContext.Default.AccountListCommandResult);
         }
         catch (Exception ex)

@@ -44,8 +44,9 @@ public sealed class TableListCommand(ILogger<TableListCommand> logger) : BaseSto
                 options.Tenant,
                 options.RetryPolicy);
 
-            context.Response.Results = ResponseResult.Create(
-                new TableListCommandResult(tables ?? []), 
+            context.Response.Results = CreateListResult(
+                tables,
+                tableList => new TableListCommandResult(tableList),
                 StorageJsonContext.Default.TableListCommandResult);
 
             // Only show warning if we actually had to fall back to a different auth method

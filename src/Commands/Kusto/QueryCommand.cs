@@ -75,8 +75,9 @@ public sealed class QueryCommand(ILogger<QueryCommand> logger) : BaseDatabaseCom
                     options.RetryPolicy);
             }
 
-            context.Response.Results = ResponseResult.Create(
-                new QueryCommandResult(results ?? []), 
+            context.Response.Results = CreateListResult(
+                results,
+                queryResults => new QueryCommandResult(queryResults),
                 KustoJsonContext.Default.QueryCommandResult);
         }
         catch (Exception ex)
