@@ -44,6 +44,7 @@ jobs:
           echo "Current tag: $CURRENT_TAG"
           echo "Previous tag: $PREVIOUS_TAG"
           
+          # Extract contributors with their emails
           CONTRIBUTORS=$(git log --format='%an <%ae>' ${PREVIOUS_TAG}..${CURRENT_TAG} | sort -u | while IFS= read -r line; do
             if [ -n "$line" ]; then
               EMAIL=$(echo "$line" | sed 's/.*<\(.*\)>.*/\1/')
@@ -60,17 +61,79 @@ jobs:
           CONTRIBUTORS=$(echo "$CONTRIBUTORS" | grep -v '^$' | sort -u)
           
           if [ -n "$CONTRIBUTORS" ]; then
-            echo "### Contributors" > contributors.txt
-            echo "" >> contributors.txt
-            echo "Thank you to the following contributors for their work on this release:" >> contributors.txt
-            echo "" >> contributors.txt
+            # Extract GitHub usernames from emails and git log
+            USERNAMES=""
+            AVATAR_HTML=""
+            
             while IFS= read -r contributor; do
               if [ -n "$contributor" ]; then
-                NAME=$(echo "$contributor" | sed 's/ <.*//')
-                echo "- $NAME" >> contributors.txt
+                EMAIL=$(echo "$contributor" | sed 's/.*<\(.*\)>.*/\1/')
+                USERNAME=""
+                
+                # Try to extract username from GitHub noreply emails
+                if [[ "$EMAIL" =~ ^[0-9]+\+(.+)@users\.noreply\.github\.com$ ]]; then
+                  USERNAME="${BASH_REMATCH[1]}"
+                elif [[ "$EMAIL" =~ ^(.+)@users\.noreply\.github\.com$ ]]; then
+                  USERNAME="${BASH_REMATCH[1]}"
+                else
+                  # Try to get username from git config or commit author
+                  COMMIT_HASH=$(git log --format='%H' --author="$EMAIL" ${PREVIOUS_TAG}..${CURRENT_TAG} | head -n1)
+                  if [ -n "$COMMIT_HASH" ]; then
+                    # Try to extract from commit message or other git metadata
+                    USERNAME=$(git show --format='%an' --no-patch $COMMIT_HASH | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
+                  fi
+                fi
+                
+                # If we still don't have a username, try using the name part before @ in email
+                if [ -z "$USERNAME" ]; then
+                  USERNAME=$(echo "$EMAIL" | cut -d'@' -f1 | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]//g')
+                fi
+                
+                # Only add if username looks valid (not empty and reasonable length)
+                if [ -n "$USERNAME" ] && [ ${#USERNAME} -gt 1 ] && [ ${#USERNAME} -lt 40 ]; then
+                  if [ -z "$USERNAMES" ]; then
+                    USERNAMES="$USERNAME"
+                  else
+                    USERNAMES="$USERNAMES,$USERNAME"
+                  fi
+                  
+                  # Add avatar HTML
+                  AVATAR_HTML="$AVATAR_HTML<img src=\"https://github.com/$USERNAME.png?size=50\" width=\"50\" height=\"50\" style=\"border-radius: 50%; margin-right: 8px; vertical-align: middle;\" alt=\"$USERNAME\">"
+                fi
               fi
             done <<< "$CONTRIBUTORS"
-            echo "has_contributors=true" >> $GITHUB_OUTPUT
+            
+            # Remove duplicates from usernames
+            USERNAMES=$(echo "$USERNAMES" | tr ',' '\n' | sort -u | tr '\n' ',' | sed 's/,$//')
+            
+            if [ -n "$USERNAMES" ]; then
+              # Count contributors
+              CONTRIBUTOR_COUNT=$(echo "$USERNAMES" | tr ',' '\n' | wc -l)
+              
+              # Format the contributor text
+              echo "### Contributors" > contributors.txt
+              echo "" >> contributors.txt
+              echo "$AVATAR_HTML" >> contributors.txt
+              echo "" >> contributors.txt
+              
+              # Format usernames list
+              if [ "$CONTRIBUTOR_COUNT" -eq 1 ]; then
+                echo "$USERNAMES" >> contributors.txt
+              elif [ "$CONTRIBUTOR_COUNT" -eq 2 ]; then
+                FIRST=$(echo "$USERNAMES" | cut -d',' -f1)
+                SECOND=$(echo "$USERNAMES" | cut -d',' -f2)
+                echo "$FIRST and $SECOND" >> contributors.txt
+              else
+                FIRST=$(echo "$USERNAMES" | cut -d',' -f1)
+                SECOND=$(echo "$USERNAMES" | cut -d',' -f2)
+                REST=$((CONTRIBUTOR_COUNT - 2))
+                echo "$FIRST, $SECOND, and $REST other contributors" >> contributors.txt
+              fi
+              
+              echo "has_contributors=true" >> $GITHUB_OUTPUT
+            else
+              echo "has_contributors=false" >> $GITHUB_OUTPUT
+            fi
           else
             echo "has_contributors=false" >> $GITHUB_OUTPUT
           fi
