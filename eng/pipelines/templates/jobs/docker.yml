@@ -4,7 +4,8 @@ parameters:
   default: false
 
 jobs:
-- job: Build image
+- job: BuildContainerImage
+  displayName: 'Build image'
   condition: and(succeededOrFailed(), ne(variables['Skip.Docker'], 'true'))
   dependsOn: []
   steps:
