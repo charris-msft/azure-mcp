@@ -1,0 +1,21 @@
+parameters:
+- name: PublishContainer
+  type: boolean
+  default: false
+
+jobs:
+- job: Build image
+  condition: and(succeededOrFailed(), ne(variables['Skip.Docker'], 'true'))
+  dependsOn: []
+  steps:
+  - checkout: self
+    fetchDepth: 0
+
+  - task: 1ES.BuildContainerImage@1
+    inputs:
+      dockerfile: $(Build.SourcesDirectory)/Dockerfile
+      context: $(Build.SourcesDirectory)
+      image: image:tag
+      enableNetwork: true
+      useBuildKit: true
+      buildArguments: --platform linux/amd64,linux/arm64
