@@ -1,23 +1,27 @@
 # Use the official .NET SDK image as the build image
 # Verify the SDK and runtime versions match the ones in global.json
-FROM mcr.microsoft.com/dotnet/sdk:9.0.300-bookworm-slim AS build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0.300-bookworm-slim AS build
 WORKDIR /src
+
+# Declare build arguments for target platform
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
 
 COPY . .
 
 # Publish the application
 FROM build AS publish
 
-# Install PowerShell
-RUN apt-get update && \
-    apt-get install -y wget apt-transport-https software-properties-common && \
-    wget -q "https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb" && \
-    dpkg -i packages-microsoft-prod.deb && \
-    apt-get update && \
-    apt-get install -y powershell && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN pwsh "eng/scripts/Build-Module.ps1" -OutputPath /app/publish -OperatingSystem Linux -Architecture x64
+# Map Docker platform to .NET RID (Runtime Identifier)
+RUN case ${TARGETPLATFORM} in \
+        "linux/amd64")  DOTNET_RID=linux-x64  ;; \
+        "linux/arm64")  DOTNET_RID=linux-arm64  ;; \
+        "linux/arm/v7") DOTNET_RID=linux-arm  ;; \
+        *) echo "Unsupported platform: ${TARGETPLATFORM}" && exit 1 ;; \
+    esac && \
+    dotnet publish src/AzureMcp.csproj --runtime "${DOTNET_RID}" -c Release --output "/app/publish" --self-contained
 
 # Build the runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:9.0.5-bookworm-slim AS runtime
@@ -34,6 +38,6 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the published application
-COPY --from=publish "/app/publish/linux-x64/dist" .
+COPY --from=publish "/app/publish" .
 
 ENTRYPOINT ["dotnet", "azmcp.dll", "server", "start"]
