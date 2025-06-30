@@ -1,7 +1,7 @@
 targetScope = 'resourceGroup'
 
 @minLength(5)
-@maxLength(24)
+@maxLength(20)
 @description('The base resource name.')
 param baseName string = resourceGroup().name
 
@@ -113,6 +113,16 @@ module azureIsv 'services/azureIsv.bicep' = if ((empty(areas) || contains(areas,
 module authorization 'services/authorization.bicep' = if (empty(areas) || contains(areas, 'Authorization')) {
   name: '${deploymentName}-authorization'
   params: {
+    testApplicationOid: testApplicationOid
+  }
+}
+
+module aiSearch 'services/aiSearch.bicep' = if (empty(areas) || contains(areas, 'Search')) {
+  name: '${deploymentName}-aiSearch'
+  params: {
+    baseName: baseName
+    location: location
+    tenantId: tenantId
     testApplicationOid: testApplicationOid
   }
 }
