@@ -477,59 +477,7 @@ These packages have stable GA releases and should be prioritized for implementat
 
 These packages are in preview/beta but have been updated since 2024, indicating active development:
 
-### Playwright
-- **Package**: `Azure.Developer.Playwright`
-- **Service**: Load Testing
-- **Preview Version**: 1.0.0-beta.1
-- **First Preview Date**: 07/01/2025
 
-### Playwright NUnit
-- **Package**: `Azure.Developer.Playwright.NUnit`
-- **Service**: Load Testing
-- **Preview Version**: 1.0.0-beta.1
-- **First Preview Date**: 07/01/2025
-
-### unknown
-- **Package**: `Azure.Analytics.OnlineExperimentation`
-- **Service**: unknown
-- **Preview Version**: 1.0.0-beta.1
-- **First Preview Date**: 06/11/2025
-
-### unknown
-- **Package**: `Azure.Projects`
-- **Service**: unknown
-- **Preview Version**: 1.0.0-beta.1
-- **First Preview Date**: 04/07/2025
-
-### unknown
-- **Package**: `Azure.Projects.AI`
-- **Service**: unknown
-- **Preview Version**: 1.0.0-beta.1
-- **First Preview Date**: 04/07/2025
-
-### unknown
-- **Package**: `Azure.Projects.Provisioning`
-- **Service**: unknown
-- **Preview Version**: 1.0.0-beta.1
-- **First Preview Date**: 04/07/2025
-
-### unknown
-- **Package**: `Azure.Projects.Web`
-- **Service**: unknown
-- **Preview Version**: 1.0.0-beta.1
-- **First Preview Date**: 04/07/2025
-
-### Conversations Authoring
-- **Package**: `Azure.AI.Language.Conversations.Authoring`
-- **Service**: Cognitive Services
-- **Preview Version**: 1.0.0-beta.1
-- **First Preview Date**: 03/06/2025
-
-### Text Authoring
-- **Package**: `Azure.AI.Language.Text.Authoring`
-- **Service**: Cognitive Services
-- **Preview Version**: 1.0.0-beta.1
-- **First Preview Date**: 03/06/2025
 
 ### Microsoft Playwright Testing
 - **Package**: `Azure.Developer.MicrosoftPlaywrightTesting.TestLogger`
@@ -567,11 +515,7 @@ These packages are in preview/beta but have been updated since 2024, indicating 
 - **Preview Version**: 1.0.0-beta.2
 - **First Preview Date**: 05/27/2024
 
-### Programmable Connectivity
-- **Package**: `Azure.Communication.ProgrammableConnectivity`
-- **Service**: Communication
-- **Preview Version**: 1.0.0-beta.1
-- **First Preview Date**: 05/12/2024
+
 
 ### Code Transparency
 - **Package**: `Azure.Security.CodeTransparency`
@@ -585,11 +529,7 @@ These packages are in preview/beta but have been updated since 2024, indicating 
 - **Preview Version**: 1.0.0-beta.2
 - **First Preview Date**: 03/12/2024
 
-### Defender EASM
-- **Package**: `Azure.Analytics.Defender.Easm`
-- **Service**: Defender EASM
-- **Preview Version**: 1.0.0-beta.1
-- **First Preview Date**: 03/04/2024
+
 
 ### OpenTelemetry LiveMetrics
 - **Package**: `Azure.Monitor.OpenTelemetry.LiveMetrics`
@@ -606,8 +546,8 @@ These packages are in preview/beta but have been updated since 2024, indicating 
 ## Summary
 
 - **GA Packages**: 68 packages ready for implementation
-- **Beta Packages (2024+)**: 21 packages for future consideration
-- **Total Potential Tools**: 89 packages
+- **Beta Packages (2024+)**: 10 packages for future consideration
+- **Total Potential Tools**: 78 packages
 
 ## Notes
 
