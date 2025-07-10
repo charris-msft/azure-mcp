@@ -220,7 +220,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Upload directory <local-directory> to file share <share-name> with optimal performance"
 - "Download entire file share <share-name> to local directory <local-path>"
 
-### AI Core Tools (New Namespace: `ai`) - 16 tools ⚠️
+### AI Core Tools (New Namespace: `ai`) - 14 tools ⚠️
 
 > **Note**: The `ai` namespace does not exist yet in the current Azure MCP server implementation.
 
@@ -258,10 +258,14 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Find the key phrases in this article: <article-text>"
 - "Detect the language of this text: <foreign-text>"
 
+### AI Vision & Document Tools (New Namespace: `ai-vision`) - 10 tools ⚠️
+
+> **Note**: The `ai-vision` namespace does not exist yet in the current Azure MCP server implementation.
+
 - [ ] #### Azure.AI.DocumentIntelligence
-- `azmcp-ai-documentintelligence-analyze` - Analyze documents and extract structured data including text, tables, key-value pairs, and custom fields. This tool processes various document types (PDFs, images, Office docs) using pre-built or custom models to extract structured information. Returns document analysis results as JSON. Requires resource-name, document-url, and optional model-id.
-- `azmcp-ai-documentintelligence-models-list` - List all available document analysis models including pre-built and custom trained models. This tool retrieves model information including supported document types, field schemas, and model capabilities. Returns model details as JSON array. Requires resource-name.
-- `azmcp-ai-documentintelligence-layout-analyze` - Extract layout information from documents including text regions, tables, selection marks, and reading order. This tool analyzes document structure and formatting without applying specific business logic, useful for general document processing. Returns layout analysis as JSON. Requires resource-name and document-url.
+- `azmcp-ai-vision-documentintelligence-analyze` - Analyze documents and extract structured data including text, tables, key-value pairs, and custom fields. This tool processes various document types (PDFs, images, Office docs) using pre-built or custom models to extract structured information. Returns document analysis results as JSON. Requires resource-name, document-url, and optional model-id.
+- `azmcp-ai-vision-documentintelligence-models-list` - List all available document analysis models including pre-built and custom trained models. This tool retrieves model information including supported document types, field schemas, and model capabilities. Returns model details as JSON array. Requires resource-name.
+- `azmcp-ai-vision-documentintelligence-layout-analyze` - Extract layout information from documents including text regions, tables, selection marks, and reading order. This tool analyzes document structure and formatting without applying specific business logic, useful for general document processing. Returns layout analysis as JSON. Requires resource-name and document-url.
 
 **Suggested Prompts:**
 - "Extract all text and structure from this PDF document: <document-url>"
@@ -269,9 +273,9 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Get the layout analysis of this scanned document including tables and forms"
 
 - [ ] #### Azure.AI.Translation.Text
-- `azmcp-ai-translation-text-translate` - Translate text content between supported languages with quality optimization. This tool performs high-quality text translation using neural machine translation models with support for multiple target languages and custom dictionaries. Returns translated text as JSON. Requires resource-name, source-text, target-language.
-- `azmcp-ai-translation-text-languages-list` - List all supported languages for text translation with language codes and names. This tool retrieves available source and target languages including regional variants and script options for translation services. Returns language information as JSON array. Requires resource-name.
-- `azmcp-ai-translation-text-detect` - Detect the language of input text with confidence scoring and script identification. This tool identifies the source language of text content from over 100 supported languages and returns ISO language codes with confidence levels. Returns language detection results as JSON. Requires resource-name and text-content.
+- `azmcp-ai-vision-translation-text-translate` - Translate text content between supported languages with quality optimization. This tool performs high-quality text translation using neural machine translation models with support for multiple target languages and custom dictionaries. Returns translated text as JSON. Requires resource-name, source-text, target-language.
+- `azmcp-ai-vision-translation-text-languages-list` - List all supported languages for text translation with language codes and names. This tool retrieves available source and target languages including regional variants and script options for translation services. Returns language information as JSON array. Requires resource-name.
+- `azmcp-ai-vision-translation-text-detect` - Detect the language of input text with confidence scoring and script identification. This tool identifies the source language of text content from over 100 supported languages and returns ISO language codes with confidence levels. Returns language detection results as JSON. Requires resource-name and text-content.
 
 **Suggested Prompts:**
 - "Translate this text from English to Spanish: <text-to-translate>"
@@ -279,9 +283,9 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Detect the language of this text and translate it to English: <foreign-text>"
 
 - [ ] #### Azure.AI.Translation.Document
-- `azmcp-ai-translation-document-translate` - Translate entire documents while preserving formatting and structure. This tool processes complete documents (PDF, Word, PowerPoint, etc.) and returns translated versions maintaining original layout, fonts, and formatting. Returns translation operation status and output document URLs. Requires resource-name, source-document-url, target-language.
-- `azmcp-ai-translation-document-status` - Check the status and progress of document translation operations. This tool monitors ongoing translation jobs providing completion percentage, processing time estimates, and error information for batch document operations. Returns operation status as JSON. Requires resource-name and operation-id.
-- `azmcp-ai-translation-document-formats-list` - List all supported document formats for translation including file types and size limits. This tool retrieves format specifications including maximum file sizes, supported extensions, and format-specific limitations. Returns format information as JSON array. Requires resource-name.
+- `azmcp-ai-vision-translation-document-translate` - Translate entire documents while preserving formatting and structure. This tool processes complete documents (PDF, Word, PowerPoint, etc.) and returns translated versions maintaining original layout, fonts, and formatting. Returns translation operation status and output document URLs. Requires resource-name, source-document-url, target-language.
+- `azmcp-ai-vision-translation-document-status` - Check the status and progress of document translation operations. This tool monitors ongoing translation jobs providing completion percentage, processing time estimates, and error information for batch document operations. Returns operation status as JSON. Requires resource-name and operation-id.
+- `azmcp-ai-vision-translation-document-formats-list` - List all supported document formats for translation including file types and size limits. This tool retrieves format specifications including maximum file sizes, supported extensions, and format-specific limitations. Returns format information as JSON array. Requires resource-name.
 
 **Suggested Prompts:**
 - "Translate this PDF document from French to English: <document-url>"
