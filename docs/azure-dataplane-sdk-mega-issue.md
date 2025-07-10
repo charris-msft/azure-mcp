@@ -125,9 +125,9 @@ These packages are in preview/beta but have been updated since 2024, indicating 
 
 Based on the dataplane SDKs listed above, the following tools should be created following the established naming convention `azmcp-<namespace>-<service>-<operation>`. 
 
-### Storage Tools (Existing Namespace: `storage`)
+### Storage Core Tools (Existing Namespace: `storage`) - 10 tools
 
-#### Azure.Storage.Blobs.Batch
+- [ ] #### Azure.Storage.Blobs.Batch
 - `azmcp-storage-blob-batch-delete` - Delete multiple blobs in a single batch operation. This tool allows efficient deletion of many blobs at once using Azure's batch API, reducing API calls and improving performance. Requires account-name, container-name, and blob patterns or names.
 - `azmcp-storage-blob-batch-set-tier` - Set access tier for multiple blobs in a single batch operation. This tool efficiently changes the storage tier (Hot, Cool, Archive) for multiple blobs simultaneously, optimizing storage costs. Requires account-name, container-name, tier-name, and blob patterns.
 - `azmcp-storage-blob-batch-submit` - Submit a batch of blob operations for execution. This tool allows you to compose and execute multiple blob operations (delete, set tier, etc.) in a single atomic batch request. Requires account-name and a collection of batch operations.
@@ -137,7 +137,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Change the access tier to cool for multiple blobs in container <container-name>"
 - "Submit a batch operation to delete blobs matching pattern log-2023-*"
 
-#### Azure.Storage.Common
+- [ ] #### Azure.Storage.Common
 - `azmcp-storage-common-account-info` - Get common account information across storage services. This tool retrieves shared metadata and properties that apply to all storage services (blobs, files, queues, tables) within a storage account. Returns account details as JSON including creation date, replication type, and service availability.
 - `azmcp-storage-common-credentials-validate` - Validate storage account credentials and connectivity. This tool verifies that the provided credentials can successfully authenticate with Azure Storage services and tests basic connectivity. Returns validation status and any authentication errors.
 - `azmcp-storage-common-endpoints-list` - List available storage service endpoints for an account. This tool retrieves all primary and secondary endpoints for blob, file, queue, and table services within a storage account. Returns endpoint URLs as a JSON array.
@@ -147,12 +147,12 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Validate my storage account credentials are working correctly"
 - "List all available endpoints for storage account <account-name>"
 
-#### Azure.Storage.Files.DataLake
-- `azmcp-storage-files-datalake-filesystem-list` - List all filesystems in a Data Lake Storage account. This tool retrieves all filesystems (containers) available in the specified Data Lake Storage Gen2 account. Returns filesystem names, creation dates, and metadata as a JSON array. Requires account-name.
-- `azmcp-storage-files-datalake-directory-create` - Create directories and nested directory structures in Data Lake Storage. This tool allows creation of single directories or complex nested directory hierarchies within a Data Lake filesystem. Requires account-name, filesystem-name, and directory-path.
-- `azmcp-storage-files-datalake-file-upload` - Upload files to Data Lake Storage with hierarchical namespace support. This tool uploads local files or content to specific paths within a Data Lake filesystem, preserving directory structures. Requires account-name, filesystem-name, file-path, and source content.
-- `azmcp-storage-files-datalake-file-download` - Download files from Data Lake Storage to local storage or retrieve content. This tool downloads files from specific paths within a Data Lake filesystem and returns the content or saves locally. Requires account-name, filesystem-name, and file-path.
-- `azmcp-storage-files-datalake-path-list` - List all paths, directories, and files in a Data Lake Storage filesystem. This tool recursively lists all items within a specified path, including subdirectories and files with their metadata. Returns path information as JSON. Requires account-name, filesystem-name, and optional path prefix.
+- [ ] #### Azure.Storage.Files.DataLake
+- `azmcp-storage-datalake-filesystem-list` - List all filesystems in a Data Lake Storage account. This tool retrieves all filesystems (containers) available in the specified Data Lake Storage Gen2 account. Returns filesystem names, creation dates, and metadata as a JSON array. Requires account-name.
+- `azmcp-storage-datalake-directory-create` - Create directories and nested directory structures in Data Lake Storage. This tool allows creation of single directories or complex nested directory hierarchies within a Data Lake filesystem. Requires account-name, filesystem-name, and directory-path.
+- `azmcp-storage-datalake-file-upload` - Upload files to Data Lake Storage with hierarchical namespace support. This tool uploads local files or content to specific paths within a Data Lake filesystem, preserving directory structures. Requires account-name, filesystem-name, file-path, and source content.
+- `azmcp-storage-datalake-file-download` - Download files from Data Lake Storage to local storage or retrieve content. This tool downloads files from specific paths within a Data Lake filesystem and returns the content or saves locally. Requires account-name, filesystem-name, and file-path.
+- `azmcp-storage-datalake-path-list` - List all paths, directories, and files in a Data Lake Storage filesystem. This tool recursively lists all items within a specified path, including subdirectories and files with their metadata. Returns path information as JSON. Requires account-name, filesystem-name, and optional path prefix.
 
 **Suggested Prompts:**
 - "List all filesystems in my Data Lake Storage account <account-name>"
@@ -160,7 +160,9 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Create a new directory structure in Data Lake filesystem <filesystem-name>"
 - "Download all files from Data Lake path /data/logs/"
 
-#### Azure.Storage.Files.Shares
+### Storage Files Tools (New Namespace: `storage-files`) - 5 tools
+
+- [ ] #### Azure.Storage.Files.Shares
 - `azmcp-storage-files-shares-list` - List all file shares in a storage account. This tool retrieves all Azure Files shares within the specified storage account, including share metadata, quotas, and usage statistics. Returns share information as a JSON array. Requires account-name.
 - `azmcp-storage-files-shares-create` - Create a new file share with specified quota and metadata. This tool creates new Azure Files shares with configurable storage quotas and custom metadata properties. Requires account-name, share-name, and optional quota settings.
 - `azmcp-storage-files-shares-files-list` - List all files and directories within a file share. This tool recursively lists all items in a specified file share directory, including files, subdirectories, and their properties. Returns file listing as JSON. Requires account-name, share-name, and optional directory-path.
@@ -173,7 +175,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Upload local file <file-path> to file share <share-name>"
 - "Download all files from file share <share-name> directory <directory>"
 
-#### Azure.Storage.Queues
+- [ ] #### Azure.Storage.Queues
 - `azmcp-storage-queue-message-send` - Send messages to an Azure Storage queue for asynchronous processing. This tool adds messages to a specified queue with configurable time-to-live and visibility delay settings. Messages are returned with receipt handles for tracking. Requires account-name, queue-name, and message-content.
 - `azmcp-storage-queue-message-receive` - Receive and optionally delete messages from an Azure Storage queue. This tool retrieves messages from the queue front, making them invisible to other consumers for a specified duration. Returns message content and receipt handles as JSON. Requires account-name and queue-name.
 - `azmcp-storage-queue-message-peek` - Peek at queue messages without removing them from the queue. This tool allows inspection of upcoming messages without affecting their visibility or position in the queue. Returns message content and metadata as JSON without receipt handles. Requires account-name and queue-name.
@@ -185,8 +187,9 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Peek at the next 10 messages in queue <queue-name> without removing them"
 - "Show me the properties and message count for queue <queue-name>"
 
-#### Azure.Storage.DataMovement
-- `azmcp-storage-datamovement-transfer-start` - Start optimized data transfer operations between storage locations. This tool initiates large-scale data movement operations with built-in retry logic, progress tracking, and parallel transfer capabilities. Returns transfer operation ID for monitoring. Requires source-location, destination-location, and transfer-options.
+### Storage Data Movement Tools (New Namespace: `storage-datamovement`) - 7 tools
+
+- [ ] #### Azure.Storage.DataMovement
 - `azmcp-storage-datamovement-transfer-status` - Check the status and progress of active data transfer operations. This tool provides real-time status updates including bytes transferred, transfer rate, and completion percentage for ongoing operations. Returns transfer status as JSON. Requires transfer-id.
 - `azmcp-storage-datamovement-transfer-pause` - Pause an active data transfer operation to temporarily halt progress. This tool suspends ongoing transfers while preserving state for later resumption, useful for managing bandwidth or system resources. Returns pause confirmation. Requires transfer-id.
 - `azmcp-storage-datamovement-transfer-resume` - Resume a previously paused data transfer operation from its last checkpoint. This tool restarts suspended transfers from their last successful state, continuing the operation without data loss. Returns resume confirmation. Requires transfer-id.
@@ -197,7 +200,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Pause the data transfer operation <transfer-id>"
 - "Resume the paused data transfer operation <transfer-id>"
 
-#### Azure.Storage.DataMovement.Blobs
+- [ ] #### Azure.Storage.DataMovement.Blobs
 - `azmcp-storage-datamovement-blob-copy` - Copy blobs between containers or accounts using optimized data movement. This tool performs high-performance blob copying with automatic chunking, parallel transfers, and retry logic for large-scale data movement. Returns copy operation status. Requires source-blob-url, destination-blob-url.
 - `azmcp-storage-datamovement-blob-upload` - Upload large files to blob storage using optimized data movement with resumable transfers. This tool handles large file uploads with automatic chunking, parallel uploads, and checkpoint-based resumption for reliability. Returns upload operation status. Requires account-name, container-name, blob-name, and source-file-path.
 - `azmcp-storage-datamovement-blob-download` - Download large blobs from storage using optimized data movement with resumable transfers. This tool performs high-performance downloads with automatic chunking, parallel streams, and resumption capabilities for large blobs. Returns download operation status. Requires account-name, container-name, blob-name, and destination-file-path.
@@ -207,7 +210,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Upload large file <file-path> to blob storage with optimal performance"
 - "Download large blob <blob-name> from container <container-name> with resumable transfer"
 
-#### Azure.Storage.DataMovement.Files.Shares
+- [ ] #### Azure.Storage.DataMovement.Files.Shares
 - `azmcp-storage-datamovement-files-copy` - Copy files between Azure Files shares using optimized data movement with parallel transfers. This tool performs high-performance file copying across shares or storage accounts with automatic retry logic and progress tracking. Returns copy operation status. Requires source-file-url, destination-file-url.
 - `azmcp-storage-datamovement-files-upload` - Upload files and directories to Azure Files shares using optimized data movement. This tool handles large file and directory uploads with parallel transfers, automatic chunking, and resumable operation support. Returns upload operation status. Requires account-name, share-name, file-path, and source-content.
 - `azmcp-storage-datamovement-files-download` - Download files and directories from Azure Files shares using optimized data movement. This tool performs high-performance downloads with parallel streams and resumable transfers for large files and directory structures. Returns download operation status. Requires account-name, share-name, file-path, and destination-path.
@@ -217,11 +220,11 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Upload directory <local-directory> to file share <share-name> with optimal performance"
 - "Download entire file share <share-name> to local directory <local-path>"
 
-### AI Tools (New Namespace: `ai`) ⚠️
+### AI Core Tools (New Namespace: `ai`) - 16 tools ⚠️
 
 > **Note**: The `ai` namespace does not exist yet in the current Azure MCP server implementation.
 
-#### Azure.AI.OpenAI
+- [ ] #### Azure.AI.OpenAI
 - `azmcp-ai-openai-completions-create` - Generate text completions using deployed Azure OpenAI models. This tool sends prompts to Azure OpenAI completion models and returns generated text with configurable parameters like temperature and max tokens. Returns completion text as JSON. Requires resource-name, deployment-name, and prompt-text.
 - `azmcp-ai-openai-chat-completions-create` - Create interactive chat completions using Azure OpenAI chat models. This tool processes conversational inputs with message history and system instructions to generate contextual responses. Returns chat response as JSON. Requires resource-name, deployment-name, and message-array.
 - `azmcp-ai-openai-embeddings-create` - Generate vector embeddings for text using Azure OpenAI embedding models. This tool converts text into high-dimensional vector representations for similarity search and machine learning applications. Returns embedding vectors as JSON array. Requires resource-name, deployment-name, and input-text.
@@ -233,7 +236,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Generate embeddings for the text: <input-text>"
 - "List all available OpenAI models in my Azure deployment"
 
-#### Azure.AI.ContentSafety
+- [ ] #### Azure.AI.ContentSafety
 - `azmcp-ai-contentsafety-text-analyze` - Analyze text content for harmful material including hate speech, violence, and sexual content. This tool scans text for policy violations and returns severity scores across multiple safety categories with detailed classification results. Returns safety analysis as JSON. Requires resource-name and text-content.
 - `azmcp-ai-contentsafety-image-analyze` - Analyze images for harmful visual content including violence, self-harm, and inappropriate material. This tool processes images and returns safety classification scores across multiple categories with confidence levels. Returns image safety analysis as JSON. Requires resource-name and image-url or image-data.
 - `azmcp-ai-contentsafety-blocklist-manage` - Create and manage custom content blocklists for enhanced content filtering. This tool allows creation, modification, and deletion of custom term blocklists to supplement built-in content safety policies. Returns blocklist operation status. Requires resource-name, operation-type, and blocklist-terms.
@@ -243,7 +246,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Check if this image contains harmful content: <image-url>"
 - "Add term <term> to my custom content safety blocklist"
 
-#### Azure.AI.TextAnalytics
+- [ ] #### Azure.AI.TextAnalytics
 - `azmcp-ai-textanalytics-sentiment-analyze` - Analyze sentiment and emotional tone in text content with confidence scores. This tool processes text to determine positive, negative, or neutral sentiment with detailed confidence metrics and opinion mining capabilities. Returns sentiment analysis as JSON. Requires resource-name and text-content.
 - `azmcp-ai-textanalytics-entities-extract` - Extract and classify named entities from text including people, locations, organizations, and custom entities. This tool identifies and categorizes entities with confidence scores and linking to knowledge bases where applicable. Returns entity extraction results as JSON. Requires resource-name and text-content.
 - `azmcp-ai-textanalytics-keyphrases-extract` - Extract key phrases and important terms from text content for summarization and indexing. This tool identifies the most relevant phrases and concepts within text for content analysis and search optimization. Returns key phrases as JSON array. Requires resource-name and text-content.
@@ -255,7 +258,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Find the key phrases in this article: <article-text>"
 - "Detect the language of this text: <foreign-text>"
 
-#### Azure.AI.DocumentIntelligence
+- [ ] #### Azure.AI.DocumentIntelligence
 - `azmcp-ai-documentintelligence-analyze` - Analyze documents and extract structured data including text, tables, key-value pairs, and custom fields. This tool processes various document types (PDFs, images, Office docs) using pre-built or custom models to extract structured information. Returns document analysis results as JSON. Requires resource-name, document-url, and optional model-id.
 - `azmcp-ai-documentintelligence-models-list` - List all available document analysis models including pre-built and custom trained models. This tool retrieves model information including supported document types, field schemas, and model capabilities. Returns model details as JSON array. Requires resource-name.
 - `azmcp-ai-documentintelligence-layout-analyze` - Extract layout information from documents including text regions, tables, selection marks, and reading order. This tool analyzes document structure and formatting without applying specific business logic, useful for general document processing. Returns layout analysis as JSON. Requires resource-name and document-url.
@@ -265,7 +268,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Analyze this invoice and extract key billing information"
 - "Get the layout analysis of this scanned document including tables and forms"
 
-#### Azure.AI.Translation.Text
+- [ ] #### Azure.AI.Translation.Text
 - `azmcp-ai-translation-text-translate` - Translate text content between supported languages with quality optimization. This tool performs high-quality text translation using neural machine translation models with support for multiple target languages and custom dictionaries. Returns translated text as JSON. Requires resource-name, source-text, target-language.
 - `azmcp-ai-translation-text-languages-list` - List all supported languages for text translation with language codes and names. This tool retrieves available source and target languages including regional variants and script options for translation services. Returns language information as JSON array. Requires resource-name.
 - `azmcp-ai-translation-text-detect` - Detect the language of input text with confidence scoring and script identification. This tool identifies the source language of text content from over 100 supported languages and returns ISO language codes with confidence levels. Returns language detection results as JSON. Requires resource-name and text-content.
@@ -275,7 +278,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "List all supported languages for text translation"
 - "Detect the language of this text and translate it to English: <foreign-text>"
 
-#### Azure.AI.Translation.Document
+- [ ] #### Azure.AI.Translation.Document
 - `azmcp-ai-translation-document-translate` - Translate entire documents while preserving formatting and structure. This tool processes complete documents (PDF, Word, PowerPoint, etc.) and returns translated versions maintaining original layout, fonts, and formatting. Returns translation operation status and output document URLs. Requires resource-name, source-document-url, target-language.
 - `azmcp-ai-translation-document-status` - Check the status and progress of document translation operations. This tool monitors ongoing translation jobs providing completion percentage, processing time estimates, and error information for batch document operations. Returns operation status as JSON. Requires resource-name and operation-id.
 - `azmcp-ai-translation-document-formats-list` - List all supported document formats for translation including file types and size limits. This tool retrieves format specifications including maximum file sizes, supported extensions, and format-specific limitations. Returns format information as JSON array. Requires resource-name.
@@ -285,7 +288,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Check the translation status of document batch <batch-id>"
 - "What document formats are supported for translation?"
 
-#### Azure.AI.Vision.ImageAnalysis
+- [ ] #### Azure.AI.Vision.ImageAnalysis
 - `azmcp-ai-vision-imageanalysis-analyze` - Analyze images and extract comprehensive visual features including objects, text, faces, and scene descriptions. This tool performs multi-modal image analysis returning detailed visual information, captions, and confidence scores for various detected elements. Returns analysis results as JSON. Requires resource-name and image-url or image-data.
 - `azmcp-ai-vision-imageanalysis-tags-extract` - Extract descriptive tags and labels from images with confidence scoring. This tool identifies visual elements, objects, activities, and concepts within images to generate relevant tags for categorization and search. Returns tag array as JSON. Requires resource-name and image-url or image-data.
 - `azmcp-ai-vision-imageanalysis-objects-detect` - Detect and locate objects within images with bounding box coordinates and classification. This tool identifies multiple objects in images providing precise location data and object categories with confidence scores. Returns object detection results as JSON. Requires resource-name and image-url or image-data.
@@ -301,7 +304,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 
 > **Note**: The `communication` namespace does not exist yet in the current Azure MCP server implementation.
 
-#### Azure.Communication.Email
+- [ ] #### Azure.Communication.Email
 - `azmcp-communication-email-send` - Send emails through Azure Communication Services with rich content and attachment support. This tool delivers emails with HTML/text content, file attachments, and delivery tracking capabilities using Azure's email infrastructure. Returns email operation status and message ID. Requires service-name, recipient-email, subject, and message-content.
 - `azmcp-communication-email-status-get` - Get delivery status and tracking information for sent emails. This tool monitors email delivery progress including sent, delivered, bounced, and failed status with detailed tracking information and error codes. Returns email status as JSON. Requires service-name and message-id.
 
@@ -309,7 +312,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Send an email to <recipient> with subject <subject> and message <message>"
 - "Check the delivery status of email with ID <email-id>"
 
-#### Azure.Communication.Chat
+- [ ] #### Azure.Communication.Chat
 - `azmcp-communication-chat-thread-create` - Create new chat threads for real-time messaging with multiple participants. This tool initializes chat conversations with configurable participant lists, thread topics, and message retention policies. Returns thread ID and creation details as JSON. Requires service-name, thread-topic, and participant-list.
 - `azmcp-communication-chat-message-send` - Send messages to existing chat threads with rich content and metadata support. This tool delivers text messages, file attachments, and system notifications to chat participants with delivery confirmation. Returns message ID and send status. Requires service-name, thread-id, and message-content.
 - `azmcp-communication-chat-participants-list` - List all participants in a chat thread with their roles and status information. This tool retrieves participant details including display names, user IDs, join dates, and current online status. Returns participant information as JSON array. Requires service-name and thread-id.
@@ -319,7 +322,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Send message <message> to chat thread <thread-id>"
 - "List all participants in chat thread <thread-id>"
 
-#### Azure.Communication.Sms
+- [ ] #### Azure.Communication.Sms
 - `azmcp-communication-sms-send` - Send SMS messages to mobile phone numbers through Azure Communication Services. This tool delivers text messages with delivery confirmation and supports both single and bulk SMS operations with customizable sender IDs. Returns message ID and send status. Requires service-name, recipient-phone-number, and message-content.
 - `azmcp-communication-sms-delivery-report` - Get comprehensive delivery reports and status information for sent SMS messages. This tool tracks message delivery including sent, delivered, failed, and undelivered status with detailed error codes and delivery timestamps. Returns delivery report as JSON. Requires service-name and message-id.
 
@@ -331,7 +334,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 
 > **Note**: The `messaging` namespace does not exist yet in the current Azure MCP server implementation.
 
-#### Azure.Messaging.EventGrid
+- [ ] #### Azure.Messaging.EventGrid
 - `azmcp-messaging-eventgrid-events-publish` - Publish custom events to Event Grid topics for event-driven architectures. This tool sends structured event data to Event Grid topics with schema validation and delivery guarantees for downstream subscribers. Returns publish operation status. Requires topic-name, event-data, and optional event-schema.
 - `azmcp-messaging-eventgrid-topics-list` - List all Event Grid topics in a subscription with configuration and status information. This tool retrieves topic details including endpoints, access keys, and subscription information for event publishing and management. Returns topic information as JSON array. Requires subscription-id.
 - `azmcp-messaging-eventgrid-subscriptions-list` - List event subscriptions for topics with filtering and endpoint configuration. This tool shows all active subscriptions including webhook endpoints, event filters, and delivery retry policies. Returns subscription details as JSON array. Requires topic-name or subscription-id.
@@ -341,7 +344,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "List all Event Grid topics in my subscription"
 - "Show me all event subscriptions for topic <topic-name>"
 
-#### Azure.Messaging.EventHubs
+- [ ] #### Azure.Messaging.EventHubs
 - `azmcp-messaging-eventhubs-events-send` - Send high-throughput events to Event Hubs for real-time data streaming and analytics. This tool publishes events to Event Hub partitions with configurable batching, partitioning strategies, and delivery guarantees. Returns send operation status. Requires event-hub-name, event-data, and optional partition-key.
 - `azmcp-messaging-eventhubs-events-receive` - Receive and process events from Event Hubs with configurable consumption patterns. This tool retrieves events from Event Hub partitions with checkpoint management and consumer group coordination. Returns event data as JSON array. Requires event-hub-name, consumer-group, and optional partition-id.
 - `azmcp-messaging-eventhubs-partitions-list` - List all partitions in an Event Hub with status and metadata information. This tool retrieves partition details including partition IDs, offset information, and message counts for monitoring and management. Returns partition information as JSON array. Requires event-hub-name.
@@ -355,7 +358,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 
 > **Note**: The `containers` namespace does not exist yet in the current Azure MCP server implementation.
 
-#### Azure.Containers.ContainerRegistry
+- [ ] #### Azure.Containers.ContainerRegistry
 - `azmcp-containers-registry-repositories-list` - List all repositories in a container registry with metadata and status information. This tool retrieves repository names, creation dates, last updated timestamps, and image counts for registry management and monitoring. Returns repository information as JSON array. Requires registry-name.
 - `azmcp-containers-registry-tags-list` - List all tags for a specific repository with detailed image metadata. This tool shows available image tags including creation dates, manifest digests, and image sizes for version management and deployment. Returns tag information as JSON array. Requires registry-name and repository-name.
 - `azmcp-containers-registry-manifest-get` - Get detailed manifest information for container images including layer details and configuration. This tool retrieves image manifests with layer information, architecture details, and security metadata for image analysis and deployment planning. Returns manifest data as JSON. Requires registry-name, repository-name, and tag-or-digest.
@@ -369,7 +372,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 
 > **Note**: The `security` namespace does not exist yet in the current Azure MCP server implementation.
 
-#### Azure.Security.KeyVault.Certificates (extends existing `keyvault` namespace)
+- [ ] #### Azure.Security.KeyVault.Certificates (extends existing `keyvault` namespace)
 - `azmcp-keyvault-certificate-create` - Create new certificates in Key Vault with configurable properties and policies. This tool generates certificates with specified key types, validity periods, and certificate authorities, supporting both self-signed and CA-signed certificates. Returns certificate creation status and thumbprint. Requires vault-name, certificate-name, and certificate-policy.
 - `azmcp-keyvault-certificate-import` - Import existing certificates and private keys into Key Vault securely. This tool uploads certificates from various formats (PFX, PEM) with password protection and access policy configuration. Returns import status and certificate details. Requires vault-name, certificate-name, and certificate-data.
 - `azmcp-keyvault-certificate-renew` - Renew certificates before expiration with automated or manual processes. This tool handles certificate renewal using existing policies or updated configurations, maintaining continuity for applications and services. Returns renewal status and new certificate details. Requires vault-name and certificate-name.
@@ -380,7 +383,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Import certificate from file <cert-file> into Key Vault <vault-name>"
 - "Renew the certificate <cert-name> in Key Vault <vault-name>"
 
-#### Azure.Security.KeyVault.Administration (extends existing `keyvault` namespace)
+- [ ] #### Azure.Security.KeyVault.Administration (extends existing `keyvault` namespace)
 - `azmcp-keyvault-admin-backup-create` - Create comprehensive backups of entire Key Vault contents including keys, secrets, and certificates. This tool performs full vault backups with encryption and secure storage for disaster recovery and compliance requirements. Returns backup operation status and location. Requires vault-name and backup-storage-url.
 - `azmcp-keyvault-admin-backup-restore` - Restore Key Vault from complete backups with data integrity verification. This tool restores all vault contents from encrypted backups, handling key restoration, secret recovery, and certificate import with validation. Returns restore operation status. Requires vault-name and backup-location.
 - `azmcp-keyvault-admin-settings-get` - Get comprehensive Key Vault administration settings and configuration details. This tool retrieves vault policies, access configurations, network settings, and administrative properties for management and auditing. Returns administration settings as JSON. Requires vault-name.
@@ -390,7 +393,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Restore Key Vault <vault-name> from backup <backup-location>"
 - "Show me the administration settings for Key Vault <vault-name>"
 
-#### Azure.Security.ConfidentialLedger (new `security` namespace)
+- [ ] #### Azure.Security.ConfidentialLedger (new `security` namespace)
 - `azmcp-security-confidentialledger-entries-append` - Append tamper-proof entries to the Confidential Ledger with cryptographic verification. This tool adds new entries to the immutable ledger with automatic integrity verification and consensus validation. Returns transaction ID and append confirmation. Requires ledger-name and entry-data.
 - `azmcp-security-confidentialledger-entries-get` - Retrieve entries from the Confidential Ledger with integrity verification and audit trails. This tool fetches ledger entries with cryptographic proof of authenticity and tamper detection. Returns entry data with verification status as JSON. Requires ledger-name and optional transaction-id or entry-range.
 - `azmcp-security-confidentialledger-receipt-get` - Get cryptographic transaction receipts providing proof of ledger operations. This tool retrieves receipts with digital signatures and merkle proof data for transaction verification and compliance auditing. Returns receipt data with cryptographic proofs as JSON. Requires ledger-name and transaction-id.
@@ -402,7 +405,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 
 ### Monitor Tools (Existing Namespace: `monitor`)
 
-#### Azure.Monitor.Ingestion
+- [ ] #### Azure.Monitor.Ingestion
 - `azmcp-monitor-ingestion-logs-upload` - Upload custom log data to Azure Monitor workspaces using data collection rules. This tool sends structured log data to Azure Monitor with schema validation and transformation support for custom monitoring scenarios. Returns ingestion operation status and record count. Requires workspace-id, data-collection-rule, and log-data.
 - `azmcp-monitor-ingestion-data-validate` - Validate log data format and schema compliance before ingestion to prevent errors. This tool checks log data against data collection rule schemas and Azure Monitor requirements to ensure successful ingestion. Returns validation results with error details as JSON. Requires data-collection-rule and log-data.
 - `azmcp-monitor-ingestion-status-check` - Check the status and progress of log ingestion operations with detailed monitoring. This tool tracks ingestion jobs providing success rates, error counts, and processing times for troubleshooting and monitoring. Returns ingestion status as JSON. Requires workspace-id and optional operation-id.
@@ -416,7 +419,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 
 > **Note**: The `data` namespace does not exist yet in the current Azure MCP server implementation.
 
-#### Azure.Data.SchemaRegistry
+- [ ] #### Azure.Data.SchemaRegistry
 - `azmcp-data-schemaregistry-schemas-list` - List all schemas in a Schema Registry with metadata and version information. This tool retrieves schema names, formats, compatibility settings, and version history for schema management and governance. Returns schema list as JSON array. Requires registry-name.
 - `azmcp-data-schemaregistry-schema-register` - Register new schemas in the Schema Registry with validation and compatibility checking. This tool uploads schema definitions (Avro, JSON Schema, etc.) with version management and backward compatibility validation. Returns schema registration status and ID. Requires registry-name, schema-name, and schema-definition.
 - `azmcp-data-schemaregistry-schema-get` - Get specific schema definitions and metadata from the Schema Registry. This tool retrieves complete schema information including definition, version details, and compatibility settings for development and validation. Returns schema data as JSON. Requires registry-name and schema-name or schema-id.
@@ -432,7 +435,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 
 > **Note**: The `health` namespace does not exist yet in the current Azure MCP server implementation.
 
-#### Azure.Health.Deidentification
+- [ ] #### Azure.Health.Deidentification
 - `azmcp-health-deidentification-text-process` - De-identify text containing protected health information (PHI) using HIPAA-compliant methods. This tool removes or masks sensitive health data including names, dates, addresses, and medical identifiers while preserving clinical context. Returns de-identified text with redaction summary. Requires service-name and text-content.
 - `azmcp-health-deidentification-job-submit` - Submit batch de-identification jobs for processing multiple documents containing health information. This tool handles large-scale PHI removal from document collections with configurable redaction policies and output formats. Returns job ID and submission status. Requires service-name, source-location, and job-configuration.
 - `azmcp-health-deidentification-job-status` - Check status and progress of batch de-identification jobs with detailed processing metrics. This tool monitors job execution providing completion percentage, processing times, and error reports for batch operations. Returns job status as JSON. Requires service-name and job-id.
@@ -446,7 +449,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 
 > **Note**: The `iot` namespace does not exist yet in the current Azure MCP server implementation.
 
-#### Azure.DigitalTwins.Core
+- [ ] #### Azure.DigitalTwins.Core
 - `azmcp-iot-digitaltwins-models-list` - List all digital twin models in an Azure Digital Twins instance with their definitions and metadata. This tool retrieves model schemas, relationships, and properties for digital twin development and management. Returns model information as JSON array. Requires instance-name.
 - `azmcp-iot-digitaltwins-instances-create` - Create new digital twin instances based on registered models with custom properties and relationships. This tool instantiates digital twins with initial property values and metadata for IoT device representation. Returns twin creation status and ID. Requires instance-name, model-id, and twin-properties.
 - `azmcp-iot-digitaltwins-instances-query` - Query digital twin instances using SQL-like syntax with filtering and relationship traversal. This tool searches twins based on properties, relationships, and metadata with support for complex queries and aggregations. Returns query results as JSON array. Requires instance-name and query-expression.
@@ -458,7 +461,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Query for all digital twins with property <property-name> = <value>"
 - "Create a relationship between twin <twin1-id> and twin <twin2-id>"
 
-#### Azure.IoT.DeviceUpdate
+- [ ] #### Azure.IoT.DeviceUpdate
 - `azmcp-iot-deviceupdate-updates-list` - List all available device updates and firmware versions with compatibility information. This tool retrieves update packages, version details, and device compatibility matrices for IoT device management. Returns update information as JSON array. Requires instance-name and optional device-type.
 - `azmcp-iot-deviceupdate-deployment-create` - Create device update deployments with scheduling and rollback capabilities. This tool initiates update deployments to device groups with configurable rollout strategies and failure handling policies. Returns deployment ID and configuration status. Requires instance-name, update-id, device-group, and deployment-configuration.
 - `azmcp-iot-deviceupdate-deployment-status` - Check deployment status and progress with detailed device-level reporting. This tool monitors update deployments providing success rates, failure analysis, and device-specific status information. Returns deployment status as JSON. Requires instance-name and deployment-id.
@@ -472,7 +475,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 
 > **Note**: The `mixedreality` namespace does not exist yet in the current Azure MCP server implementation.
 
-#### Azure.MixedReality.RemoteRendering
+- [ ] #### Azure.MixedReality.RemoteRendering
 - `azmcp-mixedreality-remoterendering-session-create` - Create remote rendering sessions for high-fidelity 3D content streaming. This tool initializes cloud-based rendering sessions with configurable compute resources and session duration for mixed reality applications. Returns session ID and connection details. Requires service-name, session-size, and optional session-configuration.
 - `azmcp-mixedreality-remoterendering-session-status` - Check status and health of active remote rendering sessions with performance metrics. This tool monitors session state including GPU utilization, network latency, and rendering quality for optimization and troubleshooting. Returns session status as JSON. Requires service-name and session-id.
 - `azmcp-mixedreality-remoterendering-models-convert` - Convert 3D models to optimized formats for remote rendering with quality settings. This tool processes 3D assets (FBX, glTF, etc.) for cloud rendering optimization including LOD generation and texture compression. Returns conversion job status and output location. Requires service-name, model-url, and conversion-settings.
@@ -486,7 +489,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 
 > **Note**: The `devops` namespace does not exist yet in the current Azure MCP server implementation.
 
-#### Azure.Developer.LoadTesting
+- [ ] #### Azure.Developer.LoadTesting
 - `azmcp-devops-loadtesting-tests-create` - Create comprehensive load tests with configurable user patterns and performance criteria. This tool designs load testing scenarios with virtual user simulation, ramp-up profiles, and performance thresholds for application testing. Returns test ID and configuration status. Requires service-name, test-configuration, and target-endpoints.
 - `azmcp-devops-loadtesting-tests-run` - Execute load tests with real-time monitoring and automatic scaling capabilities. This tool runs performance tests with live metrics collection, automatic result analysis, and configurable test duration and load patterns. Returns test run ID and execution status. Requires service-name and test-id.
 - `azmcp-devops-loadtesting-results-get` - Get detailed load test results with performance metrics and analysis reports. This tool retrieves comprehensive test outcomes including response times, throughput, error rates, and performance bottleneck identification. Returns test results as JSON. Requires service-name and test-run-id.
@@ -496,7 +499,7 @@ Based on the dataplane SDKs listed above, the following tools should be created 
 - "Run the load test <test-name> and show me the results"
 - "Get the detailed results for load test run <run-id>"
 
-#### Azure.Developer.DevCenter
+- [ ] #### Azure.Developer.DevCenter
 - `azmcp-devops-devcenter-environments-list` - List all available development environments and templates with configuration details. This tool retrieves environment definitions including resource specifications, available templates, and deployment options for development teams. Returns environment list as JSON array. Requires devcenter-name.
 - `azmcp-devops-devcenter-environment-create` - Create new development environments from templates with custom configurations. This tool provisions development resources including VMs, databases, and networking based on predefined templates with user customizations. Returns environment creation status and access details. Requires devcenter-name, template-id, and environment-configuration.
 - `azmcp-devops-devcenter-projects-list` - List all Dev Center projects with team assignments and resource allocations. This tool retrieves project information including team memberships, resource quotas, and access policies for project management and administration. Returns project list as JSON array. Requires devcenter-name.
