@@ -5,6 +5,7 @@ using AzureMcp.Areas.ContainerApps.Commands;
 using AzureMcp.Areas.ContainerApps.Options.ContainerApp;
 using AzureMcp.Areas.ContainerApps.Services;
 using AzureMcp.Commands;
+using AzureMcp.Models.Command;
 using AzureMcp.Services.Telemetry;
 using Microsoft.Extensions.Logging;
 

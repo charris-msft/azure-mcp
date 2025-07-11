@@ -4,6 +4,7 @@
 using AzureMcp.Areas.ContainerApps.Commands.ContainerApp;
 using AzureMcp.Areas.ContainerApps.Services;
 using AzureMcp.Commands;
+using AzureMcp.Models.Command;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

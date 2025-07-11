@@ -13,75 +13,94 @@ namespace AzureMcp.Tests.Areas.ContainerApps.LiveTests;
 [Trait("Category", "Live")]
 public class ContainerAppsCommandTests : CommandTestsBase, IClassFixture<LiveTestFixture>
 {
-    protected const string TenantNameReason = "Service principals cannot use TenantName for lookup";
-    protected LiveTestSettings Settings { get; }
-    protected StringBuilder FailureOutput { get; } = new();
-    protected ITestOutputHelper Output { get; }
-    protected IMcpClient Client { get; }
-
     public ContainerAppsCommandTests(LiveTestFixture fixture, ITestOutputHelper output)
         : base(fixture, output)
     {
-        Client = fixture.Client;
-        Settings = fixture.Settings;
-        Output = output;
     }
 
-    [Theory]
-    [InlineData(AuthMethod.Credential)]
-    public async Task Should_ListContainerApps_WithAuth(AuthMethod authMethod)
+    [Fact]
+    public async Task Should_ListContainerApps_WithSubscriptionId()
     {
-        // Arrange
+        // Arrange & Act
         var result = await CallToolAsync(
             "azmcp-containerapps-list",
             new()
             {
-                { "subscription", Settings.Subscription },
-                { "auth-method", authMethod.ToString().ToLowerInvariant() }
+                { "subscription", Settings.SubscriptionId }
             });
 
         // Assert
         Assert.Equal(200, result.GetProperty("status").GetInt32());
         
-        // Check if we have results (Container Apps might not exist in test subscription)
+        // The test infrastructure deploys a Container App, so we should have at least one
         if (result.TryGetProperty("results", out var resultsProperty) && resultsProperty.ValueKind != JsonValueKind.Null)
         {
             var containerApps = resultsProperty.GetProperty("containerApps");
             Assert.Equal(JsonValueKind.Array, containerApps.ValueKind);
 
-            // If we have Container Apps, verify their structure
+            // Verify the test Container App is present
+            var testAppFound = false;
             foreach (var app in containerApps.EnumerateArray())
             {
-                Assert.True(app.TryGetProperty("name", out _));
-                Assert.True(app.TryGetProperty("location", out _));
+                var name = app.GetProperty("name").GetString();
+                if (name?.Contains("testapp") == true)
+                {
+                    testAppFound = true;
+                    Assert.True(app.TryGetProperty("location", out _));
+                    Assert.True(app.TryGetProperty("status", out _));
+                    break;
+                }
             }
+            
+            Assert.True(testAppFound, "Test Container App should be found in results");
+        }
+    }
+
+    [Fact]
+    public async Task Should_ListContainerApps_WithSubscriptionName()
+    {
+        // Arrange & Act
+        var result = await CallToolAsync(
+            "azmcp-containerapps-list",
+            new()
+            {
+                { "subscription", Settings.SubscriptionName }
+            });
+
+        // Assert
+        Assert.Equal(200, result.GetProperty("status").GetInt32());
+    }
+
+    [Fact]
+    public async Task Should_ListContainerApps_WithResourceGroupFilter()
+    {
+        // Test with the specific resource group where our test app is deployed
+        var result = await CallToolAsync(
+            "azmcp-containerapps-list",
+            new()
+            {
+                { "subscription", Settings.SubscriptionId },
+                { "resource-group", Settings.ResourceGroupName }
+            });
+
+        // Should succeed and find our test Container App
+        Assert.Equal(200, result.GetProperty("status").GetInt32());
+        
+        if (result.TryGetProperty("results", out var resultsProperty) && resultsProperty.ValueKind != JsonValueKind.Null)
+        {
+            var containerApps = resultsProperty.GetProperty("containerApps");
+            Assert.Equal(JsonValueKind.Array, containerApps.ValueKind);
         }
     }
 
     [Theory]
     [InlineData("--invalid-param")]
-    [InlineData("--subscription invalidSub")]
+    [InlineData("")]
     public async Task Should_Return400_WithInvalidInput(string args)
     {
         var result = await CallToolAsync(
             $"azmcp-containerapps-list {args}");
 
         Assert.NotEqual(200, result.GetProperty("status").GetInt32());
-    }
-
-    [Fact]
-    public async Task Should_ListContainerApps_WithResourceGroup()
-    {
-        // Test with a resource group filter (even if it doesn't exist)
-        var result = await CallToolAsync(
-            "azmcp-containerapps-list",
-            new()
-            {
-                { "subscription", Settings.Subscription },
-                { "resource-group", "non-existent-rg" }
-            });
-
-        // Should succeed even with empty results for non-existent resource group
-        Assert.Equal(200, result.GetProperty("status").GetInt32());
     }
 }
