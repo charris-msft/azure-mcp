@@ -10,6 +10,4 @@ namespace AzureMcp.Areas.ContainerApps.Commands;
 [JsonSerializable(typeof(ContainerAppListCommand.ContainerAppListCommandResult))]
 [JsonSerializable(typeof(ContainerAppInfo))]
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
-internal sealed partial class ContainerAppsJsonContext : JsonSerializerContext
-{
-}
+internal sealed partial class ContainerAppsJsonContext : JsonSerializerContext;

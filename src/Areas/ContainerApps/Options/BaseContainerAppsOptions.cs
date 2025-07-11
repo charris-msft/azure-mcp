@@ -7,5 +7,4 @@ namespace AzureMcp.Areas.ContainerApps.Options;
 
 public class BaseContainerAppsOptions : SubscriptionOptions
 {
-    public string? ResourceGroup { get; set; }
 }

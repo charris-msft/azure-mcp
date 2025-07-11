@@ -24,10 +24,6 @@ public sealed class ContainerAppListCommand(ILogger<ContainerAppListCommand> log
         List all Container Apps in a subscription or resource group. This command retrieves all Container Apps
         available in the specified subscription, optionally filtered by resource group. Results include app names,
         locations, status, and FQDNs returned as a JSON array.
-          Required options:
-        - subscription: The Azure subscription ID or name
-          Optional options:
-        - resource-group: Filter to specific resource group
         """;
 
     public override string Title => CommandTitle;
