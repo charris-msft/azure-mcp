@@ -91,9 +91,14 @@ public class HttpClientService : IHttpClientService
             {
                 var bypasses = noProxy.Split(',', StringSplitOptions.RemoveEmptyEntries)
                                      .Select(s => s.Trim())
+                                     .Where(s => !string.IsNullOrEmpty(s))
+                                     .Where(s => !s.Contains('*')) // Filter out wildcard patterns which aren't supported
                                      .ToArray();
-                proxy.BypassList = bypasses;
-                _logger.LogDebug("Configured proxy bypass list: {BypassList}", string.Join(", ", bypasses));
+                if (bypasses.Length > 0)
+                {
+                    proxy.BypassList = bypasses;
+                    _logger.LogDebug("Configured proxy bypass list: {BypassList}", string.Join(", ", bypasses));
+                }
             }
 
             handler.Proxy = proxy;

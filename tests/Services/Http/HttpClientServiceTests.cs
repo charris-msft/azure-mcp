@@ -118,4 +118,28 @@ public class HttpClientServiceTests
             Environment.SetEnvironmentVariable("HTTP_PROXY", null);
         }
     }
+
+    [Fact]
+    public void GetHttpClient_WithNoProxyContainingWildcards_FiltersWildcards()
+    {
+        // Arrange
+        Environment.SetEnvironmentVariable("HTTP_PROXY", "http://proxy.example.com:8080");
+        Environment.SetEnvironmentVariable("NO_PROXY", "localhost,127.0.0.1,*.local,example.com");
+
+        try
+        {
+            var logger = new LoggerFactory().CreateLogger<HttpClientService>();
+            var service = new HttpClientService(logger);
+
+            // Act & Assert - Should not throw exception even with wildcard patterns
+            var httpClient = service.GetHttpClient();
+            Assert.NotNull(httpClient);
+        }
+        finally
+        {
+            // Clean up environment variables
+            Environment.SetEnvironmentVariable("HTTP_PROXY", null);
+            Environment.SetEnvironmentVariable("NO_PROXY", null);
+        }
+    }
 }
