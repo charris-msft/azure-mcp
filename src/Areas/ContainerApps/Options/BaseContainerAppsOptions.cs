@@ -5,6 +5,4 @@ using AzureMcp.Options;
 
 namespace AzureMcp.Areas.ContainerApps.Options;
 
-public class BaseContainerAppsOptions : SubscriptionOptions
-{
-}
+public class BaseContainerAppsOptions : SubscriptionOptions;
