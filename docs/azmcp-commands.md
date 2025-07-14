@@ -5,23 +5,23 @@
 
 ## Quick Start Examples
 
-Here are common server startup scenarios with the improved, self-documenting parameters:
+Here are common server startup scenarios with clear explanations:
 
 ```bash
-# Start with all Azure tools (default)
+# Start with all Azure tools (default - each operation is a separate tool)
 azmcp server start
 
-# Start with only storage and key vault tools using the descriptive parameter
-azmcp server start --service-areas storage keyvault
+# Start with only storage and key vault services
+azmcp server start --namespace storage keyvault
 
-# Start with one tool per Azure service using descriptive mode
-azmcp server start --tool-grouping per-service
+# Start with one tool per Azure service (storage tool, keyvault tool, etc.)
+azmcp server start --mode namespace
 
-# Start with a single unified Azure tool using descriptive mode
-azmcp server start --tool-grouping unified-tool
+# Start with a single unified Azure tool that handles all operations
+azmcp server start --mode single
 
-# Start in read-only mode with only monitoring tools
-azmcp server start --service-areas monitor --read-only
+# Start in read-only mode with only monitoring services for safety
+azmcp server start --namespace monitor --read-only
 ```
 
 > **Tip**: Use `azmcp server start --help` to see all available options with detailed descriptions and examples.
@@ -61,24 +61,24 @@ azmcp server start \
 
 #### Service Area Filtering
 
-Exposes only tools for specific Azure service areas. Use multiple `--service-areas` (or `--namespace`) parameters to include multiple services.
+Exposes only tools for specific Azure service areas. Use multiple `--namespace` parameters or multiple values to include multiple services.
 
 ```bash
 # Start MCP Server with only Storage tools
 azmcp server start \
-    --service-areas storage \
+    --namespace storage \
     [--transport <transport>] \
     [--port <port>] \
     [--read-only]
 
 # Start MCP Server with Storage and Key Vault tools
 azmcp server start \
-    --service-areas storage keyvault \
+    --namespace storage keyvault \
     [--transport <transport>] \
     [--port <port>] \
     [--read-only]
 
-# Alternative using the traditional parameter name
+# Alternative: Multiple --namespace parameters  
 azmcp server start \
     --namespace storage \
     --namespace keyvault \
@@ -92,14 +92,7 @@ azmcp server start \
 Groups all operations within each Azure service area into a single tool (e.g., all storage operations become one "storage" tool with internal routing). This mode is particularly useful when working with MCP clients that have tool limits - for example, VS Code only supports a maximum of 128 tools across all registered MCP servers.
 
 ```bash
-# Start MCP Server with per-service tools (new descriptive option)
-azmcp server start \
-    --tool-grouping per-service \
-    [--transport <transport>] \
-    [--port <port>] \
-    [--read-only]
-
-# Alternative using traditional parameter
+# Start MCP Server with per-service tools (one tool per service area)
 azmcp server start \
     --mode namespace \
     [--transport <transport>] \
@@ -112,9 +105,9 @@ azmcp server start \
 Exposes a single "azure" tool that handles internal routing across all Azure MCP tools. This is the most minimal approach, useful for MCP clients with very strict tool limits.
 
 ```bash
-# Start MCP Server with single unified Azure tool (new descriptive option)
+# Start MCP Server with single unified Azure tool
 azmcp server start \
-    --tool-grouping unified-tool \
+    --mode single \
     [--transport <transport>] \
     [--port <port>] \
     [--read-only]
@@ -130,23 +123,19 @@ azmcp server start \
 > **Tool Organization Options:**
 >
 > - **Individual tools** (default): Each Azure operation is a separate tool. Most granular but may hit tool limits.
-> - **Per-service tools** (`--tool-grouping per-service`): One tool per Azure service area (storage, keyvault, etc.). Good balance of organization and tool count.
-> - **Unified tool** (`--tool-grouping unified-tool`): Single Azure tool handling all operations. Lowest tool count.
+> - **Per-service tools** (`--mode namespace`): One tool per Azure service area (storage, keyvault, etc.). Good balance of organization and tool count.
+> - **Unified tool** (`--mode single`): Single Azure tool handling all operations. Lowest tool count.
 >
 > **Service Area Filtering:**
-> - Use `--service-areas` (or `--namespace`) to limit which Azure services are exposed
+> - Use `--namespace` to limit which Azure services are exposed
 > - Available service areas: `storage`, `keyvault`, `cosmos`, `monitor`, `search`, `servicebus`, etc.
 > - Run `azmcp -h` to see all available service areas
-> - Multiple service areas can be specified: `--service-areas storage keyvault cosmos`
+> - Multiple service areas can be specified: `--namespace storage keyvault cosmos`
 >
 > **Read-Only Mode:**
-> - The `--read-only` flag applies to all modes and filters the tool list to only contain tools that provide read-only operations
-> - When enabled, only operations like list, get, describe, and query are available
-> - Write operations like create, update, delete, and set are excluded
->
-> **Backward Compatibility:**
-> - Traditional parameter names (`--mode`, `--namespace`) continue to work
-> - New descriptive parameter names (`--tool-grouping`, `--service-areas`) provide better self-documentation
+> - The `--read-only` flag applies to all modes and provides safe, non-destructive access
+> - When enabled, only read operations like list, get, describe, and query are available
+> - Write operations like create, update, delete, and set are excluded for safety
 
 ### Azure AI Foundry Operations
 

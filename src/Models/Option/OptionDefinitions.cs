@@ -116,10 +116,6 @@ public static partial class OptionDefinitions
         public const string NamespaceName = "namespace";
         public const string ModeName = "mode";
         public const string ReadOnlyName = "read-only";
-        
-        // More descriptive aliases
-        public const string ServiceAreasName = "service-areas";
-        public const string ToolGroupingName = "tool-grouping";
 
         public static readonly Option<string> Transport = new(
             $"--{TransportName}",
@@ -144,20 +140,7 @@ public static partial class OptionDefinitions
             () => null,
             "Azure service areas to expose (e.g., storage, keyvault, cosmos, monitor). " +
             "Limits MCP tools to only the specified Azure services. " +
-            "Use 'azmcp -h' to see available service areas."
-        )
-        {
-            IsRequired = false,
-            Arity = ArgumentArity.OneOrMore,
-            AllowMultipleArgumentsPerToken = true
-        };
-
-        public static readonly Option<string[]?> ServiceAreas = new(
-            $"--{ServiceAreasName}",
-            () => null,
-            "Azure service areas to expose (e.g., storage, keyvault, cosmos, monitor). " +
-            "Limits MCP tools to only the specified Azure services. " +
-            "Alias for --namespace parameter."
+            "If not specified, all available Azure services will be exposed."
         )
         {
             IsRequired = false,
@@ -168,23 +151,10 @@ public static partial class OptionDefinitions
         public static readonly Option<string?> Mode = new Option<string?>(
             $"--{ModeName}",
             () => null,
-            "Tool organization mode:\n" +
-            "  • 'single' or 'unified-tool': Single Azure tool handling all operations\n" +
-            "  • 'namespace' or 'per-service': One tool per Azure service area\n" +
-            "  • Default: Individual tools for each Azure operation"
-        )
-        {
-            IsRequired = false
-        };
-
-        public static readonly Option<string?> ToolGrouping = new Option<string?>(
-            $"--{ToolGroupingName}",
-            () => null,
             "How to organize Azure MCP tools:\n" +
-            "  • 'unified-tool': Single tool for all Azure operations\n" +
-            "  • 'per-service': One tool per Azure service (storage, keyvault, etc.)\n" +
-            "  • Default: Individual tools for each specific operation\n" +
-            "Alias for --mode parameter with more descriptive values."
+            "  • 'single': Single unified Azure tool for all operations\n" +
+            "  • 'namespace': One tool per Azure service area (storage, keyvault, etc.)\n" +
+            "  • Default: Individual tools for each specific operation"
         )
         {
             IsRequired = false
@@ -193,9 +163,9 @@ public static partial class OptionDefinitions
         public static readonly Option<bool?> ReadOnly = new(
             $"--{ReadOnlyName}",
             () => null,
-            "Restrict MCP server to read-only operations. When enabled, only tools that " +
-            "perform read operations (list, get, query) are available. Write operations " +
-            "(create, update, delete) are excluded.");
+            "Enable read-only mode to restrict MCP server to safe operations. " +
+            "When enabled, only read operations (list, get, query) are available. " +
+            "Write operations (create, update, delete) are excluded for safety.");
     }
 
     public static class Authorization
