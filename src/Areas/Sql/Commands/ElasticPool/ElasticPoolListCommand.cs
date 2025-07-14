@@ -22,10 +22,6 @@ public sealed class ElasticPoolListCommand(ILogger<ElasticPoolListCommand> logge
         configured for a specific SQL server including their configuration, state, and capacity settings.
         Equivalent to 'az sql elastic-pool list'.
         Returns a list of elastic pools with their properties including SKU, state, capacity, and database settings.
-          Required options:
-        - subscription: Azure subscription ID
-        - resource-group: Resource group name containing the SQL server
-        - server: Azure SQL Server name
         """;
 
     public override string Title => CommandTitle;
