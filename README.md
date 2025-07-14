@@ -59,24 +59,29 @@ The Azure MCP Server supercharges your agents with Azure context. Here are some 
 ### ⚙️ Azure App Configuration
 - "List my App Configuration stores"
 
-### ☸️ Azure Kubernetes Service (AKS)
-- "List my AKS clusters in my subscription"
-- "Show me all my Azure Kubernetes Service clusters"
+### 📦 Azure Container Apps
+- "List all my Container Apps"
+- "Show Container Apps in a specific resource group"
 
 ### 📊 Azure Cosmos DB
 - "Show me all my Cosmos DB databases"
 - "List containers in my Cosmos DB database"
 
-### 📦 Azure Container Apps
-- "List all my Container Apps"
-- "Show Container Apps in a specific resource group"
-
 ### 🧮 Azure Data Explorer
 - "Get Azure Data Explorer databases in cluster 'mycluster'"
 - "Sample 10 rows from table 'StormEvents' in Azure Data Explorer database 'db1'"
 
+### ☸️ Azure Kubernetes Service (AKS)
+- "List my AKS clusters in my subscription"
+- "Show me all my Azure Kubernetes Service clusters"
+
 ### 📊 Azure Monitor
 - "Query my Log Analytics workspace"
+
+### 🔧 Azure Resource Management
+- "List my resource groups"
+- "List my Azure CDN endpoints"
+- "Help me build an Azure application using Node.js"
 
 ### �️ Azure SQL Database
 - "Show me details about my Azure SQL database 'mydb'"
@@ -87,11 +92,6 @@ The Azure MCP Server supercharges your agents with Azure context. Here are some 
 - "Show me the tables in my Storage account"
 - "Get details about my Storage container"
 - "Show my key-value pairs in App Config"
-
-### 🔧 Azure Resource Management
-- "List my resource groups"
-- "List my Azure CDN endpoints"
-- "Help me build an Azure application using Node.js"
 
 
 ## 🛠️ Currently Supported Tools
