@@ -164,10 +164,10 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
                     ) : null,
                     ZoneRedundant: pool.IsZoneRedundant,
                     LicenseType: pool.LicenseType?.ToString(),
-                    DatabaseDtuMin: pool.DatabaseDtuMin,
-                    DatabaseDtuMax: pool.DatabaseDtuMax,
-                    Dtu: pool.Dtu,
-                    StorageMB: pool.StorageMB
+                    DatabaseDtuMin: null, // DTU properties not available in current SDK
+                    DatabaseDtuMax: null,
+                    Dtu: null,
+                    StorageMB: null
                 ));
             }
 

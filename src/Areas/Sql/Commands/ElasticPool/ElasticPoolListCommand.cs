@@ -41,7 +41,7 @@ public sealed class ElasticPoolListCommand(ILogger<ElasticPoolListCommand> logge
                 return context.Response;
             }
 
-            AddSubscriptionInformation(context.Activity, options);
+            context.Activity?.WithSubscriptionTag(options);
 
             var sqlService = context.GetService<ISqlService>();
 
