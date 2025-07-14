@@ -116,12 +116,6 @@ The Azure MCP Server supercharges your agents with Azure context. Here are some 
 - Manage containers and items
 - Execute SQL queries against containers
 
-### 📦 Azure Container Apps (Serverless Applications)
-- List Container Apps in subscription
-- Filter Container Apps by resource group
-- View app status and configurations
-- Access Container App URLs and endpoints
-
 ### 🧮 Azure Data Explorer
 - List Azure Data Explorer clusters
 - List databases
