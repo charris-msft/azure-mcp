@@ -3,6 +3,4 @@
 
 namespace AzureMcp.Areas.Sql.Options;
 
-public class BaseElasticPoolOptions : BaseSqlOptions
-{
-}
+public class BaseElasticPoolOptions : BaseSqlOptions;
