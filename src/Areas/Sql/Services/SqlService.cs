@@ -140,7 +140,7 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
 
             var elasticPools = new List<SqlElasticPool>();
 
-            await foreach (var poolResource in sqlServerResource.Value.GetElasticPools().GetAllAsync(cancellationToken))
+            await foreach (var poolResource in sqlServerResource.Value.GetElasticPools().GetAllAsync())
             {
                 var pool = poolResource.Data;
                 elasticPools.Add(new SqlElasticPool(

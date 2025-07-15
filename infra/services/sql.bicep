@@ -40,7 +40,6 @@ resource sqlServer 'Microsoft.Sql/servers@2023-05-01-preview' = {
       capacity: 50
     }
     properties: {
-      maxSizeBytes: 4294967296 // 4 GB
       perDatabaseSettings: {
         minCapacity: 0
         maxCapacity: 5
