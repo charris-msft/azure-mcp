@@ -141,7 +141,7 @@ public class SqlCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelper 
         var serverName = Settings.ResourceBaseName;
 
         var result = await CallToolAsync(
-            "azmcp-sql-elasticpool-list",
+            "azmcp_sql_elastic-pool_list",
             new()
             {
                 { "subscription", Settings.SubscriptionId },

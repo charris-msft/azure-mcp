@@ -220,9 +220,9 @@ This file contains prompts used for end-to-end testing to ensure each tool is in
 
 | Tool Name | Test Prompt |
 |:----------|:----------|
-| azmcp-sql-elasticpool-list | List all elastic pools in SQL server <server_name> |
-| azmcp-sql-elasticpool-list | Show me the elastic pools configured for SQL server <server_name> |
-| azmcp-sql-elasticpool-list | What elastic pools are available in my SQL server <server_name>? |
+| azmcp-sql-elastic-pool-list | List all elastic pools in SQL server <server_name> |
+| azmcp-sql-elastic-pool-list | Show me the elastic pools configured for SQL server <server_name> |
+| azmcp-sql-elastic-pool-list | What elastic pools are available in my SQL server <server_name>? |
 
 ## Azure SQL Server Operations
 

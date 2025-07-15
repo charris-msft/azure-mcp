@@ -31,7 +31,7 @@ public class SqlSetup : IAreaSetup
         var server = new CommandGroup("server", "SQL server operations");
         sql.AddSubGroup(server);
 
-        var elasticPool = new CommandGroup("elasticpool", "SQL elastic pool operations");
+        var elasticPool = new CommandGroup("elastic-pool", "SQL elastic pool operations");
         sql.AddSubGroup(elasticPool);
 
         elasticPool.AddCommand("list", new ElasticPoolListCommand(loggerFactory.CreateLogger<ElasticPoolListCommand>()));
