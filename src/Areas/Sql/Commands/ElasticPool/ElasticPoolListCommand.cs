@@ -18,10 +18,12 @@ public sealed class ElasticPoolListCommand(ILogger<ElasticPoolListCommand> logge
 
     public override string Description =>
         """
-        List all elastic pools in an Azure SQL Server. This command retrieves information about all elastic pools
-        configured for a specific SQL server including their configuration, state, and capacity settings.
+        Lists all SQL elastic pools in an Azure SQL Server with their SKU, capacity, state, and database limits.
+        Use when you need to: view elastic pool inventory, check pool utilization, compare pool configurations, 
+        or find available pools for database placement.
+        Requires: subscription ID, resource group name, server name.
+        Returns: JSON array of elastic pools with complete configuration details.
         Equivalent to 'az sql elastic-pool list'.
-        Returns a list of elastic pools with their properties including SKU, state, capacity, and database settings.
         """;
 
     public override string Title => CommandTitle;
