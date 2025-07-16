@@ -25,7 +25,7 @@ public abstract class GlobalCommand<
 {
     protected readonly Option<string> _tenantOption = OptionDefinitions.Common.Tenant;
     protected readonly Option<AuthMethod> _authMethodOption = OptionDefinitions.Common.AuthMethod;
-    protected readonly Option<string> _resourceGroupOption = OptionDefinitions.Common.ResourceGroup;
+    protected readonly Option<string> _resourceGroupOption = OptionDefinitions.Common.CreateResourceGroupOption(isRequired: true);
     protected readonly Option<int> _retryMaxRetries = OptionDefinitions.RetryPolicy.MaxRetries;
     protected readonly Option<double> _retryDelayOption = OptionDefinitions.RetryPolicy.Delay;
     protected readonly Option<double> _retryMaxDelayOption = OptionDefinitions.RetryPolicy.MaxDelay;

@@ -6,6 +6,7 @@ using AzureMcp.Areas.Monitor.Options;
 using AzureMcp.Areas.Monitor.Options.Metrics;
 using AzureMcp.Commands;
 using AzureMcp.Commands.Subscription;
+using AzureMcp.Models.Option;
 using AzureMcp.Options;
 
 namespace AzureMcp.Areas.Monitor.Commands.Metrics;
@@ -20,7 +21,7 @@ public abstract class BaseMetricsCommand<
 {
     protected readonly Option<string> _resourceTypeOption = MonitorOptionDefinitions.Metrics.ResourceType;
     protected readonly Option<string> _resourceNameOption = MonitorOptionDefinitions.Metrics.ResourceName;
-    protected readonly Option<string> _optionalResourceGroupOption = MonitorOptionDefinitions.Metrics.OptionalResourceGroup;
+    protected readonly Option<string> _optionalResourceGroupOption = OptionDefinitions.Common.CreateResourceGroupOption(isRequired: false);
 
     protected override void RegisterOptions(Command command)
     {

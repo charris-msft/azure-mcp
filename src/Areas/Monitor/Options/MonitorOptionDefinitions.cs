@@ -168,13 +168,7 @@ public static class MonitorOptionDefinitions
             IsRequired = false
         };
 
-        public static readonly Option<string> OptionalResourceGroup = new(
-            $"--{OptionDefinitions.Common.ResourceGroupName}",
-            "The name of the Azure resource group. This is a logical container for Azure resources."
-        )
-        {
-            IsRequired = false
-        };
+        // Remove the static OptionalResourceGroup - commands should use OptionDefinitions.Common.CreateResourceGroupOption(false) directly
 
         public static readonly Option<string> ResourceType = new(
             $"--{ResourceTypeName}",

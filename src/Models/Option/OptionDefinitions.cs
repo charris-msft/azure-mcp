@@ -48,6 +48,23 @@ public static partial class OptionDefinitions
         {
             IsRequired = true
         };
+
+        /// <summary>
+        /// Creates a new ResourceGroup option instance with the specified required setting.
+        /// This avoids sharing static option instances between commands.
+        /// </summary>
+        /// <param name="isRequired">Whether the resource group option is required for this command</param>
+        /// <returns>A new Option instance for the resource group</returns>
+        public static Option<string> CreateResourceGroupOption(bool isRequired = true)
+        {
+            return new Option<string>(
+                $"--{ResourceGroupName}",
+                "The name of the Azure resource group. This is a logical container for Azure resources."
+            )
+            {
+                IsRequired = isRequired
+            };
+        }
     }
 
     public static class RetryPolicy

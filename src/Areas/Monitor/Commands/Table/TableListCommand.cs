@@ -73,7 +73,7 @@ public sealed class TableListCommand(ILogger<TableListCommand> logger) : BaseMon
     {
         var options = base.BindOptions(parseResult);
         options.TableType = parseResult.GetValueForOption(_tableTypeOption) ?? MonitorOptionDefinitions.TableType.GetDefaultValue();
-        options.ResourceGroup = parseResult.GetValueForOption(_resourceGroupOption) ?? OptionDefinitions.Common.ResourceGroup.GetDefaultValue();
+        options.ResourceGroup = parseResult.GetValueForOption(_resourceGroupOption);
         return options;
     }
 
