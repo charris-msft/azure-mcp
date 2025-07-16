@@ -628,6 +628,11 @@ azmcp storage blob container details --subscription <subscription> \
 azmcp storage datalake file-system list-paths --subscription <subscription> \
                                               --account-name <account-name> \
                                               --file-system-name <file-system-name>
+
+# List paths in a Data Lake directory
+azmcp storage datalake directory list-paths --subscription <subscription> \
+                                            --account-name <account-name> \
+                                            --file-system-name <file-system-name>
 ```
 
 ### Azure Subscription Management

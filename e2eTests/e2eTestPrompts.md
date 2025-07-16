@@ -252,6 +252,8 @@ This file contains prompts used for end-to-end testing to ensure each tool is in
 | azmcp-storage-table-list | Show me the tables in the storage account <account_name> |
 | azmcp-storage-datalake-file-system-list-paths | List all paths in the Data Lake file system <file_system_name> in the storage account <account_name> |
 | azmcp-storage-datalake-file-system-list-paths | Show me the paths in the Data Lake file system <file_system_name> in the storage account <account_name> |
+| azmcp-storage-datalake-directory-list-paths | List all paths in the Data Lake directory for file system <file_system_name> in the storage account <account_name> |
+| azmcp-storage-datalake-directory-list-paths | Show me the directory paths in the Data Lake file system <file_system_name> in the storage account <account_name> |
 
 ## Azure Subscription Management
 
