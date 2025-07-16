@@ -9,6 +9,8 @@
 
 - Added support for Data Lake directory operations - List paths in Data Lake directories via the command: `azmcp storage datalake directory list-paths`. [#631](https://github.com/Azure/azure-mcp/pull/631)
 
+- Added new commands for Azure Function code generation and deployment best practices (https://github.com/Azure/azure-mcp/pull/630)
+
 ### Breaking Changes
 
 ### Bugs Fixed
