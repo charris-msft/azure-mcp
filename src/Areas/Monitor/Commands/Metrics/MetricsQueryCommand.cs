@@ -40,7 +40,7 @@ public sealed class MetricsQueryCommand(ILogger<MetricsQueryCommand> logger)
         - {_metricNamespaceOption.Name}: {_metricNamespaceOption.Description}
         - {_metricNamesOption.Name}: {_metricNamesOption.Description}
         Optional options:
-        - {_resourceGroupOption.Name}: {_resourceGroupOption.Description}
+        - {_optionalResourceGroupOption.Name}: {_optionalResourceGroupOption.Description}
         - {_resourceTypeOption.Name}: {_resourceTypeOption.Description}
         - {_startTimeOption.Name}: {_startTimeOption.Description}
         - {_endTimeOption.Name}: {_endTimeOption.Description}
