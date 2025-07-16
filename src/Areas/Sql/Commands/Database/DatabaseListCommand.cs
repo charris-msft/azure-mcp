@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using AzureMcp.Areas.Sql.Commands;
 using AzureMcp.Areas.Sql.Models;
 using AzureMcp.Areas.Sql.Options.Database;
 using AzureMcp.Areas.Sql.Services;
