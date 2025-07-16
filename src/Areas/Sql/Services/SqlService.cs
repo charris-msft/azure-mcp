@@ -146,9 +146,9 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
                 firewallRules.Add(new SqlFirewallRule(
                     Name: rule.Name,
                     Id: rule.Id.ToString(),
-                    Type: rule.ResourceType.ToString(),
-                    StartIpAddress: rule.StartIPAddress,
-                    EndIpAddress: rule.EndIPAddress
+                    Type: rule.ResourceType?.ToString() ?? "Microsoft.Sql/servers/firewallRules",
+                    StartIpAddress: rule.StartIPAddress ?? string.Empty,
+                    EndIpAddress: rule.EndIPAddress ?? string.Empty
                 ));
             }
 
