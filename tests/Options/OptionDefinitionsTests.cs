@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.CommandLine;
 using AzureMcp.Models.Option;
 using Azure.Core;
 using Xunit;
@@ -201,7 +202,7 @@ public class OptionDefinitionsTests
 
         // Act
         var resourceGroupOption = OptionDefinitions.Common.CreateResourceGroupOption(isRequired: false);
-        var genericOption = OptionDefinitions.Common.CreateOption(
+        var genericOption = OptionDefinitions.Common.CreateOption<string>(
             $"--{OptionDefinitions.Common.ResourceGroupName}",
             "The name of the Azure resource group. This is a logical container for Azure resources.",
             opt => opt.IsRequired = false);

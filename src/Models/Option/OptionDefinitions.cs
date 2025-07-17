@@ -90,7 +90,7 @@ public static partial class OptionDefinitions
         /// <returns>A new Option instance for the resource group</returns>
         public static Option<string> CreateResourceGroupOption(bool isRequired = true)
         {
-            return CreateOption(
+            return CreateOption<string>(
                 $"--{ResourceGroupName}",
                 "The name of the Azure resource group. This is a logical container for Azure resources.",
                 option => option.IsRequired = isRequired
