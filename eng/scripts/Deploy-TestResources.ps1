@@ -2,7 +2,8 @@ param(
     [string]$SubscriptionId,
     [string]$ResourceGroupName,
     [string]$BaseName,
-    [string[]]$Areas,
+    [Parameter(Mandatory=$true)]
+    [string]$Area,
     [int]$DeleteAfterHours = 12,
     [switch]$Unique
 )
@@ -12,14 +13,15 @@ param(
 $context = Get-AzContext
 $account = $context.Account
 
-function New-StringHash($string) {
+function New-StringHash([string[]]$strings) {
+    $string = $strings -join ' '
     $hash = [System.Security.Cryptography.SHA1]::Create()
     $bytes = [System.Text.Encoding]::UTF8.GetBytes($string)
     $hashBytes = $hash.ComputeHash($bytes)
     return [BitConverter]::ToString($hashBytes) -replace '-', ''
 }
 
-$suffix = ($Unique ? [guid]::NewGuid().ToString() : (New-StringHash $account.Id)).ToLower().Substring(0, 8)
+$suffix = $Unique ? [guid]::NewGuid().ToString() : (New-StringHash $account.Id, $SubscriptionId).ToLower().Substring(0, 8)
 
 if(!$BaseName) {
     $BaseName = "mcp$($suffix)"
@@ -32,23 +34,38 @@ if(!$ResourceGroupName) {
 
 Push-Location $RepoRoot
 try {
-    $armParameters = @{ areas = ($Areas ?? @()) }
+    $testResourcesDirectory = "$RepoRoot/areas/$($Area.ToLower())/tests/"
+    $bicepPath = "$testResourcesDirectory/test-resources.bicep"
+    if(!(Test-Path -Path $bicepPath)) {
+        Write-Error "Test resources bicep template '$bicepPath' does not exist."
+        return
+    }
 
-    Write-Host "Deploying:`n  ResourceGroupName: `"$ResourceGroupName`"`n  BaseName: `"$BaseName`"`n  DeleteAfterHours: $DeleteAfterHours`n  ArmTemplateParameters: $(ConvertTo-Json $armParameters -Compress)"
+    $staticSuffix = $context.Subscription.Id.SubString(0, 4)
+    $staticResourceGroupName = "mcp-static-$staticSuffix"
+    $staticBaseName = "mcp$staticSuffix"
 
+    $additionalParameters = @{
+        StaticResourceGroupName = $staticResourceGroupName
+        StaticBaseName = $staticBaseName
+    }
+
+    Write-Host "Deploying:`n  ResourceGroupName: '$ResourceGroupName'`n  BaseName: '$BaseName'`n  DeleteAfterHours: $DeleteAfterHours`n  TestResourcesDirectory: '$testResourcesDirectory'`n  AdditionalParameters: $($additionalParameters | ConvertTo-Json -Compress)"
     if($SubscriptionId) {
         ./eng/common/TestResources/New-TestResources.ps1 `
             -SubscriptionId $SubscriptionId `
             -ResourceGroupName $ResourceGroupName `
             -BaseName $BaseName `
+            -TestResourcesDirectory $testResourcesDirectory `
             -DeleteAfterHours $DeleteAfterHours `
-            -AdditionalParameters $armParameters
+            -AdditionalParameters $additionalParameters
     } else {
         ./eng/common/TestResources/New-TestResources.ps1 `
             -ResourceGroupName $ResourceGroupName `
             -BaseName $BaseName `
+            -TestResourcesDirectory $testResourcesDirectory `
             -DeleteAfterHours $DeleteAfterHours `
-            -AdditionalParameters $armParameters
+            -AdditionalParameters $additionalParameters
     }
 }
 finally {
