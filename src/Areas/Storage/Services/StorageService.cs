@@ -350,13 +350,22 @@ public class StorageService(ISubscriptionService subscriptionService, ITenantSer
 
     public async Task<List<DataLakePathInfo>> ListDataLakeDirectoryPaths(
         string accountName,
-        string fileSystemName,
-        string directoryName,
+        string directoryPath,
         string subscriptionId,
         string? tenant = null,
         RetryPolicyOptions? retryPolicy = null)
     {
-        ValidateRequiredParameters(accountName, fileSystemName, directoryName, subscriptionId);
+        ValidateRequiredParameters(accountName, directoryPath, subscriptionId);
+
+        // Parse the directory path to extract file system and directory components
+        var pathParts = directoryPath.Split('/', 2, StringSplitOptions.RemoveEmptyEntries);
+        if (pathParts.Length < 1)
+        {
+            throw new ArgumentException("Directory path must include at least the file system name", nameof(directoryPath));
+        }
+
+        var fileSystemName = pathParts[0];
+        var directoryName = pathParts.Length > 1 ? pathParts[1] : "";
 
         var dataLakeServiceClient = await CreateDataLakeServiceClient(accountName, tenant, retryPolicy);
         var directoryClient = dataLakeServiceClient.GetDirectoryClient(fileSystemName, directoryName);

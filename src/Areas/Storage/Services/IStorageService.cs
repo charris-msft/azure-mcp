@@ -33,8 +33,7 @@ public interface IStorageService
         RetryPolicyOptions? retryPolicy = null);
     Task<List<DataLakePathInfo>> ListDataLakeDirectoryPaths(
         string accountName,
-        string fileSystemName,
-        string directoryName,
+        string directoryPath,
         string subscriptionId,
         string? tenant = null,
         RetryPolicyOptions? retryPolicy = null);

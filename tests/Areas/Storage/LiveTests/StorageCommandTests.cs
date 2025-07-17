@@ -236,8 +236,7 @@ namespace AzureMcp.Tests.Areas.Storage.LiveTests
                 {
                 { "subscription", Settings.SubscriptionName },
                 { "account-name", Settings.ResourceBaseName },
-                { "file-system-name", "testfilesystem" },
-                { "directory-name", "testdirectory" }
+                { "directory-name", "testfilesystem/testdirectory" }
                 });
 
             var actual = result.AssertProperty("paths");

@@ -13,20 +13,17 @@ public abstract class BaseDirectoryCommand<
     [DynamicallyAccessedMembers(TrimAnnotations.CommandAnnotations)] TOptions>
     : BaseStorageCommand<TOptions> where TOptions : BaseDirectoryOptions, new()
 {
-    protected readonly Option<string> _fileSystemOption = StorageOptionDefinitions.FileSystem;
     protected readonly Option<string> _directoryOption = StorageOptionDefinitions.Directory;
 
     protected override void RegisterOptions(Command command)
     {
         base.RegisterOptions(command);
-        command.AddOption(_fileSystemOption);
         command.AddOption(_directoryOption);
     }
 
     protected override TOptions BindOptions(ParseResult parseResult)
     {
         var options = base.BindOptions(parseResult);
-        options.FileSystem = parseResult.GetValueForOption(_fileSystemOption);
         options.Directory = parseResult.GetValueForOption(_directoryOption);
         return options;
     }

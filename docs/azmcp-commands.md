@@ -669,8 +669,7 @@ azmcp storage datalake file-system list-paths --subscription <subscription> \
 # List paths in a Data Lake directory
 azmcp storage datalake directory list-paths --subscription <subscription> \
                                            --account-name <account-name> \
-                                           --file-system-name <file-system-name> \
-                                           --directory-name <directory-name>
+                                           --directory-name <filesystem/directory>
 ```
 
 ### Azure Subscription Management

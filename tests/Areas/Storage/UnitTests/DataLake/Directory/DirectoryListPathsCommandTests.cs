@@ -27,8 +27,7 @@ public class DirectoryListPathsCommandTests
     private readonly CommandContext _context;
     private readonly Parser _parser;
     private readonly string _knownAccountName = "account123";
-    private readonly string _knownFileSystemName = "filesystem123";
-    private readonly string _knownDirectoryName = "directory123";
+    private readonly string _knownDirectoryPath = "filesystem123/directory123";
     private readonly string _knownSubscriptionId = "sub123";
 
     public DirectoryListPathsCommandTests()
@@ -54,13 +53,12 @@ public class DirectoryListPathsCommandTests
             new("subdirectory1", "directory", null, DateTimeOffset.Now, "\"etag2\"")
         };
 
-        _storageService.ListDataLakeDirectoryPaths(Arg.Is(_knownAccountName), Arg.Is(_knownFileSystemName), 
-            Arg.Is(_knownDirectoryName), Arg.Is(_knownSubscriptionId), Arg.Any<string>(), Arg.Any<RetryPolicyOptions>()).Returns(expectedPaths);
+        _storageService.ListDataLakeDirectoryPaths(Arg.Is(_knownAccountName), Arg.Is(_knownDirectoryPath), 
+            Arg.Is(_knownSubscriptionId), Arg.Any<string>(), Arg.Any<RetryPolicyOptions>()).Returns(expectedPaths);
 
         var args = _parser.Parse([
             "--account-name", _knownAccountName,
-            "--file-system-name", _knownFileSystemName,
-            "--directory-name", _knownDirectoryName,
+            "--directory-name", _knownDirectoryPath,
             "--subscription", _knownSubscriptionId
         ]);
 
@@ -84,13 +82,12 @@ public class DirectoryListPathsCommandTests
     public async Task ExecuteAsync_ReturnsEmptyArray_WhenNoPaths()
     {
         // Arrange
-        _storageService.ListDataLakeDirectoryPaths(Arg.Is(_knownAccountName), Arg.Is(_knownFileSystemName),
-            Arg.Is(_knownDirectoryName), Arg.Is(_knownSubscriptionId), Arg.Any<string>(), Arg.Any<RetryPolicyOptions>()).Returns([]);
+        _storageService.ListDataLakeDirectoryPaths(Arg.Is(_knownAccountName), Arg.Is(_knownDirectoryPath),
+            Arg.Is(_knownSubscriptionId), Arg.Any<string>(), Arg.Any<RetryPolicyOptions>()).Returns([]);
 
         var args = _parser.Parse([
             "--account-name", _knownAccountName,
-            "--file-system-name", _knownFileSystemName,
-            "--directory-name", _knownDirectoryName,
+            "--directory-name", _knownDirectoryPath,
             "--subscription", _knownSubscriptionId
         ]);
 
@@ -114,13 +111,12 @@ public class DirectoryListPathsCommandTests
         // Arrange
         var expectedError = "Test error";
 
-        _storageService.ListDataLakeDirectoryPaths(Arg.Is(_knownAccountName), Arg.Is(_knownFileSystemName),
-            Arg.Is(_knownDirectoryName), Arg.Is(_knownSubscriptionId), null, Arg.Any<RetryPolicyOptions>()).ThrowsAsync(new Exception(expectedError));
+        _storageService.ListDataLakeDirectoryPaths(Arg.Is(_knownAccountName), Arg.Is(_knownDirectoryPath),
+            Arg.Is(_knownSubscriptionId), null, Arg.Any<RetryPolicyOptions>()).ThrowsAsync(new Exception(expectedError));
 
         var args = _parser.Parse([
             "--account-name", _knownAccountName,
-            "--file-system-name", _knownFileSystemName,
-            "--directory-name", _knownDirectoryName,
+            "--directory-name", _knownDirectoryPath,
             "--subscription", _knownSubscriptionId
         ]);
 
@@ -134,17 +130,16 @@ public class DirectoryListPathsCommandTests
     }
 
     [Theory]
-    [InlineData("--file-system-name filesystem123 --directory-name directory123 --subscription sub123", false)] // Missing account
-    [InlineData("--account-name account123 --directory-name directory123 --subscription sub123", false)] // Missing file-system
-    [InlineData("--account-name account123 --file-system-name filesystem123 --subscription sub123", false)] // Missing directory
-    [InlineData("--account-name account123 --file-system-name filesystem123 --directory-name directory123", false)] // Missing subscription
-    [InlineData("--account-name account123 --file-system-name filesystem123 --directory-name directory123 --subscription sub123", true)] // Valid
+    [InlineData("--directory-name filesystem123/directory123 --subscription sub123", false)] // Missing account
+    [InlineData("--account-name account123 --subscription sub123", false)] // Missing directory
+    [InlineData("--account-name account123 --directory-name filesystem123/directory123", false)] // Missing subscription
+    [InlineData("--account-name account123 --directory-name filesystem123/directory123 --subscription sub123", true)] // Valid
     public async Task ExecuteAsync_ValidatesRequiredParameters(string args, bool shouldSucceed)
     {
         // Arrange
         if (shouldSucceed)
         {
-            _storageService.ListDataLakeDirectoryPaths(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
+            _storageService.ListDataLakeDirectoryPaths(Arg.Any<string>(), Arg.Any<string>(),
                 Arg.Any<string>(), Arg.Any<string>(), Arg.Any<RetryPolicyOptions>()).Returns([]);
         }
 
