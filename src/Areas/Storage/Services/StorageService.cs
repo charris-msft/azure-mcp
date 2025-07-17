@@ -359,8 +359,7 @@ public class StorageService(ISubscriptionService subscriptionService, ITenantSer
         ValidateRequiredParameters(accountName, fileSystemName, directoryName, subscriptionId);
 
         var dataLakeServiceClient = await CreateDataLakeServiceClient(accountName, tenant, retryPolicy);
-        var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(fileSystemName);
-        var directoryClient = fileSystemClient.GetDirectoryClient(directoryName);
+        var directoryClient = dataLakeServiceClient.GetDirectoryClient(fileSystemName, directoryName);
         var paths = new List<DataLakePathInfo>();
 
         try
