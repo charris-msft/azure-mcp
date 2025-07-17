@@ -20,9 +20,10 @@ public sealed class DirectoryListPathsCommand(ILogger<DirectoryListPathsCommand>
 
     public override string Description =>
         """
-        List all paths in a Data Lake directory. This command retrieves and displays all paths (files and directories)
-        available in the specified Data Lake file system within the storage account. Results include path names, 
-        types (file or directory), and metadata, returned as a JSON array. Requires account-name and file-system-name.
+        List all paths in a specific Data Lake directory. This command retrieves and displays all paths (files and directories)
+        available in the specified directory within a Data Lake file system. If no directory is specified, lists paths from the root.
+        Results include path names, types (file or directory), and metadata, returned as a JSON array. 
+        Requires account-name and file-system-name, with optional directory parameter.
         """;
 
     public override string Title => CommandTitle;
@@ -46,6 +47,7 @@ public sealed class DirectoryListPathsCommand(ILogger<DirectoryListPathsCommand>
                 options.Account!,
                 options.FileSystem!,
                 options.Subscription!,
+                options.Directory,
                 options.Tenant,
                 options.RetryPolicy);
 
@@ -55,7 +57,7 @@ public sealed class DirectoryListPathsCommand(ILogger<DirectoryListPathsCommand>
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error listing Data Lake directory paths. Account: {Account}, FileSystem: {FileSystem}.", options.Account, options.FileSystem);
+            _logger.LogError(ex, "Error listing Data Lake directory paths. Account: {Account}, FileSystem: {FileSystem}, Directory: {Directory}.", options.Account, options.FileSystem, options.Directory ?? "(root)");
             HandleException(context, ex);
         }
 

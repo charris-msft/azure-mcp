@@ -317,6 +317,7 @@ public class StorageService(ISubscriptionService subscriptionService, ITenantSer
         string accountName,
         string fileSystemName,
         string subscriptionId,
+        string? directoryPath = null,
         string? tenant = null,
         RetryPolicyOptions? retryPolicy = null)
     {
@@ -328,7 +329,11 @@ public class StorageService(ISubscriptionService subscriptionService, ITenantSer
 
         try
         {
-            await foreach (var pathItem in fileSystemClient.GetPathsAsync())
+            var pathsAsyncEnumerable = string.IsNullOrEmpty(directoryPath) 
+                ? fileSystemClient.GetPathsAsync()
+                : fileSystemClient.GetPathsAsync(path: directoryPath);
+
+            await foreach (var pathItem in pathsAsyncEnumerable)
             {
                 var pathInfo = new DataLakePathInfo(
                     pathItem.Name,

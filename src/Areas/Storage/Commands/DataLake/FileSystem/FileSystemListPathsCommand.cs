@@ -45,6 +45,7 @@ public sealed class FileSystemListPathsCommand(ILogger<FileSystemListPathsComman
                 options.Account!,
                 options.FileSystem!,
                 options.Subscription!,
+                null, // directoryPath - list all paths in file system
                 options.Tenant,
                 options.RetryPolicy);
 

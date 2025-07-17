@@ -54,7 +54,7 @@ public class DirectoryListPathsCommandTests
         };
 
         _storageService.ListDataLakePaths(Arg.Is(_knownAccountName), Arg.Is(_knownFileSystemName), Arg.Is(_knownSubscriptionId),
-            Arg.Any<string>(), Arg.Any<RetryPolicyOptions>()).Returns(expectedPaths);
+            Arg.Is<string?>(null), Arg.Any<string>(), Arg.Any<RetryPolicyOptions>()).Returns(expectedPaths);
 
         var args = _parser.Parse([
             "--account-name", _knownAccountName,
@@ -79,11 +79,46 @@ public class DirectoryListPathsCommandTests
     }
 
     [Fact]
+    public async Task ExecuteAsync_WithDirectoryParameter_ReturnsPathsFromDirectory()
+    {
+        // Arrange
+        var directoryPath = "subfolder";
+        var expectedPaths = new List<DataLakePathInfo>
+        {
+            new("subfolder/file1.txt", "file", 512, DateTimeOffset.Now, "\"etag1\""),
+            new("subfolder/nested", "directory", null, DateTimeOffset.Now, "\"etag2\"")
+        };
+
+        _storageService.ListDataLakePaths(Arg.Is(_knownAccountName), Arg.Is(_knownFileSystemName), Arg.Is(_knownSubscriptionId),
+            Arg.Is(directoryPath), Arg.Any<string>(), Arg.Any<RetryPolicyOptions>()).Returns(expectedPaths);
+
+        var args = _parser.Parse([
+            "--account-name", _knownAccountName,
+            "--file-system-name", _knownFileSystemName,
+            "--subscription", _knownSubscriptionId,
+            "--directory", directoryPath
+        ]);
+
+        // Act
+        var response = await _command.ExecuteAsync(_context, args);
+
+        // Assert
+        Assert.Equal(200, response.Status);
+        var resultText = response.Results!.ToString();
+        var result = JsonSerializer.Deserialize<DirectoryListPathsCommand.DirectoryListPathsCommandResult>(resultText!, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
+        Assert.NotNull(result);
+        Assert.Equal(expectedPaths.Count, result.Paths.Count);
+        Assert.Equal(expectedPaths[0].Name, result.Paths[0].Name);
+        Assert.Equal(expectedPaths[0].Type, result.Paths[0].Type);
+    }
+
+    [Fact]
     public async Task ExecuteAsync_ReturnsEmptyArray_WhenNoPaths()
     {
         // Arrange
         _storageService.ListDataLakePaths(Arg.Is(_knownAccountName), Arg.Is(_knownFileSystemName), Arg.Is(_knownSubscriptionId),
-            Arg.Any<string>(), Arg.Any<RetryPolicyOptions>()).Returns([]);
+            Arg.Is<string?>(null), Arg.Any<string>(), Arg.Any<RetryPolicyOptions>()).Returns([]);
 
         var args = _parser.Parse([
             "--account-name", _knownAccountName,
@@ -112,7 +147,7 @@ public class DirectoryListPathsCommandTests
         var expectedError = "Test error";
 
         _storageService.ListDataLakePaths(Arg.Is(_knownAccountName), Arg.Is(_knownFileSystemName), Arg.Is(_knownSubscriptionId),
-            null, Arg.Any<RetryPolicyOptions>()).ThrowsAsync(new Exception(expectedError));
+            Arg.Is<string?>(null), null, Arg.Any<RetryPolicyOptions>()).ThrowsAsync(new Exception(expectedError));
 
         var args = _parser.Parse([
             "--account-name", _knownAccountName,
@@ -140,7 +175,7 @@ public class DirectoryListPathsCommandTests
         if (shouldSucceed)
         {
             _storageService.ListDataLakePaths(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(),
-                Arg.Any<string>(), Arg.Any<RetryPolicyOptions>()).Returns([]);
+                Arg.Any<string?>(), Arg.Any<string>(), Arg.Any<RetryPolicyOptions>()).Returns([]);
         }
 
         var parseResult = _parser.Parse(args.Split(' '));

@@ -7,7 +7,7 @@
 
 - Support for Azure Data Lake Storage Gen2 operations - List paths in Data Lake file systems via the command: `azmcp storage datalake file-system list-paths`. [#608](https://github.com/Azure/azure-mcp/pull/608)
 
-- Added support for Data Lake directory operations - List paths in Data Lake directories via the command: `azmcp storage datalake directory list-paths`. [#631](https://github.com/Azure/azure-mcp/pull/631)
+- Added support for Data Lake directory operations - List paths in Data Lake directories via the command: `azmcp storage datalake directory list-paths`. The command now supports an optional `--directory` parameter to list paths within a specific directory. [#631](https://github.com/Azure/azure-mcp/pull/631)
 
 - Added new commands for Azure Function code generation and deployment best practices (https://github.com/Azure/azure-mcp/pull/630)
 

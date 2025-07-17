@@ -9,6 +9,7 @@ public static class StorageOptionDefinitions
     public const string ContainerName = "container-name";
     public const string TableName = "table-name";
     public const string FileSystemName = "file-system-name";
+    public const string DirectoryPath = "directory";
 
     public static readonly Option<string> Account = new(
         $"--{AccountName}",
@@ -40,5 +41,13 @@ public static class StorageOptionDefinitions
     )
     {
         IsRequired = true
+    };
+
+    public static readonly Option<string> Directory = new(
+        $"--{DirectoryPath}",
+        "The directory path within the Data Lake file system to list paths from. If not specified, lists paths from the root directory."
+    )
+    {
+        IsRequired = false
     };
 }

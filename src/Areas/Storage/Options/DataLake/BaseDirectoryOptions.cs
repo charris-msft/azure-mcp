@@ -9,4 +9,7 @@ public class BaseDirectoryOptions : BaseStorageOptions
 {
     [JsonPropertyName(StorageOptionDefinitions.FileSystemName)]
     public string? FileSystem { get; set; }
+
+    [JsonPropertyName(StorageOptionDefinitions.DirectoryPath)]
+    public string? Directory { get; set; }
 }

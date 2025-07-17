@@ -29,6 +29,7 @@ public interface IStorageService
         string accountName,
         string fileSystemName,
         string subscriptionId,
+        string? directoryPath = null,
         string? tenant = null,
         RetryPolicyOptions? retryPolicy = null);
 }
