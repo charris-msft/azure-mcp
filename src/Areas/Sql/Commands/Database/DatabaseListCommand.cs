@@ -21,10 +21,6 @@ public sealed class DatabaseListCommand(ILogger<DatabaseListCommand> logger)
         Gets a list of databases on an Azure SQL Server. This command retrieves all databases 
         hosted on the specified SQL server, including their configuration, status, performance tier, 
         and other properties. Returns an array of database objects with their detailed information.
-          Required options:
-        - subscription: Azure subscription ID or name
-        - resource-group: Resource group name containing the SQL server
-        - server: Azure SQL Server name
         """;
 
     public override string Title => CommandTitle;
