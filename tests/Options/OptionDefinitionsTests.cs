@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 using System.CommandLine;
-using AzureMcp.Models.Option;
 using Azure.Core;
+using AzureMcp.Models.Option;
 using Xunit;
 
 namespace AzureMcp.Tests.Options;
