@@ -347,4 +347,41 @@ public class StorageService(ISubscriptionService subscriptionService, ITenantSer
 
         return paths;
     }
+
+    public async Task<List<DataLakePathInfo>> ListDataLakeDirectoryPaths(
+        string accountName,
+        string fileSystemName,
+        string directoryName,
+        string subscriptionId,
+        string? tenant = null,
+        RetryPolicyOptions? retryPolicy = null)
+    {
+        ValidateRequiredParameters(accountName, fileSystemName, directoryName, subscriptionId);
+
+        var dataLakeServiceClient = await CreateDataLakeServiceClient(accountName, tenant, retryPolicy);
+        var fileSystemClient = dataLakeServiceClient.GetFileSystemClient(fileSystemName);
+        var directoryClient = fileSystemClient.GetDirectoryClient(directoryName);
+        var paths = new List<DataLakePathInfo>();
+
+        try
+        {
+            await foreach (var pathItem in directoryClient.GetPathsAsync())
+            {
+                var pathInfo = new DataLakePathInfo(
+                    pathItem.Name,
+                    pathItem.IsDirectory == true ? "directory" : "file",
+                    pathItem.ContentLength,
+                    pathItem.LastModified,
+                    pathItem.ETag.ToString());
+
+                paths.Add(pathInfo);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error listing Data Lake directory paths: {ex.Message}", ex);
+        }
+
+        return paths;
+    }
 }
