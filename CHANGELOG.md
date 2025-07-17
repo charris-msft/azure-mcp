@@ -1,5 +1,10 @@
 # Release History
 
+## Unreleased
+
+### Features Added
+- Support for Azure Data Lake Storage Gen2 directory operations - List paths in Data Lake directories via the command: `azmcp storage datalake directory list-paths`.
+
 ## 0.4.1 (2025-07-17)
 
 ### Features Added
