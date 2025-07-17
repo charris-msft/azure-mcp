@@ -554,6 +554,23 @@ azmcp redis cache list accesspolicy --subscription <subscription> \
 azmcp group list --subscription <subscription>
 ```
 
+### Azure Marketplace Operations
+
+```bash
+# Get details about an Azure Marketplace product
+azmcp marketplace product get --subscription <subscription> \
+                              --product-id <product-id> \
+                              [--include-stop-sold-plans <true/false>] \
+                              [--language <language-code>] \
+                              [--market <market-code>] \
+                              [--lookup-offer-in-tenant-level <true/false>] \
+                              [--plan-id <plan-id>] \
+                              [--sku-id <sku-id>] \
+                              [--include-service-instruction-templates <true/false>] \
+                              [--partner-tenant-id <partner-tenant-id>] \
+                              [--pricing-audience <pricing-audience>]
+```
+
 ### Azure Service Bus Operations
 
 ```bash
@@ -595,6 +612,20 @@ azmcp sql db show --subscription <subscription> \
                   --resource-group <resource-group> \
                   --server <server-name> \
                   --database <database-name>
+
+# Gets a list of firewall rules for a SQL server
+azmcp sql firewall-rule list --subscription <subscription> \
+                                  --resource-group <resource-group> \
+                                  --server <server-name>
+```
+
+### Azure SQL Elastic Pool Operations
+
+```bash
+# List all elastic pools in a SQL server
+azmcp sql elastic-pool list --subscription <subscription> \
+                           --resource-group <resource-group> \
+                           --server <server-name>
 ```
 
 ### Azure SQL Server Operations
