@@ -31,7 +31,7 @@ public sealed class MetricsDefinitionsCommand(ILogger<MetricsDefinitionsCommand>
         Required options:
         - {_resourceNameOption.Name}: {_resourceNameOption.Description}
         Optional options:
-        - {_optionalResourceGroupOption.Name}: {_optionalResourceGroupOption.Description}
+        - {_resourceGroupOption.Name}: {_resourceGroupOption.Description}
         - {_resourceTypeOption.Name}: {_resourceTypeOption.Description}
         - {_metricNamespaceOption.Name}: {_metricNamespaceOption.Description}
         - {_searchStringOption.Name}: {_searchStringOption.Description}
