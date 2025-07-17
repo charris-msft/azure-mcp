@@ -50,6 +50,39 @@ public static partial class OptionDefinitions
         };
 
         /// <summary>
+        /// Creates a new option instance with custom configuration.
+        /// This avoids sharing static option instances between commands which can cause state conflicts.
+        /// </summary>
+        /// <typeparam name="T">The type of the option value</typeparam>
+        /// <param name="name">The option name (including -- prefix)</param>
+        /// <param name="description">The option description</param>
+        /// <param name="configure">Optional action to configure the option instance</param>
+        /// <returns>A new Option instance with the specified configuration</returns>
+        public static Option<T> CreateOption<T>(string name, string description, Action<Option<T>>? configure = null)
+        {
+            var option = new Option<T>(name, description);
+            configure?.Invoke(option);
+            return option;
+        }
+
+        /// <summary>
+        /// Creates a new option instance with custom configuration and a default value.
+        /// This avoids sharing static option instances between commands which can cause state conflicts.
+        /// </summary>
+        /// <typeparam name="T">The type of the option value</typeparam>
+        /// <param name="name">The option name (including -- prefix)</param>
+        /// <param name="getDefaultValue">Function to get the default value</param>
+        /// <param name="description">The option description</param>
+        /// <param name="configure">Optional action to configure the option instance</param>
+        /// <returns>A new Option instance with the specified configuration</returns>
+        public static Option<T> CreateOption<T>(string name, Func<T> getDefaultValue, string description, Action<Option<T>>? configure = null)
+        {
+            var option = new Option<T>(name, getDefaultValue, description);
+            configure?.Invoke(option);
+            return option;
+        }
+
+        /// <summary>
         /// Creates a new ResourceGroup option instance with the specified required setting.
         /// This avoids sharing static option instances between commands.
         /// </summary>
@@ -57,13 +90,11 @@ public static partial class OptionDefinitions
         /// <returns>A new Option instance for the resource group</returns>
         public static Option<string> CreateResourceGroupOption(bool isRequired = true)
         {
-            return new Option<string>(
+            return CreateOption(
                 $"--{ResourceGroupName}",
-                "The name of the Azure resource group. This is a logical container for Azure resources."
-            )
-            {
-                IsRequired = isRequired
-            };
+                "The name of the Azure resource group. This is a logical container for Azure resources.",
+                option => option.IsRequired = isRequired
+            );
         }
     }
 

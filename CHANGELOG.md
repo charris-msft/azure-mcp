@@ -9,6 +9,7 @@
 ### Bugs Fixed
 
 - Fixed Resource Group option definition sharing static state between commands, which was causing test failures. Now each command can specify whether the resource group option is required without affecting other commands. [[#617](https://github.com/Azure/azure-mcp/issues/617)]
+- Added generic factory methods for creating option instances to prevent static state sharing between commands for any option type, making the solution extensible beyond just ResourceGroup options.
 
 ### Other Changes
 
