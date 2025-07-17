@@ -168,7 +168,6 @@ public static class MonitorOptionDefinitions
             IsRequired = false
         };
 
-        // Remove the static OptionalResourceGroup - commands should use OptionDefinitions.Common.CreateResourceGroupOption(false) directly
 
         public static readonly Option<string> ResourceType = new(
             $"--{ResourceTypeName}",
