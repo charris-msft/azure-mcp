@@ -5,9 +5,9 @@ using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AzureMcp.Core.Models.Command;
 using AzureMcp.Postgres.Commands.Table;
 using AzureMcp.Postgres.Services;
-using AzureMcp.Core.Models.Command;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -15,7 +15,6 @@ using Xunit;
 
 namespace AzureMcp.Postgres.UnitTests.Table;
 
-[Trait("Area", "Postgres")]
 public class GetSchemaCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

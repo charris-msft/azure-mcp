@@ -8,12 +8,12 @@ using AzureMcp.Core.Services.Azure.Tenant;
 using AzureMcp.Core.Services.Caching;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Tests;
 using Microsoft.Extensions.Caching.Memory;
 using Xunit;
 
 namespace AzureMcp.AppConfig.LiveTests;
 
-[Trait("Area", "AppConfig")]
 public class AppConfigCommandTests : CommandTestsBase,
     IClassFixture<LiveTestFixture>
 {
@@ -35,7 +35,6 @@ public class AppConfigCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_appconfig_accounts()
     {
         // act
@@ -54,7 +53,6 @@ public class AppConfigCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_appconfig_kvs()
     {
         // arrange
@@ -89,7 +87,6 @@ public class AppConfigCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_appconfig_kvs_with_key_and_label()
     {
         // arrange
@@ -120,7 +117,6 @@ public class AppConfigCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_lock_appconfig_kv_with_key_and_label()
     {
         // arrange
@@ -155,7 +151,6 @@ public class AppConfigCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_lock_appconfig_kv_with_key()
     {
         // arrange
@@ -188,7 +183,6 @@ public class AppConfigCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_unlock_appconfig_kv_with_key_and_label()
     {
         // arrange
@@ -231,7 +225,6 @@ public class AppConfigCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_unlock_appconfig_kv_with_key()
     {
         // arrange
@@ -272,7 +265,6 @@ public class AppConfigCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_show_appconfig_kv()
     {
         // arrange
@@ -301,7 +293,6 @@ public class AppConfigCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_set_and_delete_appconfig_kv()
     {
         // arrange

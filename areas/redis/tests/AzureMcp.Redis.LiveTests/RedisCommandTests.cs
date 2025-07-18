@@ -4,16 +4,15 @@
 using System.Text.Json;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Tests;
 using Xunit;
 
 namespace AzureMcp.Redis.LiveTests;
 
-[Trait("Area", "Redis")]
 public class RedisCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelper output) : CommandTestsBase(liveTestFixture, output),
     IClassFixture<LiveTestFixture>
 {
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_redis_caches_by_subscription_id()
     {
         var result = await CallToolAsync(
@@ -28,7 +27,6 @@ public class RedisCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_redis_caches_by_subscription_name()
     {
         var result = await CallToolAsync(
@@ -43,7 +41,6 @@ public class RedisCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_redis_caches_by_subscription_id_with_tenant_id()
     {
         var result = await CallToolAsync(
@@ -59,7 +56,6 @@ public class RedisCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_redis_caches_by_subscription_id_with_tenant_name()
     {
         Assert.SkipWhen(Settings.IsServicePrincipal, TenantNameReason);
@@ -77,7 +73,6 @@ public class RedisCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_redis_caches_with_retry_policy()
     {
         var result = await CallToolAsync(
@@ -94,7 +89,6 @@ public class RedisCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_redis_clusters_by_subscription_id()
     {
         var result = await CallToolAsync(
@@ -109,7 +103,6 @@ public class RedisCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_redis_clusters_by_subscription_name()
     {
         var result = await CallToolAsync(
@@ -124,7 +117,6 @@ public class RedisCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_redis_clusters_by_subscription_id_with_tenant_id()
     {
         var result = await CallToolAsync(
@@ -140,7 +132,6 @@ public class RedisCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_redis_access_policies()
     {
         var result = await CallToolAsync(
@@ -157,7 +148,6 @@ public class RedisCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_redis_access_policies_with_tenant_id()
     {
         var result = await CallToolAsync(
@@ -175,7 +165,6 @@ public class RedisCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_redis_databases()
     {
         var result = await CallToolAsync(
@@ -192,7 +181,6 @@ public class RedisCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_redis_databases_with_retry_policy()
     {
         var result = await CallToolAsync(

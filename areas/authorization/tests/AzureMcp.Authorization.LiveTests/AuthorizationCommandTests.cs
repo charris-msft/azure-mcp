@@ -4,18 +4,17 @@
 using System.Text.Json;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Tests;
 using Xunit;
 
 namespace AzureMcp.Authorization.LiveTests;
 
 
-[Trait("Area", "Authorization")]
 public class AuthorizationCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelper output)
     : CommandTestsBase(liveTestFixture, output),
     IClassFixture<LiveTestFixture>
 {
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_role_assignments()
     {
         var scope = $"/subscriptions/{Settings.SubscriptionId}/resourceGroups/{Settings.ResourceGroupName}";

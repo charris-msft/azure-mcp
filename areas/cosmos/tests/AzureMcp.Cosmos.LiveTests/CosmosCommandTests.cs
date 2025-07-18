@@ -4,11 +4,11 @@
 using System.Text.Json;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Tests;
 using Xunit;
 
 namespace AzureMcp.Cosmos.LiveTests;
 
-[Trait("Area", "Cosmos")]
 public class CosmosCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelper output)
     : CommandTestsBase(liveTestFixture, output),
     IClassFixture<LiveTestFixture>,
@@ -16,7 +16,6 @@ public class CosmosCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelp
 {
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_storage_accounts_by_subscription_id()
     {
         var result = await CallToolAsync(
@@ -33,7 +32,6 @@ public class CosmosCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_cosmos_database_containers()
     {
         var result = await CallToolAsync(
@@ -51,7 +49,6 @@ public class CosmosCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_cosmos_database_containers_by_database_name()
     {
         var result = await CallToolAsync(
@@ -69,7 +66,6 @@ public class CosmosCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_query_cosmos_database_container_items()
     {
         var result = await CallToolAsync(
@@ -88,7 +84,6 @@ public class CosmosCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_cosmos_accounts()
     {
         var result = await CallToolAsync(
@@ -104,7 +99,6 @@ public class CosmosCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_show_single_item_from_cosmos_account()
     {
         var dbResult = await CallToolAsync(
@@ -166,7 +160,6 @@ public class CosmosCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_and_query_multiple_databases_and_containers()
     {
         var dbResult = await CallToolAsync(

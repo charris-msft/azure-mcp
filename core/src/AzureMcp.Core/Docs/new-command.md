@@ -457,8 +457,6 @@ public class {Resource}{Operation}CommandTests
 Integration tests inherit from `CommandTestsBase` and use test fixtures:
 
 ```csharp
-[Trait("Area", "{Service}")]
-[Trait("Category", "Live")]
 public class {Service}CommandTests : CommandTestsBase, IClassFixture<LiveTestFixture>
 {
     protected const string TenantNameReason = "Service principals cannot use TenantName for lookup";
@@ -861,8 +859,6 @@ catch {
 Integration tests should use the deployed infrastructure:
 
 ```csharp
-[Trait("Area", "{Service}")]
-[Trait("Category", "Live")]
 public class {Service}CommandTests(LiveTestFixture liveTestFixture, ITestOutputHelper output)
     : CommandTestsBase(liveTestFixture, output), IClassFixture<LiveTestFixture>
 {

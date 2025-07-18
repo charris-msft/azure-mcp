@@ -4,16 +4,15 @@
 using System.Text.Json;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Tests;
 using Xunit;
 
 namespace AzureMcp.Grafana.LiveTests;
 
-[Trait("Area", "Grafana")]
 public class GrafanaCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelper output)
     : CommandTestsBase(liveTestFixture, output), IClassFixture<LiveTestFixture>
 {
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_grafana_workspaces_by_subscription_id()
     {
         var result = await CallToolAsync(
@@ -29,7 +28,6 @@ public class GrafanaCommandTests(LiveTestFixture liveTestFixture, ITestOutputHel
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_include_test_grafana_workspace_in_list()
     {
         var result = await CallToolAsync(

@@ -80,7 +80,7 @@ try {
         $testResourcesPath = $area -eq 'core' ? 'core/tests' : "areas/$area/tests"
         $hasTestResources = Test-Path "$RepoRoot/$testResourcesPath/test-resources.bicep"
         $areaMatrix[$area] = [ordered]@{
-            AreasToTest = $area -eq 'core' ? $coreAreas + @('core') : @($area)
+            Area = $area
             HasTestResources = $hasTestResources
             TestResourcesPath = $testResourcesPath
         }

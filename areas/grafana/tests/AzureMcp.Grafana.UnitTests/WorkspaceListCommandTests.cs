@@ -5,11 +5,11 @@ using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AzureMcp.Core.Models.Command;
+using AzureMcp.Core.Options;
 using AzureMcp.Grafana.Commands.Workspace;
 using AzureMcp.Grafana.Models.Workspace;
 using AzureMcp.Grafana.Services;
-using AzureMcp.Core.Models.Command;
-using AzureMcp.Core.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -17,7 +17,6 @@ using Xunit;
 
 namespace AzureMcp.Grafana.UnitTests;
 
-[Trait("Area", "Grafana")]
 public sealed class WorkspaceListCommandTests
 {
     private readonly IServiceProvider _serviceProvider;
@@ -36,7 +35,6 @@ public sealed class WorkspaceListCommandTests
     }
 
     [Fact]
-    [Trait("Category", "Unit")]
     public void Constructor_Should_Initialize_Command_Properly()
     {
         // Arrange & Act

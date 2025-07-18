@@ -15,7 +15,6 @@ using Xunit;
 
 namespace AzureMcp.AzureIsv.UnitTests.Datadog;
 
-[Trait("Area", "AzureIsv")]
 public class MonitoredResourcesListCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

@@ -1,21 +1,25 @@
 param(
+    [string] $TenantId,
+    [string] $TestApplicationId,
     [string] $ResourceGroupName,
     [string] $BaseName,
-    [string] $StaticResourceGroupName,
-    [string] $StaticBaseName
+    [hashtable] $DeploymentOutputs
 )
 
 $ErrorActionPreference = "Stop"
 
-. "$PSScriptRoot/../../eng/common/scripts/common.ps1"
+. "$PSScriptRoot/../../../eng/common/scripts/common.ps1"
+. "$PSScriptRoot/../../../eng/scripts/helpers/TestResourcesHelpers.ps1"
 
-$grafanaWorkspaceName = "$BaseName-grafana"
+$testSettings = New-TestSettings @PSBoundParameters -OutputPath $PSScriptRoot
+
+$grafanaWorkspaceName = $DeploymentOutputs.grafanaWorkspaceName
 
 Write-Host "Getting Grafana workspace information: $grafanaWorkspaceName" -ForegroundColor Yellow
 
 try {
     $grafanaWorkspace = Get-AzGrafana -ResourceGroupName $ResourceGroupName -Name $grafanaWorkspaceName
-    
+
     if ($grafanaWorkspace) {
         Write-Host "Grafana workspace '$grafanaWorkspaceName' is ready for testing" -ForegroundColor Green
         Write-Host "  - Workspace ID: $($grafanaWorkspace.Id)" -ForegroundColor Gray

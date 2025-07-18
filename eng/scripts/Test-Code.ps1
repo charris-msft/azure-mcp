@@ -3,9 +3,11 @@
 
 [CmdletBinding()]
 param(
+    [Parameter(Mandatory=$true)]
+    [string] $Area,
+    [ValidateSet('Live', 'Unit', 'All')]
+    [string] $TestType = 'Unit',
     [string] $TestResultsPath,
-    [string[]] $Areas,
-    [switch] $Live,
     [switch] $CoverageSummary,
     [switch] $OpenReport
 )
@@ -15,33 +17,50 @@ $ErrorActionPreference = 'Stop'
 
 $RepoRoot = $RepoRoot.Path.Replace('\', '/')
 
+$workPath = "$RepoRoot/.work/tests"
+Remove-Item -Recurse -Force $workPath -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Path $workPath -Force | Out-Null
+
 if (!$TestResultsPath) {
-    $TestResultsPath = "$RepoRoot/.work/testResults"
+    $TestResultsPath = "$workPath/testResults"
 }
 
 # Clean previous results
 Remove-Item -Recurse -Force $TestResultsPath -ErrorAction SilentlyContinue
 
-if($env:TF_BUILD) {
-    Move-Item -Path "$RepoRoot/tests/xunit.runner.ci.json" -Destination "$RepoRoot/tests/xunit.runner.json" -Force -ErrorAction Continue
-    Write-Host "Replaced xunit.runner.json with xunit.runner.ci.json"
+$root = $Area -eq 'Core' ? "$RepoRoot/core/tests" : "$RepoRoot/areas/$($Area.ToLower())/tests"
+
+$testProjects = @()
+
+if($TestType -in @('Live', 'All')) {
+    $testProjects += Get-ChildItem $root -Recurse -File -Filter "*.LiveTests.csproj"
+}
+if($TestType -in @('Unit', 'All')) {
+    $testProjects += Get-ChildItem $root -Recurse -File -Filter "*.UnitTests.csproj"
 }
 
-Write-Host "xunit.runner.json content:"
-Get-Content "$RepoRoot/tests/xunit.runner.json" | Out-Host
-
-# Run tests with coverage
-$filter = $Live ? "Category~Live" : "Category!~Live"
-
-if ($Areas) {
-    $filter = "$filter & ($($Areas | ForEach-Object { "Area=$_" } | Join-String -Separator ' | '))"
+if($testProjects.Count -eq 0) {
+    Write-Error "No test projects found in '$root' for test type '$TestType'."
+    return
 }
 
-Invoke-LoggedCommand ("dotnet test '$RepoRoot/tests/AzureMcp.Tests.csproj'" +
-  " --collect:'XPlat Code Coverage'" +
-  " --filter '$filter'" +
-  " --results-directory '$TestResultsPath'" +
-  " --logger 'trx'") -AllowedExitCodes @(0, 1)
+Push-Location $workPath
+try {
+    Write-Host "Creating temporary solution file..."
+    dotnet new sln -n "Tests" | Out-Null
+    foreach ($project in $testProjects) {
+        $projectPath = $project.FullName.Replace('\', '/')
+        dotnet sln add $projectPath
+    }
+
+    Invoke-LoggedCommand ("dotnet test" +
+    " --collect:'XPlat Code Coverage'" +
+    " --results-directory '$TestResultsPath'" +
+    " --logger 'trx'") -AllowedExitCodes @(0, 1)
+}
+finally {
+    Pop-Location
+}
 
 $testExitCode = $LastExitCode
 

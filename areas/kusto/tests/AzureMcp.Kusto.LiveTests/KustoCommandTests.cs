@@ -3,15 +3,15 @@
 
 using System.Text.Json;
 using Azure.Identity;
-using AzureMcp.Kusto.Services;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Kusto.Services;
+using AzureMcp.Tests;
 using ModelContextProtocol.Client;
 using Xunit;
 
 namespace AzureMcp.Kusto.LiveTests;
 
-[Trait("Area", "Kusto")]
 public class KustoCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelper output)
     : CommandTestsBase(liveTestFixture, output),
     IClassFixture<LiveTestFixture>, IAsyncLifetime
@@ -51,7 +51,6 @@ public class KustoCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_databases_in_cluster()
     {
         var result = await CallToolAsync(
@@ -68,7 +67,6 @@ public class KustoCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_kusto_tables()
     {
         var result = await CallToolAsync(
@@ -86,7 +84,6 @@ public class KustoCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelpe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_query_kusto()
     {
         var result = await CallToolAsync(

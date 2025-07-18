@@ -7,7 +7,6 @@ using Xunit;
 
 namespace AzureMcp.Core.UnitTests.Services.Caching;
 
-[Trait("Area", "Core")]
 public class CacheServiceTests
 {
     private readonly ICacheService _cacheService;

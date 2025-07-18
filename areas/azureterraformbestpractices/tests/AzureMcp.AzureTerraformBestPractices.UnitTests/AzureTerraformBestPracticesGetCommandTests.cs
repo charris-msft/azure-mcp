@@ -9,7 +9,6 @@ using Xunit;
 
 namespace AzureMcp.AzureTerraformBestPractices.UnitTests;
 
-[Trait("Area", "AzureTerraformBestPractices")]
 public class AzureTerraformBestPracticesGetCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

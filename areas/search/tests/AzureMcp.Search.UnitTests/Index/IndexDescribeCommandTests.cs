@@ -5,10 +5,10 @@ using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AzureMcp.Search.Commands.Index;
-using AzureMcp.Search.Services;
 using AzureMcp.Core.Models.Command;
 using AzureMcp.Core.Options;
+using AzureMcp.Search.Commands.Index;
+using AzureMcp.Search.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -18,7 +18,6 @@ using static AzureMcp.Search.Commands.Index.IndexDescribeCommand;
 
 namespace AzureMcp.Search.UnitTests.Index;
 
-[Trait("Area", "Search")]
 public class IndexDescribeCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

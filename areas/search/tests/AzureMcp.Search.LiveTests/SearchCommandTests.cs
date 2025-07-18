@@ -4,12 +4,11 @@
 using System.Text.Json;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Tests;
 using Xunit;
 
 namespace AzureMcp.Search.LiveTests;
 
-[Trait("Category", "Live")]
-[Trait("Area", "Search")]
 public class SearchCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelper output)
     : CommandTestsBase(liveTestFixture, output),
     IClassFixture<LiveTestFixture>

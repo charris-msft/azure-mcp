@@ -6,7 +6,6 @@ using Xunit;
 
 namespace AzureMcp.BicepSchema.UnitTests;
 
-[Trait("Area", "BicepSchema")]
 public class ApiVersionComparerTests
 {
     [Fact]

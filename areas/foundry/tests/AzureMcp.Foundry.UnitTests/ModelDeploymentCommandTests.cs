@@ -2,10 +2,10 @@
 // Licensed under the MIT License.
 
 using System.CommandLine;
-using AzureMcp.Foundry.Commands.Models;
-using AzureMcp.Foundry.Services;
 using AzureMcp.Core.Models.Command;
 using AzureMcp.Core.Options;
+using AzureMcp.Foundry.Commands.Models;
+using AzureMcp.Foundry.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -13,7 +13,6 @@ using Xunit;
 
 namespace AzureMcp.Foundry.UnitTests;
 
-[Trait("Area", "Foundry")]
 public class ModelDeploymentCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

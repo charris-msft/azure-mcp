@@ -2,10 +2,13 @@
 // Licensed under the MIT License.
 
 using System.Text.Json;
-using AzureMcp.Tests;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Tests;
 using Xunit;
+
+namespace AzureMcp.LoadTesting.LiveTests;
+
 public class LoadTestingCommandTests : CommandTestsBase,
     IClassFixture<LiveTestFixture>
 {
@@ -19,7 +22,6 @@ public class LoadTestingCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_loadtests()
     {
         // Arrange

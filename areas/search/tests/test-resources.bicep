@@ -14,12 +14,9 @@ param tenantId string = '72f988bf-86f1-41af-91ab-2d7cd011db47'
 @description('The client OID to grant access to test resources.')
 param testApplicationOid string
 
-@maxLength(12)
-@description('The base name for static resources.')
-param staticBaseName string
-
-@description('The static resource group name.')
-param staticResourceGroupName string
+var staticSuffix = toLower(substring(subscription().subscriptionId, 0, 4))
+var staticBaseName = 'mcp${staticSuffix}'
+var staticResourceGroupName = 'mcp-static-${staticSuffix}'
 
 // Is this deployment to the TME tenant
 var isTmeTenant = tenantId == '70a036f6-8e4d-4615-bad6-149c02e7720d'
@@ -55,7 +52,7 @@ resource openai 'Microsoft.CognitiveServices/accounts@2023-05-01' = if (!isTmeTe
 
 // Managed identity to place on the search service
 resource searchServiceIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = if (!isTmeTenant) {
-  name: '${baseName}-search-service-identity'
+  name: '${baseName}-openai-search-service-identity'
   location: location
 }
 
@@ -209,3 +206,7 @@ resource search_openAi_roleAssignment 'Microsoft.Authorization/roleAssignments@2
   }
 }
 
+output StaticBaseName string = staticBaseName
+output StaticResourceGroupName string = staticResourceGroupName
+output StorageAccountName string = storageAccount.name
+output ContainerName string = storageAccount::blobServices::searchDocsContainer.name

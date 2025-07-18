@@ -2,11 +2,11 @@
 // Licensed under the MIT License.
 
 using System.CommandLine.Parsing;
+using AzureMcp.Core.Models.Command;
+using AzureMcp.Core.Options;
 using AzureMcp.Sql.Commands.ElasticPool;
 using AzureMcp.Sql.Models;
 using AzureMcp.Sql.Services;
-using AzureMcp.Core.Models.Command;
-using AzureMcp.Core.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -15,7 +15,6 @@ using Xunit;
 
 namespace AzureMcp.Sql.UnitTests.ElasticPool;
 
-[Trait("Area", "Sql")]
 public class ElasticPoolListCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

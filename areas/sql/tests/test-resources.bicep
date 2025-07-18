@@ -21,7 +21,7 @@ param sqlAdminPassword string = newGuid()
 // SQL Server resource
 resource sqlServer 'Microsoft.Sql/servers@2023-05-01-preview' = {
   name: baseName
-  location: location
+  location: location == 'westus' ? 'westus2' : location  // We can't deploy to 'westus'
   properties: {
     administratorLogin: sqlAdminLogin
     administratorLoginPassword: sqlAdminPassword

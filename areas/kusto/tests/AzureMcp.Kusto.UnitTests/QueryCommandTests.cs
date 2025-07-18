@@ -4,11 +4,11 @@
 using System.CommandLine.Parsing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AzureMcp.Kusto.Commands;
-using AzureMcp.Kusto.Services;
 using AzureMcp.Core.Models;
 using AzureMcp.Core.Models.Command;
 using AzureMcp.Core.Options;
+using AzureMcp.Kusto.Commands;
+using AzureMcp.Kusto.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -16,7 +16,6 @@ using Xunit;
 
 namespace AzureMcp.Kusto.UnitTests;
 
-[Trait("Area", "Kusto")]
 public sealed class QueryCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

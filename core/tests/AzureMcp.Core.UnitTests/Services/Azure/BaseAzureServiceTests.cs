@@ -10,7 +10,6 @@ using Xunit;
 
 namespace AzureMcp.Core.UnitTests.Services.Azure;
 
-[Trait("Area", "Core")]
 public class BaseAzureServiceTests
 {
     private const string TenantId = "test-tenant-id";

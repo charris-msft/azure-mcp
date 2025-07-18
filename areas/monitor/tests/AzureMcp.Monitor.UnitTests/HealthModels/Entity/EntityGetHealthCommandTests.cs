@@ -4,11 +4,11 @@
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Text.Json.Nodes;
-using AzureMcp.Monitor.Commands.HealthModels.Entity;
-using AzureMcp.Monitor.Services;
 using AzureMcp.Core.Models;
 using AzureMcp.Core.Models.Command;
 using AzureMcp.Core.Options;
+using AzureMcp.Monitor.Commands.HealthModels.Entity;
+using AzureMcp.Monitor.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;
@@ -17,7 +17,6 @@ using Xunit;
 
 namespace AzureMcp.Monitor.UnitTests.HealthModels.Entity;
 
-[Trait("Area", "Monitor")]
 public class EntityGetHealthCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

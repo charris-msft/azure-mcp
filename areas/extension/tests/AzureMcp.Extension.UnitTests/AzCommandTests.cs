@@ -5,9 +5,10 @@ using System.CommandLine.Parsing;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AzureMcp.Extension.Commands;
 using AzureMcp.Core.Models.Command;
 using AzureMcp.Core.Services.ProcessExecution;
+using AzureMcp.Extension.Commands;
+using AzureMcp.Tests;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -15,7 +16,6 @@ using Xunit;
 
 namespace AzureMcp.Extension.UnitTests;
 
-[Trait("Area", "Extension")]
 public sealed class AzCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

@@ -5,10 +5,10 @@ using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AzureMcp.Cosmos.Commands;
-using AzureMcp.Cosmos.Services;
 using AzureMcp.Core.Models.Command;
 using AzureMcp.Core.Options;
+using AzureMcp.Cosmos.Commands;
+using AzureMcp.Cosmos.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -17,7 +17,6 @@ using Xunit;
 
 namespace AzureMcp.Cosmos.UnitTests;
 
-[Trait("Area", "Cosmos")]
 public class AccountListCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

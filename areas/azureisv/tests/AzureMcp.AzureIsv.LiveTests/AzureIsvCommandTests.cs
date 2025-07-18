@@ -4,17 +4,16 @@
 using System.Text.Json;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Tests;
 using Xunit;
 
 namespace AzureMcp.AzureIsv.LiveTests;
 
-[Trait("Area", "AzureIsv")]
 public class AzureIsvCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelper output)
     : CommandTestsBase(liveTestFixture, output),
     IClassFixture<LiveTestFixture>
 {
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_datadog_monitored_resources()
     {
         // Skipping test if Tenant is not 'Customer LED Tenant'

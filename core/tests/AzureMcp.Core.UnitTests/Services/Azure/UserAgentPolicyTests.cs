@@ -8,7 +8,6 @@ using Xunit;
 
 namespace AzureMcp.Core.UnitTests.Services.Azure;
 
-[Trait("Area", "Core")]
 public class UserAgentPolicyTests
 {
     [Fact]

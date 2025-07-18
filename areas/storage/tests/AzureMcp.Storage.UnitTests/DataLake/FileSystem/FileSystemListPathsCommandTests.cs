@@ -4,11 +4,11 @@
 using System.CommandLine.Parsing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AzureMcp.Core.Models.Command;
+using AzureMcp.Core.Options;
 using AzureMcp.Storage.Commands.DataLake.FileSystem;
 using AzureMcp.Storage.Models;
 using AzureMcp.Storage.Services;
-using AzureMcp.Core.Models.Command;
-using AzureMcp.Core.Options;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -17,7 +17,6 @@ using Xunit;
 
 namespace AzureMcp.Storage.UnitTests.DataLake.FileSystem;
 
-[Trait("Area", "Storage")]
 public class FileSystemListPathsCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

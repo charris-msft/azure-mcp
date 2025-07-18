@@ -4,10 +4,10 @@
 using System.CommandLine.Parsing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AzureMcp.Storage.Commands.Blob.Container;
-using AzureMcp.Storage.Services;
 using AzureMcp.Core.Models.Command;
 using AzureMcp.Core.Options;
+using AzureMcp.Storage.Commands.Blob.Container;
+using AzureMcp.Storage.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -16,7 +16,6 @@ using Xunit;
 
 namespace AzureMcp.Storage.UnitTests.Blob.Container;
 
-[Trait("Area", "Storage")]
 public class ContainerListCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

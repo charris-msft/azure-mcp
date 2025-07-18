@@ -18,7 +18,6 @@ using Xunit;
 
 namespace AzureMcp.Authorization.UnitTests;
 
-[Trait("Area", "Authorization")]
 public class RoleAssignmentListCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

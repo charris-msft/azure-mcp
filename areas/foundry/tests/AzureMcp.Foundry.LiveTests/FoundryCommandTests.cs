@@ -4,17 +4,16 @@
 using System.Text.Json;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Tests;
 using Xunit;
 
 namespace AzureMcp.Foundry.LiveTests;
 
-[Trait("Area", "Foundry")]
 public class FoundryCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelper output)
     : CommandTestsBase(liveTestFixture, output),
     IClassFixture<LiveTestFixture>
 {
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_foundry_models()
     {
         var result = await CallToolAsync(
@@ -30,7 +29,6 @@ public class FoundryCommandTests(LiveTestFixture liveTestFixture, ITestOutputHel
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_foundry_model_deployments()
     {
         var projectName = $"{Settings.ResourceBaseName}-ai-projects";
@@ -49,7 +47,6 @@ public class FoundryCommandTests(LiveTestFixture liveTestFixture, ITestOutputHel
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_deploy_foundry_model()
     {
         var deploymentName = $"test-deploy-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";

@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\AzureMcp.Tests\AzureMcp.Tests.csproj" />
-    <ProjectReference Include="..\..\src\AzureMcp.Core\AzureMcp.Core.csproj" />
+    <ProjectReference Include="..\..\src\AzureMcp.Cli\AzureMcp.Cli.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NSubstitute" />

@@ -1,13 +1,19 @@
 param(
+    [string] $TenantId,
+    [string] $TestApplicationId,
     [string] $ResourceGroupName,
-    [string] $BaseName
+    [string] $BaseName,
+    [hashtable] $DeploymentOutputs
 )
 
 $ErrorActionPreference = "Stop"
 
-. "$PSScriptRoot/../../eng/common/scripts/common.ps1"
+. "$PSScriptRoot/../../../eng/common/scripts/common.ps1"
+. "$PSScriptRoot/../../../eng/scripts/helpers/TestResourcesHelpers.ps1"
 
-$sqlServerName = $BaseName
+$testSettings = New-TestSettings @PSBoundParameters -OutputPath $PSScriptRoot
+
+$sqlServerName = $testSettings.ResourceBaseName
 
 Write-Host "Verifying SQL Server deployment: $sqlServerName" -ForegroundColor Yellow
 
@@ -19,7 +25,7 @@ if ($sqlServer) {
     Write-Host "  Server: $($sqlServer.ServerName)" -ForegroundColor Gray
     Write-Host "  FQDN: $($sqlServer.FullyQualifiedDomainName)" -ForegroundColor Gray
     Write-Host "  Location: $($sqlServer.Location)" -ForegroundColor Gray
-    
+
     # List databases
     $databases = Get-AzSqlDatabase -ResourceGroupName $ResourceGroupName -ServerName $sqlServerName
     Write-Host "  Databases:" -ForegroundColor Gray

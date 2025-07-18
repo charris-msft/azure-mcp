@@ -2,20 +2,20 @@
 // Licensed under the MIT License.
 
 using System.Text.Json;
-using AzureMcp.Monitor.Services;
 using AzureMcp.Core.Services.Azure.ResourceGroup;
 using AzureMcp.Core.Services.Azure.Subscription;
 using AzureMcp.Core.Services.Azure.Tenant;
 using AzureMcp.Core.Services.Caching;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Monitor.Services;
+using AzureMcp.Tests;
 using AzureMcp.Tests.Helpers;
 using Microsoft.Extensions.Caching.Memory;
 using Xunit;
 
 namespace AzureMcp.Monitor.LiveTests;
 
-[Trait("Area", "Monitor")]
 public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper output) : CommandTestsBase(fixture, output), IClassFixture<LiveTestFixture>, IAsyncLifetime
 {
     private LogAnalyticsHelper? _logHelper;
@@ -46,7 +46,6 @@ public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper outp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_monitor_tables()
     {
         var result = await CallToolAsync(
@@ -66,7 +65,6 @@ public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper outp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_monitor_workspaces()
     {
         var result = await CallToolAsync(
@@ -83,7 +81,6 @@ public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper outp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_get_table_contents()
     {
         // Query AzureMetrics table - fastest to propagate and most reliable
@@ -117,7 +114,6 @@ public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper outp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_query_monitor_logs()
     {
         await QueryForLogsAsync(
@@ -147,7 +143,6 @@ public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper outp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_monitor_table_types()
     {
         var result = await CallToolAsync(
@@ -166,7 +161,6 @@ public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper outp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_query_monitor_logs_by_resource_id()
     {
         var storageResourceId = $"/subscriptions/{Settings.SubscriptionId}/resourceGroups/{Settings.ResourceGroupName}/providers/Microsoft.Storage/storageAccounts/{Settings.ResourceBaseName}";
@@ -271,7 +265,6 @@ public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper outp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_metric_definitions()
     {
         // Example resource ID - uses a storage account that should exist from the test fixture
@@ -343,7 +336,6 @@ public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper outp
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_query_metrics()
     {
         // Example resource ID - uses a storage account that should exist from the test fixture

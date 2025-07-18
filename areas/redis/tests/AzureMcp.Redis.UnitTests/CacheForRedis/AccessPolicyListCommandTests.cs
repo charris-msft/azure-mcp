@@ -4,10 +4,10 @@
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Text.Json;
+using AzureMcp.Core.Models.Command;
 using AzureMcp.Redis.Commands.CacheForRedis;
 using AzureMcp.Redis.Models.CacheForRedis;
 using AzureMcp.Redis.Services;
-using AzureMcp.Core.Models.Command;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -16,7 +16,6 @@ using Xunit;
 
 namespace AzureMcp.Redis.UnitTests.CacheForRedis;
 
-[Trait("Area", "Redis")]
 public class AccessPolicyListCommandTests
 {
     private readonly IServiceProvider _serviceProvider;
@@ -48,8 +47,8 @@ public class AccessPolicyListCommandTests
             "rg1",
             "sub123",
             Arg.Any<string>(),
-            Arg.Any<Models.AuthMethod>(),
-            Arg.Any<AzureMcp.Core.Options.RetryPolicyOptions>())
+            Arg.Any<Core.Models.AuthMethod>(),
+            Arg.Any<Core.Options.RetryPolicyOptions>())
             .Returns(expectedAssignments);
 
         var command = new AccessPolicyListCommand(_logger);
@@ -84,8 +83,8 @@ public class AccessPolicyListCommandTests
             "rg1",
             "sub123",
             Arg.Any<string>(),
-            Arg.Any<Models.AuthMethod>(),
-            Arg.Any<AzureMcp.Core.Options.RetryPolicyOptions>())
+            Arg.Any<Core.Models.AuthMethod>(),
+            Arg.Any<Core.Options.RetryPolicyOptions>())
             .Returns([]);
 
         var command = new AccessPolicyListCommand(_logger);
@@ -107,8 +106,8 @@ public class AccessPolicyListCommandTests
             resourceGroupName: "rg1",
             subscriptionId: "sub123",
             tenant: Arg.Any<string>(),
-            authMethod: Arg.Any<Models.AuthMethod>(),
-            retryPolicy: Arg.Any<AzureMcp.Core.Options.RetryPolicyOptions>())
+            authMethod: Arg.Any<Core.Models.AuthMethod>(),
+            retryPolicy: Arg.Any<Core.Options.RetryPolicyOptions>())
             .ThrowsAsync(new Exception("Test error"));
 
         var command = new AccessPolicyListCommand(_logger);

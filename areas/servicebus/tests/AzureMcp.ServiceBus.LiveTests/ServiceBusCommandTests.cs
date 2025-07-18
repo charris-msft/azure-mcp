@@ -3,16 +3,16 @@
 
 using System.Text.Json;
 using Azure.Messaging.ServiceBus;
-using AzureMcp.ServiceBus.Options;
 using AzureMcp.Core.Models.Option;
 using AzureMcp.Core.Services.Azure.Authentication;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.ServiceBus.Options;
+using AzureMcp.Tests;
 using Xunit;
 
 namespace AzureMcp.ServiceBus.LiveTests
 {
-    [Trait("Area", "ServiceBus")]
     public class ServiceBusCommandTests : CommandTestsBase, IClassFixture<LiveTestFixture>
     {
         private const string QueueName = "queue1";
@@ -27,7 +27,6 @@ namespace AzureMcp.ServiceBus.LiveTests
         }
 
         [Fact(Skip = "The command for this test has been commented out until we know how to surface binary data.")]
-        [Trait("Category", "Live")]
         public async Task Queue_peek_messages()
         {
             var numberOfMessages = 2;
@@ -50,7 +49,6 @@ namespace AzureMcp.ServiceBus.LiveTests
         }
 
         [Fact(Skip = "The command for this test has been commented out until we know how to surface binary data.")]
-        [Trait("Category", "Live")]
         public async Task Topic_subscription_peek_messages()
         {
             var numberOfMessages = 2;
@@ -74,7 +72,6 @@ namespace AzureMcp.ServiceBus.LiveTests
         }
 
         [Fact]
-        [Trait("Category", "Live")]
         public async Task Queue_details()
         {
             var result = await CallToolAsync(
@@ -91,7 +88,6 @@ namespace AzureMcp.ServiceBus.LiveTests
         }
 
         [Fact]
-        [Trait("Category", "Live")]
         public async Task Topic_details()
         {
             var result = await CallToolAsync(
@@ -108,7 +104,6 @@ namespace AzureMcp.ServiceBus.LiveTests
         }
 
         [Fact]
-        [Trait("Category", "Live")]
         public async Task Subscription_details()
         {
             var result = await CallToolAsync(

@@ -2,12 +2,13 @@
 // Licensed under the MIT License.
 
 using System.Text.Json;
-using AzureMcp.Marketplace.Services;
 using AzureMcp.Core.Services.Azure.Subscription;
 using AzureMcp.Core.Services.Azure.Tenant;
 using AzureMcp.Core.Services.Caching;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Marketplace.Services;
+using AzureMcp.Tests;
 using Microsoft.Extensions.Caching.Memory;
 using Xunit;
 
@@ -31,7 +32,6 @@ public class MarketplaceCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_get_marketplace_product()
     {
         // Arrange - DZH318Z0HWCB is a well-known Azure Marketplace product
@@ -69,7 +69,6 @@ public class MarketplaceCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_get_marketplace_product_with_language_option()
     {
         // Arrange
@@ -95,7 +94,6 @@ public class MarketplaceCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_get_marketplace_product_with_market_option()
     {
         // Arrange
@@ -121,7 +119,6 @@ public class MarketplaceCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_get_marketplace_product_with_include_hidden_plans()
     {
         // Arrange
@@ -153,7 +150,6 @@ public class MarketplaceCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_get_marketplace_product_with_service_instruction_templates()
     {
         // Arrange
@@ -178,7 +174,6 @@ public class MarketplaceCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_handle_nonexistent_product_gracefully()
     {
         // Arrange - Using a non-existent product ID
@@ -201,7 +196,6 @@ public class MarketplaceCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_validate_required_subscription_parameter()
     {
         // Arrange
@@ -223,7 +217,6 @@ public class MarketplaceCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_validate_required_product_id_parameter()
     {
         // Act & Assert
@@ -242,7 +235,6 @@ public class MarketplaceCommandTests : CommandTestsBase,
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_get_marketplace_product_with_multiple_options()
     {
         // Arrange

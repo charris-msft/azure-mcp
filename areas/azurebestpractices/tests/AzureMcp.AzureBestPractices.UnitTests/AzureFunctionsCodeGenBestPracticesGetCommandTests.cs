@@ -12,7 +12,6 @@ using Xunit;
 
 namespace AzureMcp.AzureBestPractices.UnitTests;
 
-[Trait("Area", "AzureBestPractices")]
 public class AzureFunctionsCodeGenBestPracticesGetCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

@@ -5,17 +5,16 @@ using System.Text.Json;
 using Azure.Security.KeyVault.Keys;
 using AzureMcp.Core.UnitTests.Client;
 using AzureMcp.Core.UnitTests.Client.Helpers;
+using AzureMcp.Tests;
 using Xunit;
 
 namespace AzureMcp.KeyVault.LiveTests;
 
-[Trait("Area", "KeyVault")]
 public class KeyVaultCommandTests(LiveTestFixture liveTestFixture, ITestOutputHelper output)
     : CommandTestsBase(liveTestFixture, output),
     IClassFixture<LiveTestFixture>
 {
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_list_keys()
     {
         var result = await CallToolAsync(
@@ -32,7 +31,6 @@ public class KeyVaultCommandTests(LiveTestFixture liveTestFixture, ITestOutputHe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_get_key()
     {
         // Created in keyvault.bicep.
@@ -56,7 +54,6 @@ public class KeyVaultCommandTests(LiveTestFixture liveTestFixture, ITestOutputHe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_create_key()
     {
         var keyName = Settings.ResourceBaseName + Random.Shared.NextInt64();
@@ -80,7 +77,6 @@ public class KeyVaultCommandTests(LiveTestFixture liveTestFixture, ITestOutputHe
     }
 
     [Fact]
-    [Trait("Category", "Live")]
     public async Task Should_get_secret()
     {
         // Created in keyvault.bicep.

@@ -3,10 +3,10 @@
 
 using System.CommandLine;
 using Azure.AI.Projects;
-using AzureMcp.Foundry.Commands.Models;
-using AzureMcp.Foundry.Services;
 using AzureMcp.Core.Models.Command;
 using AzureMcp.Core.Options;
+using AzureMcp.Foundry.Commands.Models;
+using AzureMcp.Foundry.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
@@ -14,7 +14,6 @@ using Xunit;
 
 namespace AzureMcp.Foundry.UnitTests;
 
-[Trait("Area", "Foundry")]
 public class DeploymentsListCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

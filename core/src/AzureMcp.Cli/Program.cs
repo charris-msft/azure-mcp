@@ -48,22 +48,23 @@ internal class Program
     }
     private static IAreaSetup[] RegisterAreas()
     {
+        AzureMcp.Server.Commands.ServiceStartCommand.ConfigureServices = ConfigureServices;
 
         return [
             // Register core areas
-            new AzureMcp.AzureBestPractices.AzureBestPracticesSetup(),
-            new AzureMcp.Extension.ExtensionSetup(),
-            new AzureMcp.Group.GroupSetup(),
-            new AzureMcp.Server.ServerSetup(),
-            new AzureMcp.Subscription.SubscriptionSetup(),
-            new AzureMcp.Tools.ToolsSetup(),
+            new AzureMcp.Core.Areas.Group.GroupSetup(),
+            new AzureMcp.Core.Areas.Server.ServerSetup(),
+            new AzureMcp.Core.Areas.Subscription.SubscriptionSetup(),
+            new AzureMcp.Core.Areas.Tools.ToolsSetup(),
 
             // Register Azure service areas
             new AzureMcp.Aks.AksSetup(),
             new AzureMcp.AppConfig.AppConfigSetup(),
             new AzureMcp.Authorization.AuthorizationSetup(),
             new AzureMcp.AzureIsv.AzureIsvSetup(),
+            new AzureMcp.AzureBestPractices.AzureBestPracticesSetup(),
             new AzureMcp.Cosmos.CosmosSetup(),
+            new AzureMcp.Extension.ExtensionSetup(),
             new AzureMcp.Foundry.FoundrySetup(),
             new AzureMcp.Grafana.GrafanaSetup(),
             new AzureMcp.KeyVault.KeyVaultSetup(),
