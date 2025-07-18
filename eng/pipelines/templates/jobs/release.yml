@@ -2,8 +2,6 @@ parameters:
   - name: PublishToMarketplace
     type: boolean
     default: false
-  - name: VsixVersion
-    type: string
 
 jobs:
 - job: TagRepository
@@ -28,6 +26,15 @@ jobs:
   #   displayName: Create GitHub Release and upload artifacts
   #   env:
   #     GH_TOKEN: $(azuresdk-github-pat)
+
+- job: ExtractVsixVersion
+  displayName: "Extract VSIX version from package.json"
+  steps:
+    - pwsh: |
+        $packageJson = Get-Content eng/vscode/package.json -Raw | ConvertFrom-Json
+        Write-Host "##vso[task.setvariable variable=VsixVersion;isOutput=true]$($packageJson.version)"
+      name: setVsixVersion
+      displayName: "Extract VSIX version from package.json"
 
 # - deployment: Publish
 #   displayName: "Publish to npmjs.com"
