@@ -1,8 +1,3 @@
-parameters:
-  - name: PublishToMarketplace
-    type: boolean
-    default: false
-
 jobs:
 - job: TagRepository
   displayName: "Create release tag"
