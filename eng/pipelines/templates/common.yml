@@ -188,7 +188,14 @@ extends:
           - name: Version
             value: $[ stageDependencies.Initialize.Initialize.outputs['Version.Version'] ]
           jobs:
-          - template: /eng/pipelines/templates/jobs/release.yml
+            - pwsh: |
+                $packageJson = Get-Content eng/vscode/package.json -Raw | ConvertFrom-Json
+                Write-Host "##vso[task.setvariable variable=VsixVersion]$($packageJson.version)"
+              displayName: "Extract VSIX version from package.json"
+            - template: /eng/pipelines/templates/jobs/release.yml
+              parameters:
+                PublishToMarketplace: false
+                VsixVersion: $(VsixVersion)
 
       - ${{ else }}:
         - stage: Integration
