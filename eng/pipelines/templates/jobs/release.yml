@@ -120,7 +120,7 @@ jobs:
 # Job: Release VSIX artifacts to Marketplace
 - job: ReleaseVSIX
   displayName: "Release VSIX Artifacts to Marketplace"
-  dependsOn: UpdatePackageVersion
+  dependsOn: ExtractVsixVersion
   condition: and(succeeded(), ne(variables['Skip.PublishVSIX'], 'true'))
   strategy:
     matrix:
