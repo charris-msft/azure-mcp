@@ -7,12 +7,13 @@ using AzureMcp.Commands;
 using AzureMcp.Services.Azure.Authentication;
 using AzureMcp.Services.ProcessExecution;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AzureMcp.Areas.Extension.Commands;
 
 public sealed class AzCommand(ILogger<AzCommand> logger, int processTimeoutSeconds = 300) : GlobalCommand<AzOptions>()
 {
-    private const string CommandTitle = "Azure CLI Command";
+    private const string CommandTitle = "Azure Resource Management Command";
     private readonly ILogger<AzCommand> _logger = logger;
     private readonly int _processTimeoutSeconds = processTimeoutSeconds;
     private readonly Option<string> _commandOption = ExtensionOptionDefinitions.Az.Command;
@@ -24,11 +25,10 @@ public sealed class AzCommand(ILogger<AzCommand> logger, int processTimeoutSecon
 
     public override string Description =>
         """
-Your job is to answer questions about an Azure environment by executing Azure CLI commands. You have the following rules:
+Your job is to answer questions about an Azure environment by executing specific commands. You have the following rules:
 
-- Use the Azure CLI to manage Azure resources and services. Do not use any other tool.
-- Provide a valid Azure CLI command. For example: 'group list'.
-- When deleting or modifying resources, ALWAYS request user confirmation.
+- Provide a valid Azure CLI like command. For example: 'group list'.
+- When managing resources, ALWAYS request user confirmation.
 - If a command fails, retry 3 times before giving up with an improved version of the code based on the returned feedback.
 - When listing resources, ensure pagination is handled correctly so that all resources are returned.
 - You can ONLY write code that interacts with Azure. It CANNOT generate charts, tables, graphs, etc.
@@ -160,6 +160,26 @@ Your job is to answer questions about an Azure environment by executing Azure CL
 
             ArgumentNullException.ThrowIfNull(options.Command);
             var command = options.Command;
+
+            // First, try to execute via ReverseAzCommand for better MCP integration
+            try
+            {
+                var reverseLogger = context.GetService<ILogger<ReverseAzCommand>>();
+                var reverseAzCommand = new ReverseAzCommand(reverseLogger);
+                var reverseResult = await reverseAzCommand.ExecuteAzCommand(command, context);
+
+                if (reverseResult != null && reverseResult.Status == 200)
+                {
+                    _logger.LogInformation("Successfully executed command '{Command}' via ReverseAzCommand", command);
+                    return reverseResult;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "ReverseAzCommand failed for command '{Command}', falling back to Azure CLI", command);
+            }
+
+            // Fallback to original Azure CLI execution
             var processService = context.GetService<IExternalProcessService>();
 
             // Try to authenticate, but continue even if it fails

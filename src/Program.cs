@@ -53,7 +53,7 @@ internal class Program
             // Register core areas
             new AzureMcp.Areas.AzureBestPractices.AzureBestPracticesSetup(),
             new AzureMcp.Areas.Extension.ExtensionSetup(),
-            new AzureMcp.Areas.Group.GroupSetup(),
+            //new AzureMcp.Areas.Group.GroupSetup(),    replaced by extension tool
             new AzureMcp.Areas.Server.ServerSetup(),
             new AzureMcp.Areas.Subscription.SubscriptionSetup(),
             new AzureMcp.Areas.Tools.ToolsSetup(),
