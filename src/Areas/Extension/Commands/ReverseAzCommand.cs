@@ -1,13 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.CommandLine.Parsing;
 using System.Text;
 using AzureMcp.Areas.Group.Commands;
-using AzureMcp.Areas.Sql.Commands.Database;
-using AzureMcp.Areas.Sql.Commands.EntraAdmin;
-using AzureMcp.Commands;
-using AzureMcp.Models.Command;
 using Microsoft.Extensions.Logging;
 
 namespace AzureMcp.Areas.Extension.Commands;
