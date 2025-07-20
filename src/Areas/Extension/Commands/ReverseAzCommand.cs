@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using System.Text;
 using AzureMcp.Areas.Aks.Commands.Cluster;
 using Microsoft.Extensions.Logging;
 
@@ -41,7 +40,7 @@ public sealed class ReverseAzCommand
                 var remainingArgs = commandLine[azCommand.Length..].Trim();
                 var args = string.IsNullOrWhiteSpace(remainingArgs) 
                     ? Array.Empty<string>() 
-                    : ParseCommandLineArguments(remainingArgs);
+                    : CommandLineStringSplitter.Instance.Split(remainingArgs).ToArray();
                 
                 try
                 {
@@ -80,56 +79,5 @@ public sealed class ReverseAzCommand
             Message = message,
             Results = null
         };
-    }
-
-    private static string[] ParseCommandLineArguments(string commandLine)
-    {
-        var args = new List<string>();
-        var currentArg = new StringBuilder();
-        var inQuotes = false;
-        var escapeNext = false;
-
-        for (int i = 0; i < commandLine.Length; i++)
-        {
-            char c = commandLine[i];
-
-            if (escapeNext)
-            {
-                currentArg.Append(c);
-                escapeNext = false;
-                continue;
-            }
-
-            if (c == '\\')
-            {
-                escapeNext = true;
-                continue;
-            }
-
-            if (c == '"')
-            {
-                inQuotes = !inQuotes;
-                continue;
-            }
-
-            if (c == ' ' && !inQuotes)
-            {
-                if (currentArg.Length > 0)
-                {
-                    args.Add(currentArg.ToString());
-                    currentArg.Clear();
-                }
-                continue;
-            }
-
-            currentArg.Append(c);
-        }
-
-        if (currentArg.Length > 0)
-        {
-            args.Add(currentArg.ToString());
-        }
-
-        return args.ToArray();
     }
 }
