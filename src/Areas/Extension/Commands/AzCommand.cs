@@ -6,8 +6,8 @@ using AzureMcp.Areas.Extension.Options;
 using AzureMcp.Commands;
 using AzureMcp.Services.Azure.Authentication;
 using AzureMcp.Services.ProcessExecution;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace AzureMcp.Areas.Extension.Commands;
 
@@ -196,7 +196,7 @@ Your job is to answer questions about an Azure environment by executing specific
                 _logger.LogError("Error executing command '{Command}' via ReverseAzCommand: {Message}", command, reverseResult.Message);
                 return reverseResult;
             }
-            
+
         }
         catch (Exception ex)
         {

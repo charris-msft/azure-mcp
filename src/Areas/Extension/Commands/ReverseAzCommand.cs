@@ -14,7 +14,7 @@ public sealed class ReverseAzCommand
     public ReverseAzCommand(ILogger<AzCommand> logger)
     {
         _logger = logger;
-        
+
         // Initialize command handlers
         _azCommandHandlers = new Dictionary<string, Func<CommandContext, string[], Task<CommandResponse>>>
         {
@@ -38,10 +38,10 @@ public sealed class ReverseAzCommand
             if (commandLine.StartsWith(azCommand, StringComparison.OrdinalIgnoreCase))
             {
                 var remainingArgs = commandLine[azCommand.Length..].Trim();
-                var args = string.IsNullOrWhiteSpace(remainingArgs) 
-                    ? Array.Empty<string>() 
+                var args = string.IsNullOrWhiteSpace(remainingArgs)
+                    ? Array.Empty<string>()
                     : CommandLineStringSplitter.Instance.Split(remainingArgs).ToArray();
-                
+
                 try
                 {
                     var response = await handler(context, args);
