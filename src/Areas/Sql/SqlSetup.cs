@@ -34,6 +34,5 @@ public class SqlSetup : IAreaSetup
         server.AddSubGroup(entraAdmin);
 
         entraAdmin.AddCommand("list", new EntraAdminListCommand(loggerFactory.CreateLogger<EntraAdminListCommand>()));
-    
     }
 }

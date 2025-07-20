@@ -162,47 +162,47 @@ Your job is to answer questions about an Azure environment by executing specific
             var command = options.Command;
 
             // First, try to execute via ReverseAzCommand for better MCP integration
-            try
-            {
-                var reverseLogger = context.GetService<ILogger<ReverseAzCommand>>();
-                var reverseAzCommand = new ReverseAzCommand(reverseLogger);
-                var reverseResult = await reverseAzCommand.ExecuteAzCommand(command, context);
+            var reverseAzCommand = new ReverseAzCommand(_logger);
+            var reverseResult = await reverseAzCommand.ExecuteAzCommand(command, context);
 
-                if (reverseResult != null && reverseResult.Status == 200)
+            if (reverseResult.Status == 200)
+            {
+                _logger.LogInformation("Successfully executed command '{Command}' via ReverseAzCommand", command);
+                return reverseResult;
+            }
+            else if (reverseResult.Status == 404)
+            {
+                _logger.LogWarning("Command '{Command}' not recognized by ReverseAzCommand, falling back to Azure CLI execution", command);
+                // Fallback to original Azure CLI execution
+                var processService = context.GetService<IExternalProcessService>();
+
+                // Try to authenticate, but continue even if it fails
+                await AuthenticateWithAzureCredentialsAsync(processService, _logger);
+
+                var azPath = FindAzCliPath() ?? throw new FileNotFoundException("Azure CLI executable not found in PATH or common installation locations. Please ensure Azure CLI is installed.");
+                var result = await processService.ExecuteAsync(azPath, command, _processTimeoutSeconds);
+
+                if (result.ExitCode != 0)
                 {
-                    _logger.LogInformation("Successfully executed command '{Command}' via ReverseAzCommand", command);
-                    return reverseResult;
+                    context.Response.Status = 500;
+                    context.Response.Message = result.Error;
                 }
+
+                var jElem = processService.ParseJsonOutput(result);
+                context.Response.Results = ResponseResult.Create(jElem, JsonSourceGenerationContext.Default.JsonElement);
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogWarning(ex, "ReverseAzCommand failed for command '{Command}', falling back to Azure CLI", command);
+                _logger.LogError("Error executing command '{Command}' via ReverseAzCommand: {Message}", command, reverseResult.Message);
+                return reverseResult;
             }
-
-            // Fallback to original Azure CLI execution
-            var processService = context.GetService<IExternalProcessService>();
-
-            // Try to authenticate, but continue even if it fails
-            await AuthenticateWithAzureCredentialsAsync(processService, _logger);
-
-            var azPath = FindAzCliPath() ?? throw new FileNotFoundException("Azure CLI executable not found in PATH or common installation locations. Please ensure Azure CLI is installed.");
-            var result = await processService.ExecuteAsync(azPath, command, _processTimeoutSeconds);
-
-            if (result.ExitCode != 0)
-            {
-                context.Response.Status = 500;
-                context.Response.Message = result.Error;
-            }
-
-            var jElem = processService.ParseJsonOutput(result);
-            context.Response.Results = ResponseResult.Create(jElem, JsonSourceGenerationContext.Default.JsonElement);
+            
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "An exception occurred executing command. Command: {Command}.", options.Command);
             HandleException(context, ex);
         }
-
         return context.Response;
     }
 }

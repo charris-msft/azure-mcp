@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 
 using System.Text;
-using AzureMcp.Areas.Group.Commands;
+using AzureMcp.Areas.Aks.Commands.Cluster;
 using Microsoft.Extensions.Logging;
 
 namespace AzureMcp.Areas.Extension.Commands;
@@ -10,25 +10,25 @@ namespace AzureMcp.Areas.Extension.Commands;
 public sealed class ReverseAzCommand
 {
     private readonly Dictionary<string, Func<CommandContext, string[], Task<CommandResponse>>> _azCommandHandlers;
-    private readonly ILogger<ReverseAzCommand> _logger;
+    private readonly ILogger<AzCommand> _logger;
 
-    public ReverseAzCommand(ILogger<ReverseAzCommand> logger)
+    public ReverseAzCommand(ILogger<AzCommand> logger)
     {
         _logger = logger;
         
         // Initialize command handlers
         _azCommandHandlers = new Dictionary<string, Func<CommandContext, string[], Task<CommandResponse>>>
         {
-            ["group list"] = HandleGroupList,
+            ["aks list"] = HandleAksList,
         };
     }
 
-    public async Task<CommandResponse?> ExecuteAzCommand(string commandLine, CommandContext context)
+    public async Task<CommandResponse> ExecuteAzCommand(string commandLine, CommandContext context)
     {
         if (string.IsNullOrWhiteSpace(commandLine))
         {
             _logger.LogWarning("Command line is empty or null");
-            return null;
+            return CreateErrorResponse($"Empty command line", 500);
         }
 
         commandLine = commandLine.Trim();
@@ -61,10 +61,12 @@ public sealed class ReverseAzCommand
         return CreateErrorResponse($"Command '{commandLine}' is not recognized", 404);
     }
 
-    private async Task<CommandResponse> HandleGroupList(CommandContext context, string[] args)
+    private async Task<CommandResponse> HandleAksList(CommandContext context, string[] args)
     {
-        var logger = context.GetService<ILogger<GroupListCommand>>();
-        var command = new GroupListCommand(logger);
+        var loggerFactory = context.GetService<ILoggerFactory>();
+        var logger = loggerFactory?.CreateLogger<ClusterListCommand>()
+            ?? throw new InvalidOperationException("Logger not found for ClusterListCommand");
+        var command = new ClusterListCommand(logger);
         var systemCommand = command.GetCommand();
         var parseResult = systemCommand.Parse(args);
         return await command.ExecuteAsync(context, parseResult);

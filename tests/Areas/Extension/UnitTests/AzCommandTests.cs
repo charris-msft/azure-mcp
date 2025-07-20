@@ -28,6 +28,7 @@ public sealed class AzCommandTests
 
         var collection = new ServiceCollection();
         collection.AddSingleton(_processService);
+        collection.AddLogging();
         _serviceProvider = collection.BuildServiceProvider();
     }
 
