@@ -33,7 +33,7 @@ public sealed class ClusterListCommand(ILogger<ClusterListCommand> logger) : Bas
         try
         {
             var aksService = context.GetService<IAksService>();
-
+            return aksService;
         }
         catch (Exception ex)
         {
