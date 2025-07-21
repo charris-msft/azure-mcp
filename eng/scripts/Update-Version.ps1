@@ -34,6 +34,24 @@ $projectText = Get-Content $projectFile -Raw
 $projectText = $projectText -replace "<Version>$([Regex]::Escape($currentVersion))</Version>", "<Version>$Version</Version>"
 $projectText | Set-Content $projectFile -Force -NoNewLine
 
+# Update VSIX version in eng/vscode/package.json
+$vsixPackageJsonPath = "$RepoRoot/eng/vscode/package.json"
+if (Test-Path $vsixPackageJsonPath) {
+    $packageJson = Get-Content $vsixPackageJsonPath -Raw | ConvertFrom-Json
+    $currentVsixVersion = $packageJson.version
+    if ($currentVsixVersion -ne $Version) {
+        Write-Host "Current VSIX Version: $currentVsixVersion"
+        Write-Host "New VSIX Version: $Version"
+        $packageJson.version = $Version
+        $packageJson | ConvertTo-Json -Depth 100 | Set-Content $vsixPackageJsonPath -NoNewline
+        Write-Host "Updated VSIX version in $vsixPackageJsonPath from $currentVsixVersion to $Version"
+    } else {
+        Write-Host "VSIX version in $vsixPackageJsonPath is already $Version. No update needed."
+    }
+} else {
+    Write-Warning "VSIX package.json not found at $vsixPackageJsonPath"
+}
+
 if ($autoVersion) {
   & "$RepoRoot/eng/common/scripts/Update-ChangeLog.ps1" -Version $Version `
   -ChangelogPath "$RepoRoot/CHANGELOG.md" -Unreleased $True

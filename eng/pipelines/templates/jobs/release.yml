@@ -88,6 +88,7 @@ jobs:
 #             Registry: https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-js/npm/registry/
 #             Tag: latest
 
+
 - job: ExtractVsixVersion
   displayName: "Extract VSIX version from package.json"
   steps:
@@ -97,70 +98,62 @@ jobs:
       name: setVsixVersion
       displayName: "Extract VSIX version from package.json"
 
-# Deployment Job: Publish VSIX artifacts to Marketplace
-- deployment: PublishVSIX
-  displayName: "Publish VSIX Artifacts to Marketplace"
+# Job: Release VSIX artifacts to Marketplace
+- job: ReleaseVSIX
+  displayName: "Release VSIX Artifacts to Marketplace"
   dependsOn: ExtractVsixVersion
-  condition: and(succeeded(), ne(variables['Skip.PublishPackage'], 'true'))
-  environment: vsix-marketplace
+  condition: and(succeeded(), ne(variables['Skip.PublishVSIX'], 'true'))
+  strategy:
+    matrix:
+      linux_x64:
+        artifactName: vsix_package_linux_x64_signed
+      linux_arm64:
+        artifactName: vsix_package_linux_arm64_signed
+      osx_x64:
+        artifactName: vsix_package_osx_x64_signed
+      osx_arm64:
+        artifactName: vsix_package_osx_arm64_signed
+      win_x64:
+        artifactName: vsix_package_win_x64_signed
+      win_arm64:
+        artifactName: vsix_package_win_arm64_signed
   pool:
     name: azsdk-pool
     image: ubuntu-24.04
     os: linux
-  strategy:
-    runOnce:
-      deploy:
-        steps:
-          - ${{ each artifact in [
-                'vsix_package_linux_x64_signed',
-                'vsix_package_linux_arm64_signed',
-                'vsix_package_osx_x64_signed',
-                'vsix_package_osx_arm64_signed',
-                'vsix_package_win_x64_signed',
-                'vsix_package_win_arm64_signed'
-              ] }}:
-              - download: current
-                artifact: ${{ artifact }}
-                displayName: "Download ${{ artifact }}"
+  steps:
+    - download: current
+      artifact: $(artifactName)
+      displayName: "Download $(artifactName)"
 
-              - pwsh: |
-                  Write-Host "Files in artifact: ${{ artifact }}"
-                  Get-ChildItem -Path "$(Pipeline.Workspace)/${{ artifact }}" -Recurse | Select-Object FullName
-                  $baseName = Get-ChildItem "$(Pipeline.Workspace)/${{ artifact }}" -Filter *.vsix | Select-Object -First 1 | ForEach-Object { $_.BaseName }
-                  Write-Host "VSIX baseName: $baseName"
-                displayName: "List VSIX files and base name (${{ artifact }})"
+    - task: AzureCLI@2
+      displayName: "Publish (using vsce) - $(artifactName)"
+      inputs:
+        azureSubscription: azure-sdk-vsmarketplace
+        scriptType: pscore
+        scriptLocation: inlineScript
+        workingDirectory: $(Pipeline.Workspace)/$(artifactName)
+        inlineScript: |
+          Write-Host "Publishing VSIX for $(artifactName)"
+          $baseName = Get-ChildItem *.vsix | Select-Object -First 1 | ForEach-Object { $_.BaseName }
+          Write-Host "VSIX baseName: $baseName"
+          # Uncomment and configure the following lines to actually publish
+          # npm install -g @vscode/vsce
+          # vsce publish --azure-credential --packagePath "$($baseName).vsix" --manifestPath "$($baseName).manifest" --signaturePath "$($baseName).signature.p7s"
 
-              # Optionally publish to Marketplace if enabled
-              - ${{ if eq(parameters.PublishToMarketplace, true) }}:
-                - task: AzureCLI@2
-                  displayName: "Publish (using vsce) - ${{ artifact }}"
-                  inputs:
-                    azureSubscription: azure-sdk-vsmarketplace
-                    scriptType: pscore
-                    scriptLocation: inlineScript
-                    workingDirectory: $(Pipeline.Workspace)/${{ artifact }}
-                    inlineScript: |
-                      Write-Host "Publishing VSIX for ${{ artifact }}"
-                      $baseName = Get-ChildItem *.vsix | Select-Object -First 1 | ForEach-Object { $_.BaseName }
-                      Write-Host "VSIX baseName: $baseName"
-                      # Uncomment and configure the following lines to actually publish
-                      # npm install -g @vscode/vsce
-                      # vsce publish --azure-credential --packagePath "$($baseName).vsix" --manifestPath "$($baseName).manifest" --signaturePath "$($baseName).signature.p7s"
+- job: UpdatePackageVersion
+  displayName: "Update Package Versions"
+  condition: and(succeeded(), ne(variables['Skip.UpdatePackageVersion'], 'true'))
+  dependsOn: ReleaseVSIX
+  steps:
+  - checkout: self
 
-
-# - job: UpdatePackageVersion
-#   displayName: "Update Package Versions"
-#   condition: and(succeeded(), ne(variables['Skip.UpdatePackageVersion'], 'true'))
-#   dependsOn: Publish
-#   steps:
-#   - checkout: self
-
-#   # Apply the version increment to each library, which updates the Cargo.toml and changelog files.
-#   - task: PowerShell@2
-#     displayName: Increment version
-#     inputs:
-#       targetType: filePath
-#       filePath: $(Build.SourcesDirectory)/eng/scripts/Update-Version.ps1
+  # Apply the version increment to each library, which updates the Cargo.toml and changelog files.
+  - task: PowerShell@2
+    displayName: Increment version
+    inputs:
+      targetType: filePath
+      filePath: $(Build.SourcesDirectory)/eng/scripts/Update-Version.ps1
 
 #   - template: /eng/common/pipelines/templates/steps/create-pull-request.yml
 #     parameters:
