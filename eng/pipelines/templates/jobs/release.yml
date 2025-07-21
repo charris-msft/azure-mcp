@@ -19,17 +19,17 @@ parameters:
       safeName: Win_arm64
 
 jobs:
-- job: TagRepository
-  displayName: "Create release tag"
-  condition: and(succeeded(), ne(variables['Skip.TagRepository'], 'true'))
-  steps:
-  - checkout: self
+  - job: TagRepository
+    displayName: "Create release tag"
+    condition: and(succeeded(), ne(variables['Skip.TagRepository'], 'true'))
+    steps:
+    - checkout: self
 
-  - download: current
-    displayName: Download $(PipelineArtifactName)_packed
-    artifact: $(PipelineArtifactName)_packed
+    - download: current
+      displayName: Download $(PipelineArtifactName)_packed
+      artifact: $(PipelineArtifactName)_packed
 
-  - template: /eng/common/pipelines/templates/steps/retain-run.yml
+    - template: /eng/common/pipelines/templates/steps/retain-run.yml
 
   # - pwsh: |
   #     gh release create `
@@ -157,60 +157,60 @@ jobs:
 #           # vsce publish --azure-credential --packagePath "$($baseName).vsix" --manifestPath "$($baseName).manifest" --signaturePath "$($baseName).signature.p7s"
 
 
-# Deployment Jobs: Publish VSIX artifacts to Marketplace for each platform
-${{ each platform in parameters.Platforms }}:
-  - deployment: PublishVSIX_${{ platform.safeName }}
-    displayName: "Publish VSIX Artifact to Marketplace - ${{ platform.safeName }}"
-    dependsOn: ExtractVsixVersion
-    condition: and(succeeded(), ne(variables['Skip.PublishPackage'], 'true'))
-    environment: vsix-marketplace
-    pool:
-      name: azsdk-pool
-      image: ubuntu-24.04
-      os: linux
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-            - download: current
-              artifact: ${{ platform.artifact }}
-              displayName: "Download ${{ platform.artifact }}"
+  # Deployment Jobs: Publish VSIX artifacts to Marketplace for each platform
+  ${{ each platform in parameters.Platforms }}:
+    - deployment: PublishVSIX_${{ platform.safeName }}
+      displayName: "Publish VSIX Artifact to Marketplace - ${{ platform.safeName }}"
+      dependsOn: ExtractVsixVersion
+      condition: and(succeeded(), ne(variables['Skip.PublishPackage'], 'true'))
+      environment: vsix-marketplace
+      pool:
+        name: azsdk-pool
+        image: ubuntu-24.04
+        os: linux
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - download: current
+                artifact: ${{ platform.artifact }}
+                displayName: "Download ${{ platform.artifact }}"
 
-            # Optionally publish to Marketplace if enabled
-            - task: AzureCLI@2
-              displayName: "Publish (using vsce) - ${{ platform.artifact }}"
-              inputs:
-                azureSubscription: azure-sdk-vsmarketplace
-                scriptType: pscore
-                scriptLocation: inlineScript
-                workingDirectory: $(Pipeline.Workspace)/${{ platform.artifact }}
-                inlineScript: |
-                  Write-Host "Publishing VSIX for ${{ platform.artifact }}"
-                  $baseName = Get-ChildItem *.vsix | Select-Object -First 1 | ForEach-Object { $_.BaseName }
-                  Write-Host "VSIX baseName: $baseName"
-                  # Uncomment and configure the following lines to actually publish
-                  # npm install -g @vscode/vsce
-                  # vsce publish --azure-credential --packagePath "$($baseName).vsix" --manifestPath "$($baseName).manifest" --signaturePath "$($baseName).signature.p7s"
+              # Optionally publish to Marketplace if enabled
+              - task: AzureCLI@2
+                displayName: "Publish (using vsce) - ${{ platform.artifact }}"
+                inputs:
+                  azureSubscription: azure-sdk-vsmarketplace
+                  scriptType: pscore
+                  scriptLocation: inlineScript
+                  workingDirectory: $(Pipeline.Workspace)/${{ platform.artifact }}
+                  inlineScript: |
+                    Write-Host "Publishing VSIX for ${{ platform.artifact }}"
+                    $baseName = Get-ChildItem *.vsix | Select-Object -First 1 | ForEach-Object { $_.BaseName }
+                    Write-Host "VSIX baseName: $baseName"
+                    # Uncomment and configure the following lines to actually publish
+                    # npm install -g @vscode/vsce
+                    # vsce publish --azure-credential --packagePath "$($baseName).vsix" --manifestPath "$($baseName).manifest" --signaturePath "$($baseName).signature.p7s"
 
 
-- job: UpdatePackageVersion
-  displayName: "Update Package Versions"
-  condition: and(succeeded(), ne(variables['Skip.UpdatePackageVersion'], 'true'))
-  dependsOn:
-    ${{ each platform in parameters.Platforms }}:
-      - PublishVSIX_${{ platform.safeName }}
-  steps:
-  - checkout: self
+  - job: UpdatePackageVersion
+    displayName: "Update Package Versions"
+    condition: and(succeeded(), ne(variables['Skip.UpdatePackageVersion'], 'true'))
+    dependsOn:
+      ${{ each platform in parameters.Platforms }}:
+        - PublishVSIX_${{ platform.safeName }}
+    steps:
+    - checkout: self
 
-  # Apply the version increment to each library, which updates the Cargo.toml and changelog files.
-  - task: PowerShell@2
-    displayName: Increment version
-    inputs:
-      targetType: filePath
-      filePath: $(Build.SourcesDirectory)/eng/scripts/Update-Version.ps1
+    # Apply the version increment to each library, which updates the Cargo.toml and changelog files.
+    - task: PowerShell@2
+      displayName: Increment version
+      inputs:
+        targetType: filePath
+        filePath: $(Build.SourcesDirectory)/eng/scripts/Update-Version.ps1
 
-#   - template: /eng/common/pipelines/templates/steps/create-pull-request.yml
-#     parameters:
-#       PRBranchName: increment-package-version-$(Build.BuildId)
-#       CommitMsg: "Increment package version after release"
-#       PRTitle: "Increment version after release"
+  #   - template: /eng/common/pipelines/templates/steps/create-pull-request.yml
+  #     parameters:
+  #       PRBranchName: increment-package-version-$(Build.BuildId)
+  #       CommitMsg: "Increment package version after release"
+  #       PRTitle: "Increment version after release"
