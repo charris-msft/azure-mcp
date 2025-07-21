@@ -197,8 +197,8 @@ jobs:
     displayName: "Update Package Versions"
     condition: and(succeeded(), ne(variables['Skip.UpdatePackageVersion'], 'true'))
     dependsOn:
-      ${{ each platform in parameters.Platforms }}:
-        - PublishVSIX_${{ platform.safeName }}
+    ${{ each platform in parameters.Platforms }}:
+      - PublishVSIX_${{ platform.safeName }}
     steps:
     - checkout: self
 
