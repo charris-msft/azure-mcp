@@ -158,7 +158,7 @@ jobs:
 
 
   # Deployment Jobs: Publish VSIX artifacts to Marketplace for each platform
-  ${{ each platform in parameters.Platforms }}:
+  - ${{ each platform in parameters.Platforms }}:
     - deployment: PublishVSIX_${{ platform.safeName }}
       displayName: "Publish VSIX Artifact to Marketplace - ${{ platform.safeName }}"
       dependsOn: ExtractVsixVersion
