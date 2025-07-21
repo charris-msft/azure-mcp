@@ -2,18 +2,12 @@ parameters:
 - name: Platforms
   type: object
   default:
-    - artifact: vsix_package_linux_x64_signed
-      safeName: Linux_x64
-    - artifact: vsix_package_linux_arm64_signed
-      safeName: Linux_arm64
-    - artifact: vsix_package_osx_x64_signed
-      safeName: OSX_x64
-    - artifact: vsix_package_osx_arm64_signed
-      safeName: OSX_arm64
-    - artifact: vsix_package_win_x64_signed
-      safeName: Win_x64
-    - artifact: vsix_package_win_arm64_signed
-      safeName: Win_arm64
+    - linux_x64
+    - linux_arm64
+    - osx_x64
+    - osx_arm64
+    - win_x64
+    - win_arm64
 
 jobs:
 - job: TagRepository
@@ -28,16 +22,16 @@ jobs:
 
   - template: /eng/common/pipelines/templates/steps/retain-run.yml
 
-- pwsh: |
-    gh release create `
-      "$(Version)" `
-      --title "$(Version)"
+  - pwsh: |
+      gh release create `
+        "$(Version)" `
+        --title "$(Version)"
 
-    gh release upload $(Version) $(Pipeline.Workspace)/$(PipelineArtifactName)_packed/platform/*.tgz
-    gh release upload $(Version) $(Pipeline.Workspace)/$(PipelineArtifactName)_packed/wrapper/*.tgz
-  displayName: Create GitHub Release and upload artifacts
-  env:
-    GH_TOKEN: $(azuresdk-github-pat)
+      gh release upload $(Version) $(Pipeline.Workspace)/$(PipelineArtifactName)_packed/platform/*.tgz
+      gh release upload $(Version) $(Pipeline.Workspace)/$(PipelineArtifactName)_packed/wrapper/*.tgz
+    displayName: Create GitHub Release and upload artifacts
+    env:
+      GH_TOKEN: $(azuresdk-github-pat)
 
 - deployment: Publish
   displayName: "Publish to npmjs.com"
@@ -103,11 +97,13 @@ jobs:
 
 # Deployment Jobs: Publish VSIX artifacts to Marketplace for each platform
 - ${{ each platform in parameters.Platforms }}:
-  - deployment: PublishVSIX_${{ platform.safeName }}
-    displayName: "Publish VSIX Artifact to Marketplace - ${{ platform.safeName }}"
+  - deployment: PublishVSIX_${{ platform }}
+    displayName: "Publish VSIX Artifact to Marketplace - ${{ platform }}"
     dependsOn: Publish
     condition: and(succeeded(), ne(variables['Skip.PublishPackage'], 'true'))
     environment: package-publish
+    variables: 
+      artifactName: vsix_package_${{ platform }}_signed
     pool:
       name: azsdk-pool
       image: ubuntu-24.04
@@ -117,19 +113,18 @@ jobs:
         deploy:
           steps:
             - download: current
-              artifact: ${{ platform.artifact }}
-              displayName: "Download ${{ platform.artifact }}"
+              artifact: $(artifactName)
+              displayName: "Download artifact for ${{ platform }}"
 
-            # Optionally publish to Marketplace if enabled
             - task: AzureCLI@2
-              displayName: "Publish (using vsce) - ${{ platform.artifact }}"
+              displayName: "Publish (using vsce) - ${{ platform }}"
               inputs:
                 azureSubscription: azure-sdk-vsmarketplace
                 scriptType: pscore
                 scriptLocation: inlineScript
-                workingDirectory: $(Pipeline.Workspace)/${{ platform.artifact }}
+                workingDirectory: $(Pipeline.Workspace)/$(artifactName)
                 inlineScript: |
-                  Write-Host "Publishing VSIX for ${{ platform.artifact }}"
+                  Write-Host "Publishing VSIX for ${{ platform }}"
                   $baseName = Get-ChildItem *.vsix | Select-Object -First 1 | ForEach-Object { $_.BaseName }
                   Write-Host "VSIX baseName: $baseName"
                   # Uncomment and configure the following lines to actually publish
@@ -140,13 +135,7 @@ jobs:
 - job: UpdatePackageVersion
   displayName: "Update Package Versions"
   condition: and(succeeded(), ne(variables['Skip.UpdatePackageVersion'], 'true'))
-  dependsOn:
-    - ${{ format('PublishVSIX_{0}', parameters.Platforms[0].safeName) }}
-    - ${{ format('PublishVSIX_{0}', parameters.Platforms[1].safeName) }}
-    - ${{ format('PublishVSIX_{0}', parameters.Platforms[2].safeName) }}
-    - ${{ format('PublishVSIX_{0}', parameters.Platforms[3].safeName) }}
-    - ${{ format('PublishVSIX_{0}', parameters.Platforms[4].safeName) }}
-    - ${{ format('PublishVSIX_{0}', parameters.Platforms[5].safeName) }}
+  dependsOn: Publish
   steps:
   - checkout: self
 
