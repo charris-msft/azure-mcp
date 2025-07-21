@@ -111,7 +111,7 @@ jobs:
     strategy:
       runOnce:
         deploy:
-        steps:
+          steps:
           - download: current
             artifact: $(artifactName)
             displayName: "Download artifact for ${{ platform }}"
