@@ -1,15 +1,32 @@
+parameters:
+- name: Platforms
+  type: object
+  default:
+    - artifact: vsix_package_linux_x64_signed
+      safeName: Linux_x64
+    - artifact: vsix_package_linux_arm64_signed
+      safeName: Linux_arm64
+    - artifact: vsix_package_osx_x64_signed
+      safeName: OSX_x64
+    - artifact: vsix_package_osx_arm64_signed
+      safeName: OSX_arm64
+    - artifact: vsix_package_win_x64_signed
+      safeName: Win_x64
+    - artifact: vsix_package_win_arm64_signed
+      safeName: Win_arm64
+
 jobs:
-- job: TagRepository
-  displayName: "Create release tag"
-  condition: and(succeeded(), ne(variables['Skip.TagRepository'], 'true'))
-  steps:
-  - checkout: self
+  - job: TagRepository
+    displayName: "Create release tag"
+    condition: and(succeeded(), ne(variables['Skip.TagRepository'], 'true'))
+    steps:
+    - checkout: self
 
-  - download: current
-    displayName: Download $(PipelineArtifactName)_packed
-    artifact: $(PipelineArtifactName)_packed
+    - download: current
+      displayName: Download $(PipelineArtifactName)_packed
+      artifact: $(PipelineArtifactName)_packed
 
-  - template: /eng/common/pipelines/templates/steps/retain-run.yml
+    - template: /eng/common/pipelines/templates/steps/retain-run.yml
 
   - pwsh: |
       gh release create `
@@ -22,136 +39,126 @@ jobs:
     env:
       GH_TOKEN: $(azuresdk-github-pat)
 
-- deployment: Publish
-  displayName: "Publish to npmjs.com"
-  condition: and(succeeded(), ne(variables['Skip.PublishPackage'], 'true'))
-  templateContext:
-    type: releaseJob
-    isProduction: true
-    inputs:
-    - input: pipelineArtifact
-      artifactName: $(PipelineArtifactName)_packed
-      targetPath: $(Pipeline.Workspace)/drop
-  environment: package-publish
-  timeoutInMinutes: 120
-  dependsOn: TagRepository
-  pool:
-    name: azsdk-pool
-    image: ubuntu-24.04
-    os: linux
-  strategy:
-    runOnce:
-      deploy:
-        steps:
-        - task: EsrpRelease@9
-          displayName: Publish platform packages to npmjs.com
-          inputs:
-            ConnectedServiceName: 'Azure SDK PME Managed Identity'
-            ClientId: '5f81938c-2544-4f1f-9251-dd9de5b8a81b'
-            DomainTenantId: '975f013f-7f24-47e8-a7d3-abc4752bf346'
-            UseManagedIdentity: true
-            KeyVaultName: 'kv-azuresdk-codesign'
-            SignCertName: 'azure-sdk-esrp-release-certificate'
-            Intent: 'PackageDistribution'
-            ContentType: 'npm'
-            FolderLocation: $(Pipeline.Workspace)/drop/platform
-            Owners: ${{ coalesce(variables['Build.RequestedForEmail'], 'azuresdk@microsoft.com') }}
-            Approvers: ${{ coalesce(variables['Build.RequestedForEmail'], 'azuresdk@microsoft.com') }}
-            ServiceEndpointUrl: 'https://api.esrp.microsoft.com'
-            MainPublisher: 'ESRPRELPACMANTEST'
-            ProductState: latest
-        - task: EsrpRelease@9
-          displayName: Publish wrapper package to npmjs.com
-          inputs:
-            ConnectedServiceName: 'Azure SDK PME Managed Identity'
-            ClientId: '5f81938c-2544-4f1f-9251-dd9de5b8a81b'
-            DomainTenantId: '975f013f-7f24-47e8-a7d3-abc4752bf346'
-            UseManagedIdentity: true
-            KeyVaultName: 'kv-azuresdk-codesign'
-            SignCertName: 'azure-sdk-esrp-release-certificate'
-            Intent: 'PackageDistribution'
-            ContentType: 'npm'
-            FolderLocation: $(Pipeline.Workspace)/drop/wrapper
-            Owners: ${{ coalesce(variables['Build.RequestedForEmail'], 'azuresdk@microsoft.com') }}
-            Approvers: ${{ coalesce(variables['Build.RequestedForEmail'], 'azuresdk@microsoft.com') }}
-            ServiceEndpointUrl: 'https://api.esrp.microsoft.com'
-            MainPublisher: 'ESRPRELPACMANTEST'
-            ProductState: latest
-        - template: /eng/pipelines/templates/steps/publish-to-dev-feed.yml
-          parameters:
-            PathToArtifacts: $(Pipeline.Workspace)/drop
-            Registry: https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-js/npm/registry/
-            Tag: latest
-
-
-- job: ExtractVsixVersion
-  displayName: "Extract VSIX version from package.json"
-  steps:
-    - pwsh: |
-        $packageJson = Get-Content eng/vscode/package.json -Raw | ConvertFrom-Json
-        Write-Host "##vso[task.setvariable variable=VsixVersion;isOutput=true]$($packageJson.version)"
-      name: setVsixVersion
-      displayName: "Extract VSIX version from package.json"
-
-# Job: Publish VSIX artifacts to Marketplace
-- job: PublishVSCodeVSIX
-  displayName: "Publish VS Code VSIX Artifacts to Marketplace"
-  dependsOn: ExtractVsixVersion
-  condition: and(succeeded(), ne(variables['Skip.PublishVSIX'], 'true'))
-  strategy:
-    matrix:
-      linux_x64:
-        artifactName: vsix_package_linux_x64_signed
-      linux_arm64:
-        artifactName: vsix_package_linux_arm64_signed
-      osx_x64:
-        artifactName: vsix_package_osx_x64_signed
-      osx_arm64:
-        artifactName: vsix_package_osx_arm64_signed
-      win_x64:
-        artifactName: vsix_package_win_x64_signed
-      win_arm64:
-        artifactName: vsix_package_win_arm64_signed
-  pool:
-    name: azsdk-pool
-    image: ubuntu-24.04
-    os: linux
-  steps:
-    - download: current
-      artifact: $(artifactName)
-      displayName: "Download $(artifactName)"
-
-    - task: AzureCLI@2
-      displayName: "Publish (using vsce) - $(artifactName)"
+  - deployment: Publish
+    displayName: "Publish to npmjs.com"
+    condition: and(succeeded(), ne(variables['Skip.PublishPackage'], 'true'))
+    templateContext:
+      type: releaseJob
+      isProduction: true
       inputs:
-        azureSubscription: azure-sdk-vsmarketplace
-        scriptType: pscore
-        scriptLocation: inlineScript
-        workingDirectory: $(Pipeline.Workspace)/$(artifactName)
-        inlineScript: |
-          Write-Host "Publishing VSIX for $(artifactName)"
-          $baseName = Get-ChildItem *.vsix | Select-Object -First 1 | ForEach-Object { $_.BaseName }
-          Write-Host "VSIX baseName: $baseName"
-          # Uncomment and configure the following lines to actually publish
-          # npm install -g @vscode/vsce
-          # vsce publish --azure-credential --packagePath "$($baseName).vsix" --manifestPath "$($baseName).manifest" --signaturePath "$($baseName).signature.p7s"
+      - input: pipelineArtifact
+        artifactName: $(PipelineArtifactName)_packed
+        targetPath: $(Pipeline.Workspace)/drop
+    environment: package-publish
+    timeoutInMinutes: 120
+    dependsOn: TagRepository
+    pool:
+      name: azsdk-pool
+      image: ubuntu-24.04
+      os: linux
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: EsrpRelease@9
+            displayName: Publish platform packages to npmjs.com
+            inputs:
+              ConnectedServiceName: 'Azure SDK PME Managed Identity'
+              ClientId: '5f81938c-2544-4f1f-9251-dd9de5b8a81b'
+              DomainTenantId: '975f013f-7f24-47e8-a7d3-abc4752bf346'
+              UseManagedIdentity: true
+              KeyVaultName: 'kv-azuresdk-codesign'
+              SignCertName: 'azure-sdk-esrp-release-certificate'
+              Intent: 'PackageDistribution'
+              ContentType: 'npm'
+              FolderLocation: $(Pipeline.Workspace)/drop/platform
+              Owners: ${{ coalesce(variables['Build.RequestedForEmail'], 'azuresdk@microsoft.com') }}
+              Approvers: ${{ coalesce(variables['Build.RequestedForEmail'], 'azuresdk@microsoft.com') }}
+              ServiceEndpointUrl: 'https://api.esrp.microsoft.com'
+              MainPublisher: 'ESRPRELPACMANTEST'
+              ProductState: latest
+          - task: EsrpRelease@9
+            displayName: Publish wrapper package to npmjs.com
+            inputs:
+              ConnectedServiceName: 'Azure SDK PME Managed Identity'
+              ClientId: '5f81938c-2544-4f1f-9251-dd9de5b8a81b'
+              DomainTenantId: '975f013f-7f24-47e8-a7d3-abc4752bf346'
+              UseManagedIdentity: true
+              KeyVaultName: 'kv-azuresdk-codesign'
+              SignCertName: 'azure-sdk-esrp-release-certificate'
+              Intent: 'PackageDistribution'
+              ContentType: 'npm'
+              FolderLocation: $(Pipeline.Workspace)/drop/wrapper
+              Owners: ${{ coalesce(variables['Build.RequestedForEmail'], 'azuresdk@microsoft.com') }}
+              Approvers: ${{ coalesce(variables['Build.RequestedForEmail'], 'azuresdk@microsoft.com') }}
+              ServiceEndpointUrl: 'https://api.esrp.microsoft.com'
+              MainPublisher: 'ESRPRELPACMANTEST'
+              ProductState: latest
+          - template: /eng/pipelines/templates/steps/publish-to-dev-feed.yml
+            parameters:
+              PathToArtifacts: $(Pipeline.Workspace)/drop
+              Registry: https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-js/npm/registry/
+              Tag: latest
 
-- job: UpdatePackageVersion
-  displayName: "Update Package Versions"
-  condition: and(succeeded(), ne(variables['Skip.UpdatePackageVersion'], 'true'))
-  dependsOn: PublishVSCodeVSIX
-  steps:
-  - checkout: self
 
-  # Apply the version increment to each library, which updates the Cargo.toml and changelog files.
-  - task: PowerShell@2
-    displayName: Increment version
-    inputs:
-      targetType: filePath
-      filePath: $(Build.SourcesDirectory)/eng/scripts/Update-Version.ps1
+  # Deployment Jobs: Publish VSIX artifacts to Marketplace for each platform
+  - ${{ each platform in parameters.Platforms }}:
+    - deployment: PublishVSIX_${{ platform.safeName }}
+      displayName: "Publish VSIX Artifact to Marketplace - ${{ platform.safeName }}"
+      dependsOn: Publish
+      condition: and(succeeded(), ne(variables['Skip.PublishPackage'], 'true'))
+      environment: package-publish
+      pool:
+        name: azsdk-pool
+        image: ubuntu-24.04
+        os: linux
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - download: current
+                artifact: ${{ platform.artifact }}
+                displayName: "Download ${{ platform.artifact }}"
 
-  - template: /eng/common/pipelines/templates/steps/create-pull-request.yml
-    parameters:
-      PRBranchName: increment-package-version-$(Build.BuildId)
-      CommitMsg: "Increment package version after release"
-      PRTitle: "Increment version after release"
+              # Optionally publish to Marketplace if enabled
+              - task: AzureCLI@2
+                displayName: "Publish (using vsce) - ${{ platform.artifact }}"
+                inputs:
+                  azureSubscription: azure-sdk-vsmarketplace
+                  scriptType: pscore
+                  scriptLocation: inlineScript
+                  workingDirectory: $(Pipeline.Workspace)/${{ platform.artifact }}
+                  inlineScript: |
+                    Write-Host "Publishing VSIX for ${{ platform.artifact }}"
+                    $baseName = Get-ChildItem *.vsix | Select-Object -First 1 | ForEach-Object { $_.BaseName }
+                    Write-Host "VSIX baseName: $baseName"
+                    # Uncomment and configure the following lines to actually publish
+                    # npm install -g @vscode/vsce
+                    # vsce publish --azure-credential --packagePath "$($baseName).vsix" --manifestPath "$($baseName).manifest" --signaturePath "$($baseName).signature.p7s"
+
+
+  - job: UpdatePackageVersion
+    displayName: "Update Package Versions"
+    condition: and(succeeded(), ne(variables['Skip.UpdatePackageVersion'], 'true'))
+    dependsOn:
+      - ${{ format('PublishVSIX_{0}', parameters.Platforms[0].safeName) }}
+      - ${{ format('PublishVSIX_{0}', parameters.Platforms[1].safeName) }}
+      - ${{ format('PublishVSIX_{0}', parameters.Platforms[2].safeName) }}
+      - ${{ format('PublishVSIX_{0}', parameters.Platforms[3].safeName) }}
+      - ${{ format('PublishVSIX_{0}', parameters.Platforms[4].safeName) }}
+      - ${{ format('PublishVSIX_{0}', parameters.Platforms[5].safeName) }}
+    steps:
+    - checkout: self
+
+    # Apply the version increment to each library, which updates the Cargo.toml and changelog files.
+    - task: PowerShell@2
+      displayName: Increment version
+      inputs:
+        targetType: filePath
+        filePath: $(Build.SourcesDirectory)/eng/scripts/Update-Version.ps1
+
+    - template: /eng/common/pipelines/templates/steps/create-pull-request.yml
+      parameters:
+        PRBranchName: increment-package-version-$(Build.BuildId)
+        CommitMsg: "Increment package version after release"
+        PRTitle: "Increment version after release"
