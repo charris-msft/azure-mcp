@@ -99,7 +99,7 @@ jobs:
 - ${{ each platform in parameters.Platforms }}:
   - deployment: PublishVSIX_${{ platform }}
     displayName: "Publish VSIX Artifact to Marketplace - ${{ platform }}"
-    dependsOn: Publish
+    dependsOn: TagRepository
     condition: and(succeeded(), ne(variables['Skip.PublishPackage'], 'true'))
     environment: package-publish
     variables: 
@@ -134,7 +134,7 @@ jobs:
 - job: UpdatePackageVersion
   displayName: "Update Package Versions"
   condition: and(succeeded(), ne(variables['Skip.UpdatePackageVersion'], 'true'))
-  dependsOn: Publish
+  dependsOn: TagRepository
   steps:
   - checkout: self
 
