@@ -1,8 +1,3 @@
-parameters:
-- name: PublishToMarketplace
-  type: boolean
-  default: false
-
 jobs:
 - job: TagRepository
   displayName: "Create release tag"
@@ -98,9 +93,9 @@ jobs:
       name: setVsixVersion
       displayName: "Extract VSIX version from package.json"
 
-# Job: Release VSIX artifacts to Marketplace
-- job: ReleaseVSIX
-  displayName: "Release VSIX Artifacts to Marketplace"
+# Job: Publish VSIX artifacts to Marketplace
+- job: PublishVSCodeVSIX
+  displayName: "Publish VS Code VSIX Artifacts to Marketplace"
   dependsOn: ExtractVsixVersion
   condition: and(succeeded(), ne(variables['Skip.PublishVSIX'], 'true'))
   strategy:
@@ -144,7 +139,7 @@ jobs:
 - job: UpdatePackageVersion
   displayName: "Update Package Versions"
   condition: and(succeeded(), ne(variables['Skip.UpdatePackageVersion'], 'true'))
-  dependsOn: ReleaseVSIX
+  dependsOn: PublishVSCodeVSIX
   steps:
   - checkout: self
 
