@@ -163,7 +163,7 @@ jobs:
       displayName: "Publish VSIX Artifact to Marketplace - ${{ platform.safeName }}"
       dependsOn: ExtractVsixVersion
       condition: and(succeeded(), ne(variables['Skip.PublishPackage'], 'true'))
-      environment: vsix-marketplace
+      environment: package-publish
       pool:
         name: azsdk-pool
         image: ubuntu-24.04
