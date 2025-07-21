@@ -104,14 +104,14 @@ jobs:
 #             Tag: latest
 
 
-# - job: ExtractVsixVersion
-#   displayName: "Extract VSIX version from package.json"
-#   steps:
-#     - pwsh: |
-#         $packageJson = Get-Content eng/vscode/package.json -Raw | ConvertFrom-Json
-#         Write-Host "##vso[task.setvariable variable=VsixVersion;isOutput=true]$($packageJson.version)"
-#       name: setVsixVersion
-#       displayName: "Extract VSIX version from package.json"
+  - job: ExtractVsixVersion
+    displayName: "Extract VSIX version from package.json"
+    steps:
+      - pwsh: |
+          $packageJson = Get-Content eng/vscode/package.json -Raw | ConvertFrom-Json
+          Write-Host "##vso[task.setvariable variable=VsixVersion;isOutput=true]$($packageJson.version)"
+        name: setVsixVersion
+        displayName: "Extract VSIX version from package.json"
 
 # # Job: Release VSIX artifacts to Marketplace
 # - job: ReleaseVSIX
@@ -197,8 +197,12 @@ jobs:
     displayName: "Update Package Versions"
     condition: and(succeeded(), ne(variables['Skip.UpdatePackageVersion'], 'true'))
     dependsOn:
-    ${{ each platform in parameters.Platforms }}:
-      - PublishVSIX_${{ platform.safeName }}
+      ${{ parameters.Platforms[0] && format('PublishVSIX_{0}', parameters.Platforms[0].safeName) }}
+      ${{ parameters.Platforms[1] && format('PublishVSIX_{0}', parameters.Platforms[1].safeName) }}
+      ${{ parameters.Platforms[2] && format('PublishVSIX_{0}', parameters.Platforms[2].safeName) }}
+      ${{ parameters.Platforms[3] && format('PublishVSIX_{0}', parameters.Platforms[3].safeName) }}
+      ${{ parameters.Platforms[4] && format('PublishVSIX_{0}', parameters.Platforms[4].safeName) }}
+      ${{ parameters.Platforms[5] && format('PublishVSIX_{0}', parameters.Platforms[5].safeName) }}
     steps:
     - checkout: self
 
