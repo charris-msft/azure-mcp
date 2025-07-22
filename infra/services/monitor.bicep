@@ -33,7 +33,7 @@ resource workspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
 
 // Create a storage account to monitor
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' = {
-  name: '${baseName}mon'
+  name: baseName
   location: location
   sku: {
     name: 'Standard_LRS'
@@ -188,5 +188,23 @@ resource tableServiceDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-
         }
       }
     ]
+  }
+}
+
+resource blobContributorRoleDefinition 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  scope: subscription()
+  // This is the Storage Blob Data Contributor role.
+  // Read, write, and delete Azure Storage containers and blobs
+  // See https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles#storage
+  name: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
+}
+
+resource appBlobRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' =  {
+  name: guid(blobContributorRoleDefinition.id, testApplicationOid, storageAccount.id)
+  scope: storageAccount
+  properties:{
+    principalId: testApplicationOid
+    roleDefinitionId: blobContributorRoleDefinition.id
+    description: 'Blob Contributor for testApplicationOid'
   }
 }

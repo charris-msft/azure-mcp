@@ -4,7 +4,7 @@ targetScope = 'resourceGroup'
 param baseName string = resourceGroup().name
 
 @description('The location for the Datadog monitor')
-param location string
+param location string = resourceGroup().location == 'westus' ? 'westus2' : resourceGroup().location
 
 @description('The tenant ID to which the application and resources belong.')
 param tenantId string
@@ -12,7 +12,8 @@ param tenantId string
 @description('The client OID to grant access')
 param testApplicationOid string
 
-resource datadogMonitor 'Microsoft.Datadog/monitors@2023-01-01' = {
+// This module is conditionally deployed only for the specific tenant ID.
+resource datadogMonitor 'Microsoft.Datadog/monitors@2023-01-01' = if (tenantId == '888d76fa-54b2-4ced-8ee5-aac1585adee7') {
   name: baseName
   location: location
   sku: {
@@ -35,10 +36,10 @@ resource datadogMonitor 'Microsoft.Datadog/monitors@2023-01-01' = {
 
 resource datadogContributorRole 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
   scope: subscription()
-  name: '8e3af657-a8ff-443c-a75c-2fe8c4bcb635' 
+  name: '8e3af657-a8ff-443c-a75c-2fe8c4bcb635'
 }
 
-resource datadogRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+resource datadogRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (tenantId == '888d76fa-54b2-4ced-8ee5-aac1585adee7') {
   name: guid(testApplicationOid, datadogContributorRole.id, datadogMonitor.id)
   scope: datadogMonitor
   properties: {

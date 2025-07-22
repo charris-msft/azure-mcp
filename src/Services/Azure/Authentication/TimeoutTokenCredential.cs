@@ -3,6 +3,8 @@
 
 using Azure.Core;
 
+namespace AzureMcp.Services.Azure.Authentication;
+
 public class TimeoutTokenCredential(TokenCredential innerCredential, TimeSpan timeout) : TokenCredential
 {
     private readonly TokenCredential _innerCredential = innerCredential;

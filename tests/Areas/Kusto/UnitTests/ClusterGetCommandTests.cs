@@ -6,7 +6,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using AzureMcp.Areas.Kusto.Commands;
 using AzureMcp.Areas.Kusto.Services;
-using AzureMcp.Commands.Kusto;
 using AzureMcp.Models.Command;
 using AzureMcp.Options;
 using Microsoft.Extensions.DependencyInjection;

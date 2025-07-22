@@ -6,6 +6,7 @@ using System.CommandLine.Parsing;
 using System.Text.Json;
 using AzureMcp.Areas.Redis.Commands.CacheForRedis;
 using AzureMcp.Areas.Redis.Services;
+using AzureMcp.Models;
 using AzureMcp.Models.Command;
 using AzureMcp.Options;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,7 +40,7 @@ public class CacheListCommandTests
     public async Task ExecuteAsync_ReturnsCaches_WhenCachesExist()
     {
         var expectedCaches = new CacheModel[] { new() { Name = "cache1" }, new() { Name = "cache2" } };
-        _redisService.ListCachesAsync("sub123", Arg.Any<string>(), Arg.Any<Models.AuthMethod>(), Arg.Any<RetryPolicyOptions>())
+        _redisService.ListCachesAsync("sub123", Arg.Any<string>(), Arg.Any<AuthMethod>(), Arg.Any<RetryPolicyOptions>())
             .Returns(expectedCaches);
 
         var command = new CacheListCommand(_logger);
@@ -84,7 +85,7 @@ public class CacheListCommandTests
     public async Task ExecuteAsync_HandlesException()
     {
         var expectedError = "Test error. To mitigate this issue, please refer to the troubleshooting guidelines here at https://aka.ms/azmcp/troubleshooting.";
-        _redisService.ListCachesAsync("sub123", Arg.Any<string>(), Arg.Any<Models.AuthMethod>(), Arg.Any<RetryPolicyOptions>())
+        _redisService.ListCachesAsync("sub123", Arg.Any<string>(), Arg.Any<AuthMethod>(), Arg.Any<RetryPolicyOptions>())
             .ThrowsAsync(new Exception("Test error"));
 
         var command = new CacheListCommand(_logger);

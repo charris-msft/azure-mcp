@@ -5,7 +5,7 @@ using System.Diagnostics;
 using AzureMcp.Tests.Client.Helpers;
 using Xunit;
 
-namespace AzureMcp.Tests.Client;
+namespace AzureMcp.Tests.Client.LiveTests;
 
 [Trait("Area", "Core")]
 public class NpxTests : IClassFixture<LiveTestSettingsFixture>

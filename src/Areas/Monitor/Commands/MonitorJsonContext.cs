@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using AzureMcp.Areas.Monitor.Commands.Metrics;
 using AzureMcp.Areas.Monitor.Commands.Table;
@@ -9,6 +10,7 @@ using AzureMcp.Areas.Monitor.Commands.Workspace;
 
 namespace AzureMcp.Commands.Monitor;
 
+[JsonSerializable(typeof(List<JsonNode>))]
 [JsonSerializable(typeof(WorkspaceListCommand.WorkspaceListCommandResult))]
 [JsonSerializable(typeof(TableListCommand.TableListCommandResult))]
 [JsonSerializable(typeof(TableTypeListCommand.TableTypeListCommandResult))]

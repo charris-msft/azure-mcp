@@ -6,6 +6,9 @@ using AzureMcp.Tests;
 using AzureMcp.Tests.Client;
 using AzureMcp.Tests.Client.Helpers;
 using Xunit;
+
+namespace AzureMcp.Tests.Areas.LoadTesting.LiveTests;
+
 public class LoadTestingCommandTests : CommandTestsBase,
     IClassFixture<LiveTestFixture>
 {
@@ -24,7 +27,7 @@ public class LoadTestingCommandTests : CommandTestsBase,
     {
         // Arrange
         var result = await CallToolAsync(
-            "azmcp-loadtesting-testresource-list",
+            "azmcp_loadtesting_testresource_list",
             new()
             {
                 { "subscription", _subscriptionId },

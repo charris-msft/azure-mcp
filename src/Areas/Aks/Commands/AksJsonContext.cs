@@ -9,6 +9,6 @@ namespace AzureMcp.Commands.Aks;
 
 [JsonSerializable(typeof(ClusterListCommand.ClusterListCommandResult))]
 [JsonSerializable(typeof(ClusterGetCommand.ClusterGetCommandResult))]
-[JsonSerializable(typeof(Cluster))]
+[JsonSerializable(typeof(Models.Cluster))]
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 internal sealed partial class AksJsonContext : JsonSerializerContext;

@@ -19,7 +19,7 @@ public sealed class EntityGetHealthCommand(ILogger<EntityGetHealthCommand> logge
          $"""
         Gets the health of an entity from a specified Azure Monitor Health Model.
         Returns entity health information.
-        
+
         Required arguments:
         - {MonitorOptionDefinitions.Health.Entity.Name}: The entity to get health for
         - {MonitorOptionDefinitions.Health.HealthModel.Name}: The health model name
@@ -70,7 +70,7 @@ public sealed class EntityGetHealthCommand(ILogger<EntityGetHealthCommand> logge
                 options.Tenant,
                 options.RetryPolicy);
 
-            context.Response.Results = ResponseResult.Create(result, JsonSourceGenerationContext.Default.JsonNode);
+            context.Response.Results = ResponseResult.Create(result, MonitorJsonContext.Default.JsonNode);
         }
         catch (Exception ex)
         {

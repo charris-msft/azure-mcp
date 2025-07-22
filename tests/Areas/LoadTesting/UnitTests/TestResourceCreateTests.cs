@@ -12,6 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
+
+namespace AzureMcp.Areas.LoadTesting.UnitTests;
+
 public class TestResourceCreateCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

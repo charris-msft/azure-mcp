@@ -6,7 +6,7 @@ using Xunit;
 
 namespace AzureMcp.Tests;
 
-public static class Extensions
+public static class TestExtensions
 {
     public const string RunningFromDotnetTestReason =
         "Test skipped when running from dotnet test. This test requires interactive environment.";

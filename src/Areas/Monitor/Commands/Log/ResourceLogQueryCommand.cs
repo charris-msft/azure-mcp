@@ -28,7 +28,7 @@ public sealed class ResourceLogQueryCommand(ILogger<ResourceLogQueryCommand> log
         - The {MonitorOptionDefinitions.TableNameName} parameter specifies the Log Analytics table to query.
         - The {MonitorOptionDefinitions.QueryTextName} parameter accepts a KQL query or a predefined query name.
         - Optional parameters: {MonitorOptionDefinitions.HoursName} (default: {MonitorOptionDefinitions.Hours.GetDefaultValue()}) to set the time range, and {MonitorOptionDefinitions.LimitName} (default: {MonitorOptionDefinitions.Limit.GetDefaultValue()}) to limit the number of results.
-        
+
         This tool is useful for:
         - Querying logs for any Azure resource by resourceId
         - Investigating diagnostics, errors, and activity logs
@@ -69,7 +69,7 @@ public sealed class ResourceLogQueryCommand(ILogger<ResourceLogQueryCommand> log
                 options.Tenant,
                 options.RetryPolicy);
 
-            context.Response.Results = ResponseResult.Create(results, JsonSourceGenerationContext.Default.ListJsonNode);
+            context.Response.Results = ResponseResult.Create(results, MonitorJsonContext.Default.ListJsonNode);
         }
         catch (Exception ex)
         {

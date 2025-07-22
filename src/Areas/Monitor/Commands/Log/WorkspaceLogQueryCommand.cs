@@ -65,7 +65,7 @@ public sealed class WorkspaceLogQueryCommand(ILogger<WorkspaceLogQueryCommand> l
                 options.Tenant,
                 options.RetryPolicy);
 
-            context.Response.Results = ResponseResult.Create(results, JsonSourceGenerationContext.Default.ListJsonNode);
+            context.Response.Results = ResponseResult.Create(results, MonitorJsonContext.Default.ListJsonNode);
         }
         catch (Exception ex)
         {

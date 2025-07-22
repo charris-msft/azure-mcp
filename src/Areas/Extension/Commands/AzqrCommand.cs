@@ -97,7 +97,7 @@ public sealed class AzqrCommand(ILogger<AzqrCommand> logger, int processTimeoutS
                 return response;
             }
             var resultObj = new AzqrReportResult(xlsxReportFilePath, jsonReportFilePath, result.Output);
-            response.Results = ResponseResult.Create(resultObj, JsonSourceGenerationContext.Default.AzqrReportResult);
+            response.Results = ResponseResult.Create(resultObj, ExtensionJsonContext.Default.AzqrReportResult);
             response.Status = 200;
             response.Message = "azqr report generated successfully.";
             return response;

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureMcp.Areas.Tools;
 
-internal sealed class ToolsSetup : IAreaSetup
+public sealed class ToolsSetup : IAreaSetup
 {
     public void ConfigureServices(IServiceCollection services)
     {

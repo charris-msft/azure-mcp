@@ -8,7 +8,7 @@ using ModelContextProtocol.Client;
 using ModelContextProtocol.Protocol;
 using Xunit;
 
-namespace AzureMcp.Tests.Client;
+namespace AzureMcp.Tests.Client.LiveTests;
 
 [Trait("Area", "Core")]
 public class ClientToolTests(LiveTestFixture liveTestFixture) : IClassFixture<LiveTestFixture>

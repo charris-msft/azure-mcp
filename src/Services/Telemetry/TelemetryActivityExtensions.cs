@@ -6,7 +6,7 @@ using AzureMcp.Options;
 
 namespace AzureMcp.Services.Telemetry
 {
-    internal static class TelemetryActivityExtensions
+    public static class TelemetryActivityExtensions
     {
         public static Activity? WithSubscriptionTag(this Activity? activity, SubscriptionOptions subscriptionOptions)
         {

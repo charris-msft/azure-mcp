@@ -12,13 +12,6 @@ using AzureMcp.Options;
 
 namespace AzureMcp.Commands;
 
-internal static class TrimAnnotations
-{
-    public const DynamicallyAccessedMemberTypes CommandAnnotations =
-        DynamicallyAccessedMemberTypes.PublicProperties
-        | DynamicallyAccessedMemberTypes.NonPublicProperties;
-}
-
 public abstract class GlobalCommand<
     [DynamicallyAccessedMembers(TrimAnnotations.CommandAnnotations)] TOptions> : BaseCommand
     where TOptions : GlobalOptions, new()

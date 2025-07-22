@@ -10,7 +10,6 @@ using AzureMcp.Models;
 using AzureMcp.Models.Command;
 using AzureMcp.Options;
 using AzureMcp.Services.Azure.Subscription;
-using AzureMcp.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ModelContextProtocol.Server;

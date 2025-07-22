@@ -11,7 +11,7 @@ namespace AzureMcp.Areas.Server;
 /// <summary>
 /// Initializes and configures the Server area for the Azure MCP application.
 /// </summary>
-internal sealed class ServerSetup : IAreaSetup
+public sealed class ServerSetup : IAreaSetup
 {
     /// <summary>
     /// Configures services required for the Server area.
