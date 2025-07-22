@@ -83,7 +83,7 @@ public static class AzureMcpServiceCollectionExtensions
         {
             services.AddSingleton<IToolLoader, ServerToolLoader>();
         }
-        else
+        else // null, "all", or any other unrecognized mode - expose all tools individually
         {
             services.AddSingleton<IMcpDiscoveryStrategy, RegistryDiscoveryStrategy>();
             services.AddSingleton<IToolLoader>(sp =>
