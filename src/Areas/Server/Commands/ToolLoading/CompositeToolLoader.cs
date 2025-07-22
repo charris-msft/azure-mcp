@@ -126,7 +126,7 @@ public sealed class CompositeToolLoader(IEnumerable<IToolLoader> toolLoaders, IL
             var errorMessage = $"The tool {request.Params.Name} was not found";
             var errorData = new Dictionary<string, object?> { ["error"] = errorMessage };
             var errorJson = JsonSerializer.Serialize(errorData, ServerJsonContext.Default.DictionaryStringObject);
-            
+
             var content = new TextContentBlock
             {
                 Text = errorJson,

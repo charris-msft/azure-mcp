@@ -19,8 +19,22 @@ public sealed class ToolLoaderJsonErrorTests
     {
         // Arrange
         var mockLogger = Substitute.For<ILogger<CompositeToolLoader>>();
-        var mockToolLoaders = new List<IToolLoader>();
+        
+        // Create a mock loader with a known tool to satisfy the requirement of at least one loader
+        var mockLoader = Substitute.For<IToolLoader>();
+        mockLoader.ListToolsHandler(Arg.Any<RequestContext<ListToolsRequestParams>>(), Arg.Any<CancellationToken>())
+            .Returns(new ListToolsResult { Tools = new List<Tool> { CreateTestTool("existing-tool") } });
+        
+        var mockToolLoaders = new List<IToolLoader> { mockLoader };
         var compositeLoader = new CompositeToolLoader(mockToolLoaders, mockLogger);
+        
+        // Initialize the tool map by calling ListToolsHandler
+        var mockServer = Substitute.For<IMcpServer>();
+        var listRequest = new RequestContext<ListToolsRequestParams>(mockServer)
+        {
+            Params = new ListToolsRequestParams()
+        };
+        await compositeLoader.ListToolsHandler(listRequest, CancellationToken.None);
 
         var mockServer = Substitute.For<IMcpServer>();
         var request = new RequestContext<CallToolRequestParams>(mockServer)
@@ -67,5 +81,20 @@ public sealed class ToolLoaderJsonErrorTests
         {
             return false;
         }
+    }
+
+    private static Tool CreateTestTool(string name, string description = "Test tool")
+    {
+        return new Tool
+        {
+            Name = name,
+            Description = description,
+            InputSchema = JsonDocument.Parse("""
+                {
+                    "type": "object",
+                    "properties": {}
+                }
+                """).RootElement
+        };
     }
 }
