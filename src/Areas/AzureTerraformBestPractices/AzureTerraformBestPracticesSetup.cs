@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureMcp.Areas.AzureTerraformBestPractices;
 
-internal class AzureTerraformBestPracticesSetup : IAreaSetup
+public class AzureTerraformBestPracticesSetup : IAreaSetup
 {
     public void ConfigureServices(IServiceCollection services)
     {

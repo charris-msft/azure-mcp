@@ -11,7 +11,7 @@ using AzureMcp.Services.Azure.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace AzureMcp.Tests.Helpers;
+namespace AzureMcp.Tests.Areas.Monitor.LiveTests;
 
 /// <summary>
 /// Helper class for sending logs to Azure Log Analytics using the Azure Monitor Ingestion SDK.

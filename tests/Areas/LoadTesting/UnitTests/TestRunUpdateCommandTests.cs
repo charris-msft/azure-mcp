@@ -13,6 +13,8 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 
+namespace AzureMcp.Areas.LoadTesting.UnitTests;
+
 public class TestRunUpdateCommandTests
 {
     private readonly IServiceProvider _serviceProvider;

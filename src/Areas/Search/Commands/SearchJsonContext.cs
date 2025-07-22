@@ -5,6 +5,8 @@ using System.Text.Json.Serialization;
 using AzureMcp.Areas.Search.Commands.Index;
 using AzureMcp.Areas.Search.Commands.Service;
 
+namespace AzureMcp.Areas.Search.Commands;
+
 [JsonSerializable(typeof(ServiceListCommand.ServiceListCommandResult))]
 [JsonSerializable(typeof(IndexListCommand.IndexListCommandResult))]
 [JsonSerializable(typeof(IndexDescribeCommand.IndexDescribeCommandResult))]

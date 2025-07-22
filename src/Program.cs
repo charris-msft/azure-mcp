@@ -21,6 +21,8 @@ internal class Program
     {
         try
         {
+            AzureMcp.Areas.Server.Commands.ServiceStartCommand.ConfigureServices = ConfigureServices;
+
             ServiceCollection services = new();
             ConfigureServices(services);
 

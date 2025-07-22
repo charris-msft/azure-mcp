@@ -7,6 +7,7 @@ using System.Text.Json;
 using AzureMcp.Areas.Redis.Commands.CacheForRedis;
 using AzureMcp.Areas.Redis.Models.CacheForRedis;
 using AzureMcp.Areas.Redis.Services;
+using AzureMcp.Models;
 using AzureMcp.Models.Command;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -48,7 +49,7 @@ public class AccessPolicyListCommandTests
             "rg1",
             "sub123",
             Arg.Any<string>(),
-            Arg.Any<Models.AuthMethod>(),
+            Arg.Any<AuthMethod>(),
             Arg.Any<AzureMcp.Options.RetryPolicyOptions>())
             .Returns(expectedAssignments);
 
@@ -84,7 +85,7 @@ public class AccessPolicyListCommandTests
             "rg1",
             "sub123",
             Arg.Any<string>(),
-            Arg.Any<Models.AuthMethod>(),
+            Arg.Any<AuthMethod>(),
             Arg.Any<AzureMcp.Options.RetryPolicyOptions>())
             .Returns([]);
 
@@ -107,7 +108,7 @@ public class AccessPolicyListCommandTests
             resourceGroupName: "rg1",
             subscriptionId: "sub123",
             tenant: Arg.Any<string>(),
-            authMethod: Arg.Any<Models.AuthMethod>(),
+            authMethod: Arg.Any<AuthMethod>(),
             retryPolicy: Arg.Any<AzureMcp.Options.RetryPolicyOptions>())
             .ThrowsAsync(new Exception("Test error"));
 

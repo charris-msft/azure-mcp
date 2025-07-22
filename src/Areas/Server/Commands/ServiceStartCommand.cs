@@ -3,7 +3,6 @@
 
 using AzureMcp.Areas.Server.Options;
 using AzureMcp.Commands;
-using AzureMcp.Models.Option;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -40,6 +39,8 @@ public sealed class ServiceStartCommand : BaseCommand
     /// Gets the title of the command.
     /// </summary>
     public override string Title => CommandTitle;
+
+    public static Action<IServiceCollection> ConfigureServices { get; set; } = _ => { };
 
     /// <summary>
     /// Registers command options for the service start command.
@@ -122,7 +123,7 @@ public sealed class ServiceStartCommand : BaseCommand
             })
             .ConfigureServices(services =>
             {
-                Program.ConfigureServices(services);
+                ConfigureServices(services);
                 ConfigureMcpServer(services, serverOptions);
             })
             .Build();

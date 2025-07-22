@@ -9,17 +9,14 @@ param baseName string = resourceGroup().name
 param location string = resourceGroup().location
 
 @description('The tenant ID to which the application and resources belong.')
-param tenantId string = '72f988bf-86f1-41af-91ab-2d7cd011db47'
+param tenantId string = subscription().tenantId
 
 @description('The client OID to grant access to test resources.')
-param testApplicationOid string
+param testApplicationOid string = deployer().objectId
 
-@maxLength(12)
-@description('The base name for static resources.')
-param staticBaseName string
-
-@description('The static resource group name.')
-param staticResourceGroupName string
+var staticSuffix = toLower(substring(subscription().subscriptionId, 0, 4))
+var staticBaseName = 'mcp${staticSuffix}'
+var staticResourceGroupName = 'mcp-static-${staticSuffix}'
 
 // Is this deployment to the TME tenant
 var isTmeTenant = tenantId == '70a036f6-8e4d-4615-bad6-149c02e7720d'
@@ -209,3 +206,7 @@ resource search_openAi_roleAssignment 'Microsoft.Authorization/roleAssignments@2
   }
 }
 
+output staticBaseName string = staticBaseName
+output staticResourceGroupName string = staticResourceGroupName
+output storageAccountName string = storageAccount.name
+output containerName string = storageAccount::blobServices::searchDocsContainer.name

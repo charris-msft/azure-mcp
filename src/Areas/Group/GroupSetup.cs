@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureMcp.Areas.Group;
 
-internal sealed class GroupSetup : IAreaSetup
+public sealed class GroupSetup : IAreaSetup
 {
     public void ConfigureServices(IServiceCollection services)
     {

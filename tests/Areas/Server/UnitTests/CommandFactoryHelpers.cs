@@ -3,6 +3,9 @@
 
 using System.Diagnostics;
 using AzureMcp.Areas;
+using AzureMcp.Areas.KeyVault;
+using AzureMcp.Areas.Storage;
+using AzureMcp.Areas.Subscription;
 using AzureMcp.Commands;
 using AzureMcp.Services.Telemetry;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,15 +18,18 @@ internal class CommandFactoryHelpers
 {
     public static CommandFactory CreateCommandFactory(IServiceProvider? serviceProvider = default)
     {
-        IServiceProvider services = serviceProvider ?? new ServiceCollection().AddLogging().BuildServiceProvider();
+        IServiceProvider services = serviceProvider ?? new ServiceCollection()
+            .AddLogging()
+            .BuildServiceProvider();
 
         var logger = services.GetRequiredService<ILogger<CommandFactory>>();
         var telemetryService = services.GetService<ITelemetryService>() ?? new NoOpTelemetryService();
-        var areaSetups = typeof(IAreaSetup).Assembly.GetTypes()
-           .Where(t => typeof(IAreaSetup).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
-           .Select(t => ActivatorUtilities.CreateInstance(services, t) as IAreaSetup)
-           .OfType<IAreaSetup>()
-           .ToArray();
+
+        IAreaSetup[] areaSetups = [
+            new SubscriptionSetup(),
+            new KeyVaultSetup(),
+            new StorageSetup()
+        ];
 
         var commandFactory = new CommandFactory(services, areaSetups, telemetryService, logger);
 

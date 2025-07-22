@@ -163,7 +163,7 @@ public sealed class AzdCommand(ILogger<AzdCommand> logger, int processTimeoutSec
             var processService = context.GetService<IExternalProcessService>();
             processService.SetEnvironmentVariables(new Dictionary<string, string>
             {
-                ["AZURE_DEV_USER_AGENT"] = BaseAzureService.s_defaultUserAgent,
+                ["AZURE_DEV_USER_AGENT"] = BaseAzureService.DefaultUserAgent,
             });
 
             var azdPath = FindAzdCliPath() ?? throw new FileNotFoundException("Azure Developer CLI executable not found in PATH or common installation locations. Please ensure Azure Developer CLI is installed.");
@@ -279,7 +279,7 @@ public sealed class AzdCommand(ILogger<AzdCommand> logger, int processTimeoutSec
                 break;
         }
 
-        response.Results = ResponseResult.Create(contentResults, JsonSourceGenerationContext.Default.ListString);
+        response.Results = ResponseResult.Create(contentResults, ExtensionJsonContext.Default.ListString);
 
         return response;
     }
@@ -351,7 +351,7 @@ public sealed class AzdCommand(ILogger<AzdCommand> logger, int processTimeoutSec
             );
         }
 
-        response.Results = ResponseResult.Create(contentResults, JsonSourceGenerationContext.Default.ListString);
+        response.Results = ResponseResult.Create(contentResults, ExtensionJsonContext.Default.ListString);
 
         return response;
     }

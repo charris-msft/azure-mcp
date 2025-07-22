@@ -15,7 +15,7 @@ namespace AzureMcp.Services.Azure;
 public abstract class BaseAzureService(ITenantService? tenantService = null, ILoggerFactory? loggerFactory = null)
 {
     private static readonly UserAgentPolicy s_sharedUserAgentPolicy;
-    internal static readonly string s_defaultUserAgent;
+    public static readonly string DefaultUserAgent;
 
     private CustomChainedCredential? _credential;
     private string? _lastTenantId;
@@ -32,11 +32,11 @@ public abstract class BaseAzureService(ITenantService? tenantService = null, ILo
         var framework = assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName;
         var platform = System.Runtime.InteropServices.RuntimeInformation.OSDescription;
 
-        s_defaultUserAgent = $"azmcp/{version} ({framework}; {platform})";
-        s_sharedUserAgentPolicy = new UserAgentPolicy(s_defaultUserAgent);
+        DefaultUserAgent = $"azmcp/{version} ({framework}; {platform})";
+        s_sharedUserAgentPolicy = new UserAgentPolicy(DefaultUserAgent);
     }
 
-    protected string UserAgent { get; } = s_defaultUserAgent;
+    protected string UserAgent { get; } = DefaultUserAgent;
 
     protected async Task<string?> ResolveTenantIdAsync(string? tenant)
     {

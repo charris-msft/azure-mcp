@@ -1,37 +1,58 @@
 param(
+    [string] $TenantId,
+    [string] $TestApplicationId,
     [string] $ResourceGroupName,
     [string] $BaseName,
-    [string] $StaticResourceGroupName,
-    [string] $StaticBaseName
+    [hashtable] $DeploymentOutputs
 )
+
 
 $ErrorActionPreference = "Stop"
 
-. "$PSScriptRoot/../../eng/common/scripts/common.ps1"
+. "$PSScriptRoot/../../../eng/common/scripts/common.ps1"
+. "$PSScriptRoot/../../../eng/scripts/helpers/TestResourcesHelpers.ps1"
 
-$context = Get-AzContext
+$testSettings = New-TestSettings @PSBoundParameters -OutputPath $PSScriptRoot
 
-# Get current subscription ID
-$subscriptionId = $context.Subscription.Id
-$tenantId = $context.Tenant.Id
+$samplesPath = "$PSScriptRoot/samples".Replace('\', '/')
+
+$tenantId = $testSettings.TenantId
+$subscriptionId = $testSettings.SubscriptionId
+
+#cspell: words STATICRESOURCEGROUPNAME, STATICBASENAME, STORAGEACCOUNTNAME, CONTAINERNAME
+
+$staticBaseName = $DeploymentOutputs.STATICBASENAME
+$staticResourceGroupName = $DeploymentOutputs.STATICRESOURCEGROUPNAME
+$storageAccountName = $DeploymentOutputs.STORAGEACCOUNTNAME
+$containerName = $DeploymentOutputs.CONTAINERNAME
+
 $isTmeTenant = $tenantId -eq '70a036f6-8e4d-4615-bad6-149c02e7720d'
 
 # Use the constructed name for the openai resource from ./aiSearch.bicep
 # Find the existing managed identity and openai resource
 if($isTmeTenant) {
-    $openAiResourceName = $StaticBaseName
-    $managedIdentityName = "$StaticBaseName-search-service-identity"
-    $managedIdentity = Get-AzUserAssignedIdentity -ResourceGroupName $StaticResourceGroupName -Name $managedIdentityName
+    $openAiResourceName = $staticBaseName
+    $managedIdentityName = "$staticBaseName-search-service-identity"
+    $managedIdentityResourceGroup = $staticResourceGroupName
 } else {
     $openAiResourceName = $BaseName
-    $managedIdentityName = "$BaseName-openai-search-service-identity"
-    $managedIdentity = Get-AzUserAssignedIdentity -ResourceGroupName $ResourceGroupName -Name $managedIdentityName
+    $managedIdentityName = "$BaseName-search-service-identity"
+    $managedIdentityResourceGroup = $ResourceGroupName
 }
+
+# Configure the Azure Search service
+
+Write-Host "Initializing search service:"
+Write-Host "  Tenant ID: $tenantId"
+Write-Host "  Subscription ID: $subscriptionId"
+Write-Host "  OpenAI Resource Name: $openAiResourceName"
+Write-Host "  Managed Identity Resource Group: $managedIdentityResourceGroup"
+Write-Host "  Managed Identity Name: $managedIdentityName"
+
+$managedIdentity = Get-AzUserAssignedIdentity -ResourceGroupName $managedIdentityResourceGroup -Name $managedIdentityName
 
 $token = Get-AzAccessToken -ResourceUrl https://search.azure.com -AsSecureString | Select-Object -ExpandProperty Token
 $uri = "https://$BaseName.search.windows.net"
-$storageAccountName = "$($BaseName)ais"
-$containerName = 'searchdocs'
 
 $apiVersion = "2024-09-01-preview"
 
@@ -233,7 +254,7 @@ $indexerDefinition = @{
 $context = New-AzStorageContext -StorageAccountName $storageAccountName -UseConnectedAccount
 $categories = @('A', 'B', 'C')
 Write-Host "Uploading sample files to blob storage: $storageAccountName/$containerName" -ForegroundColor Yellow
-$files = Get-ChildItem -Path "$PSScriptRoot/../samples" -Filter '*.md'
+$files = Get-ChildItem -Path $samplesPath -Filter '*.md'
 $i = 0;
 foreach ($file in $files) {
     $category = $categories[$i++ % $categories.Count]

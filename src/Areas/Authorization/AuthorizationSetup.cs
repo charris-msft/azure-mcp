@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureMcp.Areas.Authorization;
 
-internal sealed class AuthorizationSetup : IAreaSetup
+public sealed class AuthorizationSetup : IAreaSetup
 {
     public void ConfigureServices(IServiceCollection services)
     {

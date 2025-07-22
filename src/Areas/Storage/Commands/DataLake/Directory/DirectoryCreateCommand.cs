@@ -1,12 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using AzureMcp.Areas.Storage.Commands;
 using AzureMcp.Areas.Storage.Models;
 using AzureMcp.Areas.Storage.Options;
 using AzureMcp.Areas.Storage.Options.DataLake.Directory;
 using AzureMcp.Areas.Storage.Services;
-using AzureMcp.Commands.Storage;
 using AzureMcp.Services.Telemetry;
 using Microsoft.Extensions.Logging;
 
@@ -25,8 +23,8 @@ public sealed class DirectoryCreateCommand(ILogger<DirectoryCreateCommand> logge
         """
         Create a directory in a Data Lake file system. This command creates a new directory at the specified path
         within the Data Lake file system. The directory path must include the file system name as the first component
-        (e.g., 'myfilesystem/data/logs' or 'myfilesystem/archives/2024'). The path supports nested structures using 
-        forward slashes (/). If the directory already exists, the operation will succeed and return the existing 
+        (e.g., 'myfilesystem/data/logs' or 'myfilesystem/archives/2024'). The path supports nested structures using
+        forward slashes (/). If the directory already exists, the operation will succeed and return the existing
         directory information. Returns directory metadata including name, type, and creation timestamp as JSON.
         """;
 

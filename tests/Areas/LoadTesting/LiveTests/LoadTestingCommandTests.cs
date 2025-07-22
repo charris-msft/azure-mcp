@@ -6,6 +6,9 @@ using AzureMcp.Tests;
 using AzureMcp.Tests.Client;
 using AzureMcp.Tests.Client.Helpers;
 using Xunit;
+
+namespace AzureMcp.Tests.Areas.LoadTesting.LiveTests;
+
 public class LoadTestingCommandTests : CommandTestsBase,
     IClassFixture<LiveTestFixture>
 {

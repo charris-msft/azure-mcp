@@ -8,7 +8,7 @@ using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 using Xunit;
 
-namespace AzureMcp.Tests.Client;
+namespace AzureMcp.Tests.Client.UnitTests;
 
 [Trait("Area", "Core")]
 public class MockClientTests

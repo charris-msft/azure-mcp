@@ -6,7 +6,7 @@ using Azure.ResourceManager.Models;
 using Azure.ResourceManager.Resources;
 using Azure.ResourceManager.Resources.Models;
 
-namespace AzureMcp.Tests.Helpers;
+namespace AzureMcp.Tests.Areas.Subscription.UnitTests;
 
 /// <summary>
 /// Helper methods for creating test subscription data using the Azure SDK model factories.
