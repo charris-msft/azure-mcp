@@ -14,7 +14,7 @@ $RepoRoot = $RepoRoot.Path.Replace('\', '/')
 $entitlements = "$RepoRoot/eng/dotnet-executable-entitlements.plist"
 
 $artifactDirectories = Get-ChildItem -Path $ArtifactsPath -Directory
-| Where-Object { $_.Name -like "$ArtifactPrefix*" }
+| Where-Object { $_.Name -like "$ArtifactPrefix*" } `
 | Where-Object { $_.Name -notlike '*FailedAttempt*' }
 
 New-Item -ItemType Directory -Force -Path $OutputPath | Out-Null
@@ -61,9 +61,23 @@ foreach ($packageJson in $packageJsonFiles) {
         Write-Host "Deleting $binaryFilePath" -ForegroundColor Yellow
         Remove-Item -Path $binaryFilePath -Force -ProgressAction SilentlyContinue
     }
+}
 
-    Write-Host "Copying $packageDirectory to $OutputPath`n" -ForegroundColor Yellow
-    Copy-Item -Path $packageDirectory -Destination $OutputPath -Recurse -Force
+foreach ($artifactDirectory in $artifactDirectories) {
+    $nugetDir = Get-ChildItem -Path $artifactDirectory -Directory -Name "nuget" -ErrorAction SilentlyContinue
+    $npmDir = Get-ChildItem -Path $artifactDirectory -Directory -Name "npm" -ErrorAction SilentlyContinue
+    
+    if ($nugetDir) {
+        $nugetPath = Join-Path $artifactDirectory $nugetDir
+        Write-Host "Copying nuget directory from $nugetPath to $OutputPath" -ForegroundColor Yellow
+        Copy-Item -Path $nugetPath -Destination $OutputPath -Recurse -Force
+    }
+    
+    if ($npmDir) {
+        $npmPath = Join-Path $artifactDirectory $npmDir
+        Write-Host "Copying npm directory from $npmPath to $OutputPath" -ForegroundColor Yellow
+        Copy-Item -Path $npmPath -Destination $OutputPath -Recurse -Force
+    }
 }
 
 Write-Host "`n##[group] Output Path Contents:"
