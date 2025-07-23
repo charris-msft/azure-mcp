@@ -68,6 +68,7 @@ The Azure MCP Server supercharges your agents with Azure context. Here are some 
 ### ⚙️ Azure App Configuration
 
 * "List my App Configuration stores"
+* "Show my key-value pairs in App Config"
 
 ### ☸️ Azure Kubernetes Service (AKS)
 
