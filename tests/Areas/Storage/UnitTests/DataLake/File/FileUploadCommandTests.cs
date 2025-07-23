@@ -91,12 +91,12 @@ public class FileUploadCommandTests
         Assert.Equal("Success", response.Message);
         Assert.NotNull(response.Results);
 
-        var result = JsonSerializer.Deserialize(response.Results.Value.ToString(),
-            typeof(JsonElement)) as JsonElement?;
-        var file = result?.GetProperty("file");
-        Assert.Equal(_knownFilePath, file?.GetProperty("name").GetString());
-        Assert.Equal("file", file?.GetProperty("type").GetString());
-        Assert.Equal(1024, file?.GetProperty("size").GetInt64());
+        var json = JsonSerializer.Serialize(response.Results);
+        var result = JsonSerializer.Deserialize<JsonElement>(json);
+        var file = result.GetProperty("file");
+        Assert.Equal(_knownFilePath, file.GetProperty("name").GetString());
+        Assert.Equal("file", file.GetProperty("type").GetString());
+        Assert.Equal(1024, file.GetProperty("size").GetInt64());
     }
 
     [Theory]
