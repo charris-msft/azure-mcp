@@ -109,7 +109,6 @@ The Azure MCP Server supercharges your agents with Azure context. Here are some 
 * "Get details about my Storage container"
 * "List paths in my Data Lake file system"
 * "Upload a local file to my Data Lake Storage"
-* "Show my key-value pairs in App Config"
 
 ## 🛠️ Currently Supported Tools
 
