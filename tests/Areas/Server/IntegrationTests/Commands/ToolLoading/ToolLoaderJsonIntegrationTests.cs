@@ -29,12 +29,12 @@ public sealed class ToolLoaderJsonIntegrationTests
     {
         // Arrange
         var mockLogger = Substitute.For<ILogger<CompositeToolLoader>>();
-        
+
         // Create a mock loader with a known tool to satisfy the requirement of at least one loader
         var mockLoader = Substitute.For<IToolLoader>();
         mockLoader.ListToolsHandler(Arg.Any<RequestContext<ListToolsRequestParams>>(), Arg.Any<CancellationToken>())
             .Returns(new ListToolsResult { Tools = new List<Tool> { CreateTestTool("existing-tool") } });
-        
+
         var mockToolLoaders = new List<IToolLoader> { mockLoader };
         var compositeLoader = new CompositeToolLoader(mockToolLoaders, mockLogger);
 
@@ -46,7 +46,6 @@ public sealed class ToolLoaderJsonIntegrationTests
         };
         await compositeLoader.ListToolsHandler(listRequest, CancellationToken.None);
 
-        var mockServer = Substitute.For<IMcpServer>();
         var request = new RequestContext<CallToolRequestParams>(mockServer)
         {
             Params = new CallToolRequestParams
@@ -63,22 +62,22 @@ public sealed class ToolLoaderJsonIntegrationTests
         Assert.True(result.IsError, "Expected error result for unknown tool");
         Assert.NotNull(result.Content);
         Assert.Single(result.Content);
-        
+
         var textContent = result.Content.First() as TextContentBlock;
         Assert.NotNull(textContent);
-        
+
         // This is the critical test: the response should be valid JSON
         // Previously this would fail with "JsonException: 'T' is an invalid start of a value"
         // because the response was plain text like "The tool azmcp-appconfig-kv-set was not found"
         JsonElement root;
         var parseException = Record.Exception(() => root = JsonSerializer.Deserialize<JsonElement>(textContent.Text));
         Assert.Null(parseException);
-        
+
         // Verify the JSON structure
         root = JsonSerializer.Deserialize<JsonElement>(textContent.Text);
         Assert.Equal(JsonValueKind.Object, root.ValueKind);
         Assert.True(root.TryGetProperty("error", out var errorElement));
-        
+
         var errorMessage = errorElement.GetString();
         Assert.NotNull(errorMessage);
         Assert.Contains("azmcp-appconfig-kv-set", errorMessage);
@@ -94,12 +93,12 @@ public sealed class ToolLoaderJsonIntegrationTests
     {
         // Arrange - simulate the failing test scenario
         var mockLogger = Substitute.For<ILogger<CompositeToolLoader>>();
-        
+
         // Create a mock loader with a known tool to satisfy the requirement of at least one loader
         var mockLoader = Substitute.For<IToolLoader>();
         mockLoader.ListToolsHandler(Arg.Any<RequestContext<ListToolsRequestParams>>(), Arg.Any<CancellationToken>())
             .Returns(new ListToolsResult { Tools = new List<Tool> { CreateTestTool("existing-tool") } });
-        
+
         var mockToolLoaders = new List<IToolLoader> { mockLoader };
         var compositeLoader = new CompositeToolLoader(mockToolLoaders, mockLogger);
 
@@ -132,14 +131,14 @@ public sealed class ToolLoaderJsonIntegrationTests
         // It tries to deserialize the text content as JSON
         JsonElement root;
         var deserializeException = Record.Exception(() => root = JsonSerializer.Deserialize<JsonElement>(content!));
-        
+
         // The fix ensures this no longer throws a JsonException
         Assert.Null(deserializeException);
-        
+
         // Verify we can process it like the test framework expects
         root = JsonSerializer.Deserialize<JsonElement>(content!);
         Assert.Equal(JsonValueKind.Object, root.ValueKind);
-        
+
         // The test framework looks for a "results" property, but for errors we have "error"
         // This is fine because error responses should have IsError=true
         Assert.True(result.IsError);
