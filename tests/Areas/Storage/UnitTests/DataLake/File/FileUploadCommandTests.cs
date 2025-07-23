@@ -91,7 +91,7 @@ public class FileUploadCommandTests
         Assert.Equal("Success", response.Message);
         Assert.NotNull(response.Results);
 
-        var result = JsonSerializer.Deserialize(response.Results.Value.ToString(), 
+        var result = JsonSerializer.Deserialize(response.Results.Value.ToString(),
             typeof(JsonElement)) as JsonElement?;
         var file = result?.GetProperty("file");
         Assert.Equal(_knownFilePath, file?.GetProperty("name").GetString());
@@ -151,7 +151,7 @@ public class FileUploadCommandTests
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 Arg.Any<RetryPolicyOptions>())
-            .Throws(new Exception("Test error"));
+            .ThrowsAsync(new Exception("Test error"));
 
         var parseResult = _parser.Parse([
             "--account-name", _knownAccountName,
@@ -182,7 +182,7 @@ public class FileUploadCommandTests
                 Arg.Any<string>(),
                 Arg.Any<string>(),
                 Arg.Any<RetryPolicyOptions>())
-            .Throws(new FileNotFoundException("Local file not found"));
+            .ThrowsAsync(new FileNotFoundException("Local file not found"));
 
         var parseResult = _parser.Parse([
             "--account-name", _knownAccountName,

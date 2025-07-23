@@ -258,7 +258,7 @@ namespace AzureMcp.Tests.Areas.Storage.LiveTests
             // Create a temporary test file
             var tempFilePath = Path.GetTempFileName();
             var testContent = "This is a test file for Azure Data Lake upload.";
-            await File.WriteAllTextAsync(tempFilePath, testContent);
+            await File.WriteAllTextAsync(tempFilePath, testContent, TestContext.Current.CancellationToken);
 
             try
             {

@@ -433,7 +433,7 @@ public class StorageService(ISubscriptionService subscriptionService, ITenantSer
 
             // Get file properties after upload
             var properties = await fileClient.GetPropertiesAsync();
-            
+
             return new DataLakePathInfo(
                 filePath,
                 "file",
