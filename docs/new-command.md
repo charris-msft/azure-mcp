@@ -5,14 +5,16 @@
 
 This document provides a comprehensive guide for implementing commands in Azure MCP following established patterns.
 
-## Area Pattern: Organizing Service Code
+## Area Pattern: Organizing code by area
 
-All new services and their commands should use the Area pattern:
+All new Azure services and their commands should use the Area pattern:
 
-- **Service code** goes in `src/Areas/{ServiceName}` (e.g., `src/Areas/Storage`)
-- **Tests** go in `tests/Areas/{ServiceName}`
+- **Area code** goes in `areas/{area-name}/src/AzureMcp.{AreaName}` (e.g., `areas/storage/src/AzureMcp.Storage`)
+- **Tests** go in `areas/{area-name}/tests`, divided into UnitTests and LiveTests:
+  -  `areas/{area-name}/tests/AzureMcp.{AreaName}.UnitTests`
+  -  `areas/{area-name}/tests/AzureMcp.{AreaName}.LiveTests`
 
-This keeps all code, options, models, and tests for a service together. See `src/Areas/Storage` for a reference implementation.
+This keeps all code, options, models, and tests for an area together. See `areas/storage` for a reference implementation.
 
 ## Command Architecture
 
@@ -59,7 +61,7 @@ This keeps all code, options, models, and tests for a service together. See `src
 
    Each command is:
    - In code, to avoid ambiguity between service classes and Azure services, we refer to Azure services as Areas
-   - Registered in the RegisterCommands method of its service's Areas/{Area}/{Area}Setup.cs file
+   - Registered in the RegisterCommands method of its area's `areas/{area-name}/src/AzureMcp.{AreaName}/{AreaName}Setup.cs` file
    - Organized in a hierarchy of command groups
    - Documented with a title, description and examples
    - Validated before execution
@@ -75,29 +77,27 @@ This keeps all code, options, models, and tests for a service together. See `src
 
 A complete command requires:
 
-1. OptionDefinitions static class: `src/Areas/{Area}/Options/{Area}OptionDefinitions.cs`
-2. Options class: `src/Areas/{Area}/Options/{Resource}/{Operation}Options.cs`
-3. Command class: `src/Areas/{Area}/Commands/{Resource}/{Resource}{Operation}Command.cs`
-4. Service interface: `src/Areas/{Area}/Services/I{Area}Service.cs`
-5. Service implementation: `src/Areas/{Area}/Services/{Area}Service.cs`
+1. OptionDefinitions static class: `areas/{area-name}/src/AzureMcp.{AreaName}/Options/{AreaName}OptionDefinitions.cs`
+2. Options class: `areas/{area-name}/src/AzureMcp.{AreaName}/Options/{Resource}/{Operation}Options.cs`
+3. Command class: `areas/{area-name}/src/AzureMcp.{AreaName}/Commands/{Resource}/{Resource}{Operation}Command.cs`
+4. Service interface: `areas/{area-name}/src/AzureMcp.{AreaName}/Services/I{ServiceName}Service.cs`
+5. Service implementation: `areas/{area-name}/src/AzureMcp.{AreaName}/Services/{ServiceName}Service.cs`
    - It's common for an area to have a single service class named after the
      area but some areas will have multiple service classes
-6. Unit test: `tests/Areas/{Area}/UnitTests/{Resource}/{Resource}{Operation}CommandTests.cs`
-7. Integration test: `tests/Areas/{Area}/LiveTests/{Area}CommandTests.cs`
-8. Command registration in RegisterCommands(): `src/Areas/{Area}/{Area}Setup.cs`
-9. Area registration in RegisterAreas(): `src/Program.cs`
+6. Unit test: `areas/{area-name}/tests/AzureMcp.{AreaName}.UnitTests/{Resource}/{Resource}{Operation}CommandTests.cs`
+7. Integration test: `areas/{area-name}/tests/AzureMcp.{AreaName}.LiveTests/{AreaName}CommandTests.cs`
+8. Command registration in RegisterCommands(): `areas/{area-name}/src/AzureMcp.{AreaName}/{AreaName}Setup.cs`
+9. Area registration in RegisterAreas(): `core/src/AzureMcp.Cli/Program.cs`
 10. **Live test infrastructure** (if needed):
-   - Bicep template: `/infra/services/{service}.bicep`
-   - Module registration in: `/infra/test-resources.bicep`
-   - Optional post-deployment script: `/infra/services/{service}-post.ps1`
+   - Bicep template: `/areas/{area-name}/tests/test-resources.bicep`
+   - Optional post-deployment script: `/areas/{area-name}/tests/test-resources-post.ps1`
 
 **IMPORTANT**: If implementing a new area, you must also ensure:
 - The Azure Resource Manager package is added to `Directory.Packages.props` first
-- The package reference is added to `src/AzureMcp.csproj`
 - Models, base commands, and option definitions follow the established patterns
 - JSON serialization context includes all new model types
 - Service registration in the area setup ConfigureServices method
-- **Live test infrastructure**: Add Bicep template to `/infra/services/` and module to `/infra/test-resources.bicep`
+- **Live test infrastructure**: Add Bicep template to `/areas/{area-name}/tests`
 - **Test resource deployment**: Ensure resources are properly configured with RBAC for test application
 - **Resource naming**: Follow consistent naming patterns - many services use just `baseName`, while others may need suffixes for disambiguation (e.g., `{baseName}-suffix`)
 
@@ -108,8 +108,10 @@ A complete command requires:
 When creating commands that interact with Azure services, you'll need to:
 
 **Package Management:**
-- Add the appropriate Azure Resource Manager package to both `Directory.Packages.props` and `AzureMcp.csproj`
-- Example: `<PackageVersion Include="Azure.ResourceManager.Sql" Version="1.3.0" />`
+- Add the appropriate Azure Resource Manager package to `Directory.Packages.props`
+  - Example: `<PackageVersion Include="Azure.ResourceManager.Sql" Version="1.3.0" />`
+- Add the package reference in `AzureMcp.{AreaName}.csproj`
+  - Example: `<PackageReference Include="Azure.ResourceManager.Sql" />`
 
 **Subscription Resolution:**
 - Always use `ISubscriptionService.GetSubscription()` to resolve subscription ID or name
@@ -117,11 +119,11 @@ When creating commands that interact with Azure services, you'll need to:
 - This handles both subscription IDs and subscription names automatically
 - Example pattern:
 ```csharp
-public class MyService(ISubscriptionService subscriptionService, ITenantService tenantService) 
+public class MyService(ISubscriptionService subscriptionService, ITenantService tenantService)
     : BaseAzureService(tenantService), IMyService
 {
     private readonly ISubscriptionService _subscriptionService = subscriptionService;
-    
+
     public async Task<MyResource> GetResourceAsync(string subscription, ...)
     {
         var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
@@ -237,7 +239,7 @@ public sealed class {Resource}{Operation}Command(ILogger<{Resource}{Operation}Co
                 return context.Response;
             }
 
-            context.Activity?.WithSubscriptionTag(options); 
+            context.Activity?.WithSubscriptionTag(options);
 
             // Get the appropriate service from DI
             var service = context.GetService<I{Area}Service>();
@@ -291,19 +293,18 @@ public sealed class {Resource}{Operation}Command(ILogger<{Resource}{Operation}Co
 
 ### 3. Base Service Command Classes
 
-Each service has its own hierarchy of base command classes that inherit from `GlobalCommand` or `SubscriptionCommand`. Services that work with Azure resources should inject `ISubscriptionService` for subscription resolution. For example:
+Each area has its own hierarchy of base command classes that inherit from `GlobalCommand` or `SubscriptionCommand`. Service classes that work with Azure resources should inject `ISubscriptionService` for subscription resolution. For example:
 
 ```csharp
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
 using System.Diagnostics.CodeAnalysis;
-using AzureMcp.Commands.Subscription;
-using AzureMcp.Models.Option;
-using AzureMcp.Areas.{Area}.Options;
-using AzureMcp.Commands;
+using AzureMcp.Core.Commands;
+using AzureMcp.Core.Commands.Subscription;
+using AzureMcp.{Area}.Options;
 
-namespace AzureMcp.Areas.{Area}.Commands;
+namespace AzureMcp.{Area}.Commands;
 
 // Base command for all service commands (if no members needed, use concise syntax)
 public abstract class Base{Area}Command<
@@ -346,7 +347,7 @@ public abstract class Base{Area}Command<
 }
 
 // Service implementation example with subscription resolution
-public class {Area}Service(ISubscriptionService subscriptionService, ITenantService tenantService) 
+public class {Area}Service(ISubscriptionService subscriptionService, ITenantService tenantService)
     : BaseAzureService(tenantService), I{Area}Service
 {
     private readonly ISubscriptionService _subscriptionService = subscriptionService ?? throw new ArgumentNullException(nameof(subscriptionService));
@@ -355,7 +356,7 @@ public class {Area}Service(ISubscriptionService subscriptionService, ITenantServ
     {
         // Always use subscription service for resolution
         var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
-        
+
         var resourceGroupResource = await subscriptionResource
             .GetResourceGroupAsync(resourceGroup, cancellationToken);
         // Continue with resource access...
@@ -454,24 +455,9 @@ public class {Resource}{Operation}CommandTests
 Integration tests inherit from `CommandTestsBase` and use test fixtures:
 
 ```csharp
-[Trait("Area", "{Area}")]
-[Trait("Category", "Live")]
-public class {Area}CommandTests : CommandTestsBase, IClassFixture<LiveTestFixture>
+public class {Area}CommandTests(LiveTestFixture liveTestFixture, ITestOutputHelper output)
+    : CommandTestsBase(liveTestFixture, output), IClassFixture<LiveTestFixture>
 {
-    protected const string TenantNameReason = "Service principals cannot use TenantName for lookup";
-    protected LiveTestSettings Settings { get; }
-    protected StringBuilder FailureOutput { get; } = new();
-    protected ITestOutputHelper Output { get; }
-    protected IMcpClient Client { get; }
-
-    public {Area}CommandTests(LiveTestFixture fixture, ITestOutputHelper output)
-        : base(fixture, output)
-    {
-        Client = fixture.Client;
-        Settings = fixture.Settings;
-        Output = output;
-    }
-
     [Theory]
     [InlineData(AuthMethod.Credential)]
     [InlineData(AuthMethod.Key)]
@@ -543,12 +529,14 @@ private void RegisterCommands(CommandGroup rootGroup, ILoggerFactory loggerFacto
     private static IAreaSetup[] RegisterAreas()
     {
         return [
-            new AzureMcp.Areas.AppConfig.AppConfigSetup(),
-            new AzureMcp.Areas.{Area}.{Area}Setup(),
-            new AzureMcp.Areas.Storage.StorageSetup(),
+            new AzureMcp.AppConfig.AppConfigSetup(),
+            new AzureMcp.{Area}.{Area}Setup(),
+            new AzureMcp.Storage.StorageSetup(),
         ];
     }
 ```
+
+The area list in should `RegisterAreas()` should stay sorted alphabetically.
 
 ## Error Handling
 
@@ -693,6 +681,9 @@ public async Task ExecuteAsync_HandlesServiceError()
 **Running Tests Efficiently:**
 When developing new commands, run only your specific tests to save time:
 ```bash
+# Run all tests from the test project directory:
+pushd ./areas/your-area/tests/AzureMcp.YourArea.UnitTests  #or .LiveTests
+
 # Run only tests for your specific command class
 dotnet test --filter "FullyQualifiedName~YourCommandNameTests" --verbosity normal
 
@@ -700,17 +691,17 @@ dotnet test --filter "FullyQualifiedName~YourCommandNameTests" --verbosity norma
 dotnet test --filter "FullyQualifiedName~EntraAdminListCommandTests" --verbosity normal
 
 # Run all tests for a specific area
-dotnet test --filter "Area=Sql" --verbosity normal
+dotnet test --verbosity normal
 ```
 
 ### Integration Tests
-Services requiring test resource deployment should add a bicep template to `/infra/services/` and import that template as a module in `/infra/test-resources.bicep`. If additional logic needs to be performed after resource deployment, but before any live tests are run, add a `{service}-post.ps1` script to the `/infra/services/` folder. See `/infra/services/storage.bicep` and `/infra/services/storage-post.ps1` for canonical examples.
+Areas requiring test resource deployment should add a bicep template, `tests/test-resources.bicep`,  to their area directory. If additional logic needs to be performed after resource deployment, but before any live tests are run, add a `test-resources-post.ps1` in the same directory. See `/areas/storage/tests/test-resources.bicep` and `/areas/storage/tests/test-resources-post.ps1` for canonical examples.
 
 #### Live Test Resource Infrastructure
 
-**1. Create Service Bicep Template (`/infra/services/{service}.bicep`)**
+**1. Create Area Bicep Template (`/areas/{area-name}/tests/test-resources.bicep`)**
 
-Follow this pattern for your service's infrastructure:
+Follow this pattern for your area's infrastructure:
 
 ```bicep
 targetScope = 'resourceGroup'
@@ -720,19 +711,14 @@ targetScope = 'resourceGroup'
 @description('The base resource name. Service names have specific length restrictions.')
 param baseName string = resourceGroup().name
 
+@description('The client OID to grant access to test resources.')
+param testApplicationOid string = deployer().objectId
+
+// The test infrastructure will only provide baseName and testApplicationOid.
+// Any additional parameters are for local deployments only and require default values.
+
 @description('The location of the resource. By default, this is the same as the resource group.')
 param location string = resourceGroup().location
-
-@description('The client OID to grant access to test resources.')
-param testApplicationOid string
-
-// Optional: Additional service-specific parameters
-@description('Service-specific configuration parameter.')
-param serviceSpecificParam string = 'defaultValue'
-
-@description('Service administrator password.')
-@secure()
-param adminPassword string = newGuid()
 
 // Main service resource
 resource serviceResource 'Microsoft.{Provider}/{resourceType}@{apiVersion}' = {
@@ -790,27 +776,14 @@ output testResourceName string = serviceResource::testResource.name
 - Use resource naming that clearly identifies test purposes
 
 **Common Resource Naming Patterns:**
-- Main service: `baseName` (most common, e.g., `mcp12345`) or `{baseName}-{service}` if disambiguation needed
+- Deployments are on a per-area basis. Name collisions should not occur across area templates.
+- Main service: `baseName` (most common, e.g., `mcp12345`) or `{baseName}{suffix}` if disambiguation needed
 - Child resources: `test{resource}` (e.g., `testdb`, `testcontainer`)
 - Follow Azure naming conventions and length limits
 - Ensure names are unique within resource group scope
-- Check existing services in `/infra/services/` for consistent patterns
+- Check existing `test-resources.bicep` files for consistent patterns
 
-**2. Add Module to Main Template (`/infra/test-resources.bicep`)**
-
-```bicep
-module {area} 'services/{service}.bicep' = if (empty(areas) || contains(areas, '{service}')) {
-  name: '${deploymentName}-{service}'
-  params: {
-    baseName: baseName
-    location: location
-    testApplicationOid: testApplicationOid
-    // Add service-specific parameters if needed
-  }
-}
-```
-
-**3. Optional: Post-Deployment Script (`/infra/services/{service}-post.ps1`)**
+**2. Optional: Post-Deployment Script (`/area/{area-name}/tests/test-resources-post.ps1`)**
 
 Create if additional setup is needed after resource deployment:
 
@@ -827,7 +800,7 @@ Create if additional setup is needed after resource deployment:
 param (
     [Parameter(Mandatory)]
     [hashtable] $DeploymentOutputs,
-    
+
     [Parameter(Mandatory)]
     [hashtable] $AdditionalParameters
 )
@@ -838,13 +811,13 @@ try {
     # Extract outputs from deployment
     $serviceName = $DeploymentOutputs['{area}']['serviceResourceName']['value']
     $resourceGroup = $AdditionalParameters['ResourceGroupName']
-    
+
     # Perform additional setup (e.g., create sample data, configure settings)
     Write-Host "Setting up test data for $serviceName..."
-    
+
     # Example: Run Azure CLI commands for additional setup
     # az {service} {operation} --name $serviceName --resource-group $resourceGroup
-    
+
     Write-Host "{Area} post-deployment setup completed successfully."
 }
 catch {
@@ -869,7 +842,7 @@ public class {Area}CommandTests(LiveTestFixture liveTestFixture, ITestOutputHelp
         // Use the deployed test resources
         var serviceName = Settings.ResourceBaseName;
         var resourceName = "test{resource}";
-        
+
         var result = await CallToolAsync(
             "azmcp_{area}_{resource}_show",
             new()
@@ -883,7 +856,7 @@ public class {Area}CommandTests(LiveTestFixture liveTestFixture, ITestOutputHelp
         // Verify successful response
         var resource = result.AssertProperty("{resource}");
         Assert.Equal(JsonValueKind.Object, resource.ValueKind);
-        
+
         // Verify resource properties
         var name = resource.GetProperty("name").GetString();
         Assert.Equal(resourceName, name);
@@ -897,7 +870,7 @@ public class {Area}CommandTests(LiveTestFixture liveTestFixture, ITestOutputHelp
     {
         var allArgs = new[] { firstArg }.Concat(remainingArgs);
         var argsString = string.Join(" ", allArgs);
-        
+
         var result = await CallToolAsync(
             "azmcp_{area}_{resource}_show",
             new()
@@ -913,11 +886,11 @@ public class {Area}CommandTests(LiveTestFixture liveTestFixture, ITestOutputHelp
 
 **5. Deploy and Test Resources**
 
-Use the deployment script with your service area:
+Use the deployment script with your area:
 
 ```powershell
-# Deploy test resources for your service
-./eng/scripts/Deploy-TestResources.ps1 -Areas "{Area}" -Location "East US"
+# Deploy test resources for your area
+./eng/scripts/Deploy-TestResources.ps1 -Areas "{Area}"
 
 # Run live tests
 dotnet test --filter "Category=Live&Area={Area}"
@@ -1031,7 +1004,7 @@ Failure to call `base.Dispose()` will prevent request and response data from `Ca
    - Use primary constructors
    - Make command classes sealed
    - Include live test infrastructure for Azure services
-   - Use consistent resource naming patterns (check existing services in `/infra/services/`)
+   - Use consistent resource naming patterns (check existing `test-resources.bicep` files)
    - Output resource identifiers from Bicep templates
    - Use concatenated all lowercase names for command groups (no dashes)
 
@@ -1071,7 +1044,7 @@ var subscriptionResource = await _subscriptionService.GetSubscription(subscripti
 - **Solution**: Convert to string: `Location.ToString()` instead of `Location?.Name`
 
 **Issue: Wrong resource access pattern**
-- **Problem**: Using `.GetSqlServerAsync(name, cancellationToken)` 
+- **Problem**: Using `.GetSqlServerAsync(name, cancellationToken)`
 - **Solution**: Use resource collections: `.GetSqlServers().GetAsync(name)`
 - **Pattern**: Always access through collections, not direct async methods
 
@@ -1079,7 +1052,7 @@ var subscriptionResource = await _subscriptionService.GetSubscription(subscripti
 
 **Issue: Bicep template validation fails**
 - **Cause**: Invalid parameter constraints, missing required properties, or API version issues
-- **Solution**: Use `az bicep build --file infra/services/{service}.bicep` to validate template
+- **Solution**: Use `az bicep build --file areas/{area-name}/tests/test-resources.bicep` to validate template
 - **Fix**: Check Azure Resource Manager template reference for correct syntax and required properties
 
 **Issue: Live tests fail with "Resource not found"**
@@ -1094,7 +1067,9 @@ var subscriptionResource = await _subscriptionService.GetSubscription(subscripti
 
 **Issue: Deployment fails with template validation errors**
 - **Cause**: Parameter constraints, resource naming conflicts, or invalid configurations
-- **Solution**: Review deployment logs and error messages
+- **Solution**:
+  - Review deployment logs and error messages
+  - Use `./eng/scripts/Deploy-TestResources.ps1 -Area {area-name} -Debug` for verbose deployment logs including resource provider errors.
 - **Common fixes**:
   - Adjust `@minLength`/`@maxLength` for service naming limits
   - Ensure unique resource names within scope
@@ -1131,7 +1106,7 @@ var subscriptionResource = await _subscriptionService.GetSubscription(subscripti
 - **Solution**: Use correct generic type: `ILogger<BaseDatabaseCommand<TOptions>>`
 
 **Issue: Missing using statements for TrimAnnotations**
-- **Solution**: Add `using AzureMcp.Commands;` for `TrimAnnotations.CommandAnnotations`
+- **Solution**: Add `using AzureMcp.Core.Commands;` for `TrimAnnotations.CommandAnnotations`
 
 ## Checklist
 
@@ -1153,17 +1128,17 @@ Before submitting:
 - [ ] Code formatting applied with `dotnet format`
 - [ ] Spelling check passes with `.\eng\common\spelling\Invoke-Cspell.ps1`
 - [ ] **Remove unnecessary using statements from all C# files** (use IDE cleanup or `dotnet format analyzers`)
-- [ ] Azure Resource Manager package added to both Directory.Packages.props and AzureMcp.csproj
+- [ ] Azure Resource Manager package added to both `Directory.Packages.props` and `AzureMcp.{Area}.csproj`
 - [ ] All Azure SDK property names verified and correct
-- [ ] Resource access patterns use collections (e.g., `.GetSqlServers().GetAsync()`
+- [ ] Resource access patterns use collections (e.g., `.GetSqlServers().GetAsync()`)
 - [ ] Subscription resolution uses `ISubscriptionService.GetSubscription()`
 - [ ] Service constructor includes `ISubscriptionService` injection for Azure resources
 - [ ] JSON serialization context includes all new model types
-- [ ] Live test infrastructure created (Bicep template in `/infra/services/`)
-- [ ] Test resources module added to `/infra/test-resources.bicep`
+- [ ] Live test infrastructure created (`test-resources.bicep` template in `areas/{area-name}/tests`)
+- [ ] Live test resource template test with `./eng/scripts/Deploy-TestResources.ps1 -Area {area-name}`
 - [ ] RBAC permissions configured for test application in Bicep template
 - [ ] Live tests use deployed resources via `Settings.ResourceBaseName` pattern
-- [ ] Resource outputs defined in Bicep template for test consumption
+- [ ] Resource outputs defined in Bicep template for `test-resources-post.ps1` script consumption
 
 ### Documentation Requirements
 
@@ -1171,13 +1146,13 @@ Before submitting:
 
 - [ ] **CHANGELOG.md**: Add entry under "Unreleased" section describing the new command(s)
 - [ ] **docs/azmcp-commands.md**: Add command documentation with description, syntax, parameters, and examples
-- [ ] **README.md**: Update the supported services table and add example prompts demonstrating the new command(s) in the appropriate service section
+- [ ] **README.md**: Update the supported services table and add example prompts demonstrating the new command(s) in the appropriate area section
 - [ ] **e2eTests/e2eTestPrompts.md**: Add test prompts for end-to-end validation of the new command(s)
 
 **Documentation Standards**:
 - Use consistent command paths in all documentation (e.g., `azmcp sql db show`, not `azmcp sql database show`)
 - Organize example prompts by service in README.md under service-specific sections (e.g., `### 🗄️ Azure SQL Database`)
-- Place new commands in the appropriate service section, or create a new service section if needed
+- Place new commands in the appropriate area section, or create a new area section if needed
 - Provide clear, actionable examples that users can run with placeholder values
 - Include parameter descriptions and required vs optional indicators in azmcp-commands.md
 - Keep CHANGELOG.md entries concise but descriptive of the capability added

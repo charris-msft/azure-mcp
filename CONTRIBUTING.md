@@ -52,20 +52,26 @@ If you are contributing significant changes, or if the issue is already assigned
 ### Project Structure
 
 The project is organized as follows:
-- `src/` - Main source code
-  - `Areas/{Area}/` - Service specific code
-    - `Commands/` - Command implementations
-    - `Models/` - Service specific models
-    - `Services/` - Service implementations and interfaces
-    - `Options/` - Service specific command options
-  - `Commands/` - Command base and helper classes
-  - `Models/` - Common models and base classes
-  - `Services/` - Common services
-  - `Options/` - Command option definitions
-- `tests/` - Test files
-  - `Areas/{Area}/` - Service specific tests
-    - `UnitTests/` - Unit tests require no authentication or test resources
-    - `LiveTests/` - Live tests depend on Azure resources and authentication
+- `core/` - Core functionality and CLI application
+  - `src/` - Core source code
+    - `AzureMcp.Core/` - Core library with shared functionality
+    - `AzureMcp.Cli/` - CLI application entry point
+  - `tests/` - Core test files
+    - `AzureMcp.Core.UnitTests/` - Core unit tests
+    - `AzureMcp.Core.LiveTests/` - Core integration tests
+    - `AzureMcp.Tests/` - Shared test utilities
+- `areas/` - Service-specific implementations
+  - `{area-name}/` - Individual Azure service areas (e.g., `storage`, `cosmos`)
+    - `src/AzureMcp.{AreaName}/` - Service specific code
+      - `Commands/` - Command implementations
+      - `Models/` - Service specific models
+      - `Services/` - Service implementations and interfaces
+      - `Options/` - Service specific command options
+    - `tests/` - Service specific tests
+      - `AzureMcp.{AreaName}.UnitTests/` - Unit tests require no authentication or test resources
+      - `AzureMcp.{AreaName}.LiveTests/` - Live tests depend on Azure resources and authentication
+      - `test-resources.bicep` - Infrastructure templates for testing
+      - `test-resources-post.ps1` - Post-deployment scripts
 - `docs/` - Documentation
 
 ## Development Workflow
@@ -94,7 +100,7 @@ The project is organized as follows:
    "create [namespace] [resource] [operation] command using #new-command.md as a reference"
    ```
 
-4. **Follow implementation guidelines** in [src/Docs/new-command.md](https://github.com/Azure/azure-mcp/blob/main/src/Docs/new-command.md)
+4. **Follow implementation guidelines** in [docs/new-command.md](https://github.com/Azure/azure-mcp/blob/main/docs/new-command.md)
 
 5. **Add documentation**:
    - Update [/docs/azmcp-commands.md](https://github.com/Azure/azure-mcp/blob/main/docs/azmcp-commands.md)
@@ -153,7 +159,7 @@ Update your mcp.json to point to the locally built azmcp executable:
   "servers": {
     "azure-mcp-server": {
       "type": "stdio",
-      "command": "<absolute-path-to>/azure-mcp/src/bin/Debug/net9.0/azmcp[.exe]",
+      "command": "<absolute-path-to>/azure-mcp/core/src/AzureMcp.Cli/bin/Debug/net9.0/azmcp[.exe]",
       "args": ["server", "start"]
     }
   }
@@ -173,7 +179,7 @@ Optional `--namespace` and `--mode` parameters can be used to configure differen
   "servers": {
     "azure-mcp-server": {
       "type": "stdio",
-      "command": "<absolute-path-to>/azure-mcp/src/bin/Debug/net9.0/azmcp[.exe]",
+      "command": "<absolute-path-to>/azure-mcp/core/src/AzureMcp.Cli/bin/Debug/net9.0/azmcp[.exe]",
       "args": ["server", "start"]
     }
   }
@@ -186,7 +192,7 @@ Optional `--namespace` and `--mode` parameters can be used to configure differen
   "servers": {
     "azure-mcp-server": {
       "type": "stdio",
-      "command": "<absolute-path-to>/azure-mcp/src/bin/Debug/net9.0/azmcp[.exe]",
+      "command": "<absolute-path-to>/azure-mcp/core/src/AzureMcp.Cli/bin/Debug/net9.0/azmcp[.exe]",
       "args": ["server", "start", "--namespace", "storage", "--namespace", "keyvault"]
     }
   }
@@ -199,7 +205,7 @@ Optional `--namespace` and `--mode` parameters can be used to configure differen
   "servers": {
     "azure-mcp-server": {
       "type": "stdio",
-      "command": "<absolute-path-to>/azure-mcp/src/bin/Debug/net9.0/azmcp[.exe]",
+      "command": "<absolute-path-to>/azure-mcp/core/src/AzureMcp.Cli/bin/Debug/net9.0/azmcp[.exe]",
       "args": ["server", "start", "--mode", "namespace"]
     }
   }
@@ -212,7 +218,7 @@ Optional `--namespace` and `--mode` parameters can be used to configure differen
   "servers": {
     "azure-mcp-server": {
       "type": "stdio",
-      "command": "<absolute-path-to>/azure-mcp/src/bin/Debug/net9.0/azmcp[.exe]",
+      "command": "<absolute-path-to>/azure-mcp/core/src/AzureMcp.Cli/bin/Debug/net9.0/azmcp[.exe]",
       "args": ["server", "start", "--mode", "single"]
     }
   }
@@ -225,7 +231,7 @@ Optional `--namespace` and `--mode` parameters can be used to configure differen
   "servers": {
     "azure-mcp-server": {
       "type": "stdio",
-      "command": "<absolute-path-to>/azure-mcp/src/bin/Debug/net9.0/azmcp[.exe]",
+      "command": "<absolute-path-to>/azure-mcp/core/src/AzureMcp.Cli/bin/Debug/net9.0/azmcp[.exe]",
       "args": ["server", "start", "--namespace", "storage", "--namespace", "keyvault", "--mode", "namespace"]
     }
   }
@@ -425,7 +431,7 @@ The Azure MCP Server supports connecting to external MCP servers through an embe
 
 #### Registry Configuration
 
-External MCP servers are defined in the embedded resource file `src/Areas/Server/Resources/registry.json`. This file contains server configurations that support both SSE (Server-Sent Events) and stdio transport mechanisms, following the standard MCP configuration format.
+External MCP servers are defined in the embedded resource file `core/src/AzureMcp.Core/Areas/Server/Resources/registry.json`. This file contains server configurations that support both SSE (Server-Sent Events) and stdio transport mechanisms, following the standard MCP configuration format.
 
 The registry structure follows this format:
 
@@ -479,7 +485,7 @@ azmcp server start --mode namespace
 
 To add a new external MCP server to the registry:
 
-1. Edit `src/Areas/Server/Resources/registry.json`
+1. Edit `core/src/AzureMcp.Core/Areas/Server/Resources/registry.json`
 2. Add your server configuration under the `servers` object using VS Code's MCP configuration schema
 3. Use a unique identifier as the key
 4. Provide either a `url` for SSE transport or `type: "stdio"` with `command` for stdio transport
@@ -535,7 +541,7 @@ We're building this in the open.  Your feedback is much appreciated, and will he
 ### Additional Resources
 
 - [Azure MCP Documentation](https://github.com/Azure/azure-mcp/blob/main/README.md)
-- [Command Implementation Guide](https://github.com/Azure/azure-mcp/blob/main/src/Docs/new-command.md)
+- [Command Implementation Guide](https://github.com/Azure/azure-mcp/blob/main/docs/new-command.md)
 - [VS Code Insiders Download](https://code.visualstudio.com/insiders/)
 - [GitHub Copilot Documentation](https://docs.github.com/en/copilot)
 
