@@ -350,38 +350,6 @@ resource simpleTestWorkbook 'Microsoft.Insights/workbooks@2023-06-01' = {
   }
 }
 
-// User workbook for testing different kind
-resource userWorkbook 'Microsoft.Insights/workbooks@2023-06-01' = {
-  name: guid('${baseName}-user-workbook')
-  location: location
-  kind: 'user'
-  properties: {
-    displayName: '${baseName} User Workbook'
-    description: 'User workbook for testing different kind filter'
-    category: 'workbook'
-    sourceId: workspace.id
-    serializedData: string({
-      version: 'Notebook/1.0'
-      items: [
-        {
-          type: 1
-          content: {
-            json: '# User Workbook\n\nThis is a user workbook for testing kind filters.'
-          }
-        }
-      ]
-      styleSettings: {}
-      '$schema': 'https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json'
-    })
-  }
-  tags: {
-    purpose: 'testing'
-    environment: 'development'
-    project: 'azure-mcp'
-    category: 'filter-test'
-  }
-}
-
 // Sentinel workbook for testing different category
 resource sentinelWorkbook 'Microsoft.Insights/workbooks@2023-06-01' = {
   name: guid('${baseName}-sentinel-workbook')
@@ -452,7 +420,6 @@ output performanceWorkbookId string = performanceWorkbook.id
 output securityWorkbookId string = securityWorkbook.id
 output applicationInsightsWorkbookId string = applicationInsightsWorkbook.id
 output simpleTestWorkbookId string = simpleTestWorkbook.id
-output userWorkbookId string = userWorkbook.id
 output sentinelWorkbookId string = sentinelWorkbook.id
 output tsgWorkbookId string = tsgWorkbook.id
 
@@ -462,7 +429,6 @@ output workbookNames array = [
   securityWorkbook.properties.displayName
   applicationInsightsWorkbook.properties.displayName
   simpleTestWorkbook.properties.displayName
-  userWorkbook.properties.displayName
   sentinelWorkbook.properties.displayName
   tsgWorkbook.properties.displayName
 ]

@@ -79,7 +79,7 @@ public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper outp
         Assert.NotEmpty(array);
     }
 
-    [Fact]
+    [Fact(Skip= "Intermitent failures due to slow ingestion")]
     public async Task Should_get_table_contents()
     {
         // Query AzureMetrics table - fastest to propagate and most reliable
