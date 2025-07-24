@@ -192,7 +192,7 @@ public class CompositeToolLoaderTests
         Assert.Single(result.Content);
         var textContent = Assert.IsType<TextContentBlock>(result.Content[0]);
         Assert.NotNull(callRequest.Params);
-        
+
         // Verify the response is valid JSON with the correct error message
         using var doc = JsonDocument.Parse(textContent.Text);
         Assert.True(doc.RootElement.TryGetProperty("error", out var errorElement));

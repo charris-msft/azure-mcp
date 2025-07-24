@@ -19,15 +19,15 @@ public sealed class ToolLoaderJsonErrorTests
     {
         // Arrange
         var mockLogger = Substitute.For<ILogger<CompositeToolLoader>>();
-        
+
         // Create a mock loader with a known tool to satisfy the requirement of at least one loader
         var mockLoader = Substitute.For<IToolLoader>();
         mockLoader.ListToolsHandler(Arg.Any<RequestContext<ListToolsRequestParams>>(), Arg.Any<CancellationToken>())
             .Returns(new ListToolsResult { Tools = new List<Tool> { CreateTestTool("existing-tool") } });
-        
+
         var mockToolLoaders = new List<IToolLoader> { mockLoader };
         var compositeLoader = new CompositeToolLoader(mockToolLoaders, mockLogger);
-        
+
         // Initialize the tool map by calling ListToolsHandler
         var mockServer = Substitute.For<IMcpServer>();
         var listRequest = new RequestContext<ListToolsRequestParams>(mockServer)
@@ -53,13 +53,13 @@ public sealed class ToolLoaderJsonErrorTests
         Assert.True(result.IsError);
         Assert.NotNull(result.Content);
         Assert.Single(result.Content);
-        
+
         var textContent = result.Content.First() as TextContentBlock;
         Assert.NotNull(textContent);
-        
+
         // Verify the response is valid JSON
         Assert.True(IsValidJson(textContent.Text), $"Response should be valid JSON but was: {textContent.Text}");
-        
+
         // Verify the JSON contains the error message
         using var doc = JsonDocument.Parse(textContent.Text);
         Assert.True(doc.RootElement.TryGetProperty("error", out var errorElement));
