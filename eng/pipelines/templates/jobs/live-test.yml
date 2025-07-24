@@ -59,8 +59,7 @@ jobs:
         ./eng/scripts/Test-Code.ps1 `
           -TestType 'Live' `
           -Area $(Area) `
-          -TestResultsPath '$(Build.ArtifactStagingDirectory)/testResults' `
-          -Debug
+          -TestResultsPath '$(Build.ArtifactStagingDirectory)/testResults'
 
         exit $LastExitCode
       pwsh: true
