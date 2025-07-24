@@ -8,35 +8,48 @@ If you are contributing significant changes, or if the issue is already assigned
 
 ## Table of Contents
 
-- [Table of Contents](#table-of-contents)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Project Structure](#project-structure)
-- [Development Workflow](#development-workflow)
-  - [Development Process](#development-process)
-  - [Adding a New Command](#adding-a-new-command)
-- [Testing](#testing)
-  - [Unit Tests](#unit-tests)
-  - [End-to-end Tests](#end-to-end-tests)
-  - [Testing Local Build with VS Code](#testing-local-build-with-vs-code)
-  - [Testing Local Build with Docker](#testing-local-build-with-docker)
-  - [Live Tests](#live-tests)
-  - [NPX Live Tests](#npx-live-tests)
-  - [Debugging Live Tests](#debugging-live-tests)
-- [Quality and Standards](#quality-and-standards)
-  - [Code Style](#code-style)
-  - [AOT Compatibility Analysis](#aot-compatibility-analysis)
-  - [Model Context Protocol (MCP)](#model-context-protocol-mcp)
-- [Advanced Configuration](#advanced-configuration)
-  - [Configuring External MCP Servers](#configuring-external-mcp-servers)
-- [Project Management](#project-management)
-  - [Pull Request Process](#pull-request-process)
-  - [Builds and Releases (Internal)](#builds-and-releases-internal)
-- [Support and Community](#support-and-community)
-  - [Questions and Support](#questions-and-support)
-  - [Additional Resources](#additional-resources)
-  - [Code of Conduct](#code-of-conduct)
-  - [License](#license)
+- [Contributing to Azure MCP](#contributing-to-azure-mcp)
+  - [Table of Contents](#table-of-contents)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Project Structure](#project-structure)
+  - [Development Workflow](#development-workflow)
+    - [Development Process](#development-process)
+    - [Adding a New Command](#adding-a-new-command)
+  - [Testing](#testing)
+    - [Unit Tests](#unit-tests)
+    - [End-to-end Tests](#end-to-end-tests)
+    - [Testing Local Build with VS Code](#testing-local-build-with-vs-code)
+      - [Build the Server](#build-the-server)
+      - [Configure mcp.json](#configure-mcpjson)
+      - [Server Modes](#server-modes)
+      - [Start from IDE](#start-from-ide)
+    - [Testing Local Build with Docker](#testing-local-build-with-docker)
+    - [Live Tests](#live-tests)
+    - [NPX Live Tests](#npx-live-tests)
+    - [Debugging Live Tests](#debugging-live-tests)
+  - [Quality and Standards](#quality-and-standards)
+    - [Code Style](#code-style)
+    - [AOT Compatibility Analysis](#aot-compatibility-analysis)
+      - [Running the Analysis](#running-the-analysis)
+      - [Installing Git Hooks](#installing-git-hooks)
+    - [Model Context Protocol (MCP)](#model-context-protocol-mcp)
+  - [Advanced Configuration](#advanced-configuration)
+    - [Configuring External MCP Servers](#configuring-external-mcp-servers)
+      - [Registry Configuration](#registry-configuration)
+      - [Transport Types](#transport-types)
+      - [Server Discovery and Namespace Filtering](#server-discovery-and-namespace-filtering)
+      - [Adding New External MCP Servers](#adding-new-external-mcp-servers)
+      - [Example External Servers](#example-external-servers)
+  - [Project Management](#project-management)
+    - [Pull Request Process](#pull-request-process)
+    - [Builds and Releases (Internal)](#builds-and-releases-internal)
+      - [PR Validation](#pr-validation)
+  - [Support and Community](#support-and-community)
+    - [Questions and Support](#questions-and-support)
+    - [Additional Resources](#additional-resources)
+    - [Code of Conduct](#code-of-conduct)
+    - [License](#license)
 
 ## Getting Started
 
@@ -298,16 +311,16 @@ Before running live tests:
 | `Unique`            | switch   | Make `{hash}` in the resource group name and base name unique per invocation. Defaults to a hash of your username             |
 | `DeleteAfterHours`  | int      | Change the timespan used to set the DeleteAfter tag. Defaults to 12 hours.                                                   |
 
-After deploying test resources, you should have a `.testsettings.json` file with your deployment information in the root of the repo.
+After deploying test resources, you should have a `.testsettings.json` file with your deployment information in the deployed areas' `/tests` directory.
 
 Run live tests with:
 ```pwsh
-./eng/scripts/Test-Code.ps1 -Live
+./eng/scripts/Test-Code.ps1 -TestType Live
 ```
 
 You can scope tests to specific areas:
 ```pwsh
-./eng/scripts/Test-Code.ps1 -Live -Areas Storage, KeyVault
+./eng/scripts/Test-Code.ps1 -TestType Live -Areas Storage, KeyVault
 ```
 
 ### NPX Live Tests
@@ -339,7 +352,7 @@ This will produce .tgz files in the `.dist` directory and set the `TestPackage` 
 
 ### Debugging Live Tests
 
-This section assumes that the necessary Azure resources for live tests are already deployed and that the `.testsettings.json` file with deployment information is located at the root of the local repository clone.
+This section assumes that the necessary Azure resources for live tests are already deployed and that the `.testsettings.json` file with deployment information is located in the area's `/tests/` directory.
 
 To debug the Azure MCP Server (`azmcp`) when running live tests in VS Code:
 

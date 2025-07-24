@@ -95,7 +95,7 @@ public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper outp
                 { "limit", 5 },
                 { "hours", 24 }
             },
-            $"AzureMetrics | where ResourceProvider == 'MICROSOFT.STORAGE' and TimeGenerated > datetime({DateTime.UtcNow:yyyy-MM-dd HH:mm:ss.fff}) | project TimeGenerated, MetricName, Total, ResourceId",
+            $"AzureMetrics | where ResourceProvider == 'MICROSOFT.STORAGE' and TimeGenerated > ago(1d) | project TimeGenerated, MetricName, Total, ResourceId",
             sendLogInfo: "Generating storage metrics...",
             sendLogAction: async () =>
             {
@@ -127,7 +127,7 @@ public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper outp
                 { "limit", 1 },
                 { "hours", 24 }
             },
-            $"StorageBlobLogs | where TimeGenerated > datetime({DateTime.UtcNow:yyyy-MM-dd HH:mm:ss.fff}) | project TimeGenerated, OperationName, StatusText",
+            $"StorageBlobLogs | where TimeGenerated > ago(1d) | project TimeGenerated, OperationName, StatusText",
             sendLogInfo: "Generating storage blob logs...",
             sendLogAction: async () =>
             {
@@ -174,7 +174,7 @@ public class MonitorCommandTests(LiveTestFixture fixture, ITestOutputHelper outp
                 { "limit", 1 },
                 { "hours", 24 }
             },
-            $"StorageBlobLogs | where TimeGenerated > datetime({DateTime.UtcNow:yyyy-MM-dd HH:mm:ss.fff}) | project TimeGenerated, OperationName, StatusText",
+            $"StorageBlobLogs | where TimeGenerated > ago(1d) | project TimeGenerated, OperationName, StatusText",
             sendLogInfo: "Generating storage blob logs for resource query...",
             sendLogAction: async () =>
             {
