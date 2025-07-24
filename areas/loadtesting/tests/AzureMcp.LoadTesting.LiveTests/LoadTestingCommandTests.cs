@@ -35,7 +35,7 @@ public class LoadTestingCommandTests : CommandTestsBase,
             });
 
         // Assert
-        var items = result.AssertProperty("LoadTests");
+        var items = result.AssertProperty("LoadTest");
         Assert.Equal(JsonValueKind.Array, items.ValueKind);
         Assert.NotEmpty(items.EnumerateArray());
         foreach (var item in items.EnumerateArray())
