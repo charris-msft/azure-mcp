@@ -36,7 +36,6 @@ public sealed class ToolLoaderJsonErrorTests
         };
         await compositeLoader.ListToolsHandler(listRequest, CancellationToken.None);
 
-        var mockServer = Substitute.For<IMcpServer>();
         var request = new RequestContext<CallToolRequestParams>(mockServer)
         {
             Params = new CallToolRequestParams
