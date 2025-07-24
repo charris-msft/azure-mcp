@@ -7,7 +7,7 @@ param(
     [ValidateSet('Live', 'Unit', 'All')]
     [string] $TestType = 'Unit',
     [string] $TestResultsPath,
-    [switch] $CoverageSummary,
+    [switch] $CollectCoverage,
     [switch] $OpenReport
 )
 
