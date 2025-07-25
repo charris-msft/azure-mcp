@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.Versioning;
 using Azure.Core;
 using Azure.ResourceManager;
+using Azure.ResourceManager.Resources;
 using AzureMcp.Options;
 using AzureMcp.Services.Azure.Authentication;
 using AzureMcp.Services.Azure.Tenant;
@@ -116,6 +117,32 @@ public abstract class BaseAzureService(ITenantService? tenantService = null, ILo
         catch (Exception ex)
         {
             throw new Exception($"Failed to create ARM client: {ex.Message}", ex);
+        }
+    }
+
+    /// <summary>
+    /// Gets a TenantResource instance based on the input tenant parameter
+    /// </summary>
+    /// <param name="tenant">Optional Azure tenant ID or name</param>
+    /// <returns>TenantResource instance or null if not found</returns>
+    protected async Task<TenantResource?> GetTenantResourceAsync(string? tenant = null)
+    {
+        if (_tenantService == null)
+        {
+            return null;
+        }
+
+        if (string.IsNullOrEmpty(tenant))
+        {
+            var tenants = await _tenantService.GetTenants();
+            return tenants.FirstOrDefault();
+        }
+        else
+        {
+            var resolvedTenantId = await _tenantService.GetTenantId(tenant);
+            var tenants = await _tenantService.GetTenants();
+            return tenants.FirstOrDefault(t => 
+                t.Data.TenantId?.ToString().Equals(resolvedTenantId, StringComparison.OrdinalIgnoreCase) == true);
         }
     }
 
