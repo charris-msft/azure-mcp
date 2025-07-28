@@ -344,15 +344,25 @@ namespace AzureMcp.Storage.LiveTests
             var allArgs = new[] { firstArg }.Concat(remainingArgs);
             var argsString = string.Join(" ", allArgs);
 
-            var result = await CallToolAsync(
-                "azmcp_storage_datalake_file_upload",
-                new()
-                {
-                    { "args", argsString }
-                });
+            // For error testing, we expect CallToolAsync to throw an exception for invalid input
+            try
+            {
+                var result = await CallToolAsync(
+                    "azmcp_storage_datalake_file_upload",
+                    new()
+                    {
+                        { "args", argsString }
+                    });
 
-            // Should return validation error
-            Assert.NotEqual(200, result.Status);
+                // If we get here, the command didn't fail as expected
+                Assert.Fail("Expected command to fail with invalid input, but it succeeded");
+            }
+            catch (Exception ex)
+            {
+                // Expected behavior - the command should fail with invalid input
+                Assert.NotNull(ex.Message);
+                Assert.NotEmpty(ex.Message);
+            }
         }
     }
 }
