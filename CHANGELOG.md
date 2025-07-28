@@ -1,15 +1,93 @@
-# Release History
+# CHANGELOG 📝
 
-## 0.4.1 (Unreleased)
+The Azure MCP Server updates automatically by default whenever a new release comes out 🚀. We ship updates twice a week on Tuesdays and Thursdays 😊
+
+## 0.5.1 (Unreleased)
 
 ### Features Added
-- Support for Azure Load testing operations - Modify load testing resource, test and test runs. [#315](https://github.com/Azure/azure-mcp/pull/315)
+- Added support for listing SQL databases via the command: `azmcp-sql-db-list`. [[#746](https://github.com/Azure/azure-mcp/pull/746)]
 
 ### Breaking Changes
 
 ### Bugs Fixed
 
 ### Other Changes
+
+- Major repository structure change.
+  - Service areas moved from `/src/areas/{Area}` and `/tests/areas/{Area}` into `/areas/{area}/src` and `/areas/{area}/tests`
+  - Common code moved into `/core/src` and `/core/tests`
+
+## 0.5.0 (2025-07-24)
+
+### Features Added
+
+- Added a new VS Code extension (VSIX installer) for the VS Code Marketplace. [[#661](https://github.com/Azure/azure-mcp/pull/661)]
+- Added `--mode all` startup option to expose all Azure MCP tools individually. [[#689](https://github.com/Azure/azure-mcp/issues/689)]
+- Added more tools for Azure Key Vault: [[#517](https://github.com/Azure/azure-mcp/pull/517)]
+  - `azmcp-keyvault-certificate-list` - List certificates in a key vault
+  - `azmcp-keyvault-certificate-get` - Get details of a specific certificate
+  - `azmcp-keyvault-certificate-create` - Create a new certificate
+  - `azmcp-keyvault-secret-list` - List secrets in a key vault
+  - `azmcp-keyvault-secret-create` - Create a new secret
+- Added support for Azure Workbooks management operations: [[#629](https://github.com/Azure/azure-mcp/pull/629)]
+  - `azmcp-workbooks-list` - List workbooks in a resource group with optional filtering
+  - `azmcp-workbooks-show` - Get detailed information about a specific workbook
+  - `azmcp-workbooks-create` - Create new workbooks with custom visualizations and content
+  - `azmcp-workbooks-update` - Update existing workbook configurations and metadata
+  - `azmcp-workbooks-delete` - Delete workbooks when no longer needed
+- Added support for creating a directory in Azure Storage DataLake via the `azmcp-storage-datalake-directory-create` command. [[#647](https://github.com/Azure/azure-mcp/pull/647)]
+- Added support for getting the details of an Azure Kubernetes Service (AKS) cluster via the `azmcp-aks-cluster-get` command. [[#700](https://github.com/Azure/azure-mcp/pull/700)]
+
+### Breaking Changes
+
+- Changed the default startup mode to list tools at the namespace level instead of at an individual level, reducing total tool count from around 128 tools to 25. Use `--mode all` to restore the previous behavior of exposing all tools individually. [[#689](https://github.com/Azure/azure-mcp/issues/689)]
+- Consolidated Azure best practices commands into the command `azmcp-bestpractices-get` with `--resource` and `--action` parameters: [[#677](https://github.com/Azure/azure-mcp/pull/677)]
+  - Removed `azmcp-bestpractices-general-get`, `azmcp-bestpractices-azurefunctions-get-code-generation` and `azmcp-bestpractices-azurefunctions-get-deployment`
+  - Use `--resource general --action code-generation` for general Azure code generation best practices
+  - Use `--resource general --action deployment` for general Azure deployment best practices
+  - Use `--resource azurefunctions --action code-generation` instead of the old azurefunctions code-generation command
+  - Use `--resource azurefunctions --action deployment` instead of the old azurefunctions deployment command
+  - Use `--resource static-web-app --action all` to get Static Web Apps development and deployment best practices
+
+### Bugs Fixed
+
+- Fixes tool discovery race condition causing "tool not found" errors in MCP clients that use different processes to start and use the server, like LangGraph. [[#556](https://github.com/Azure/azure-mcp/issues/556)]
+
+## 0.4.1 (2025-07-17)
+
+### Features Added
+
+- Added support for the following Azure Load Testing operations: [[#315](https://github.com/Azure/azure-mcp/pull/315)]
+  - `azmcp-loadtesting-testresource-list` - List Azure Load testing resources.
+  - `azmcp-loadtesting-testresource-create` - Create a new Azure Load testing resource.
+  - `azmcp-loadtesting-test-get` - Get details of a specific load test configuration.
+  - `azmcp-loadtesting-test-create` - Create a new load test configuration.
+  - `azmcp-loadtesting-testrun-get` - Get details of a specific load test run.
+  - `azmcp-loadtesting-testrun-list` - List all load test runs for a specific test.
+  - `azmcp-loadtesting-testrun-create` - Create a new load test run.
+  - `azmcp-loadtesting-testrun-delete` - Delete a specific load test run.
+- Added support for scanning Azure resources for compliance recommendations using the Azure Quick Review CLI via the command: `azmcp-extension-azqr`. [[#510](https://github.com/Azure/azure-mcp/pull/510)]
+- Added support for listing paths in Data Lake file systems via the command: `azmcp-storage-datalake-file-system-list-paths`. [[#608](https://github.com/Azure/azure-mcp/pull/608)]
+- Added support for listing SQL elastic pools via the command: `azmcp-sql-elastic-pool-list`. [[#606](https://github.com/Azure/azure-mcp/pull/606)]
+- Added support for listing SQL server firewall rules via the command: `azmcp-sql-firewall-rule-list`. [[#610](https://github.com/Azure/azure-mcp/pull/610)]
+- Added new commands for obtaining Azure Functions best practices via the following commands: [[#630](https://github.com/Azure/azure-mcp/pull/630)]
+  - `azmcp-bestpractices-azurefunctions-get-code-generation` - Get code generation best practices for Azure Functions.
+  - `azmcp-bestpractices-azurefunctions-get-deployment` - Get deployment best practices for Azure Functions.
+- Added support for get details about a product in the Azure Marketplace via the command: `azmcp-marketplace-product-get`. [[#442](https://github.com/Azure/azure-mcp/pull/442)]
+
+### Breaking Changes
+
+- Renamed the command `azmcp-bestpractices-get` to `azmcp-bestpractices-general-get`. [[#630](https://github.com/Azure/azure-mcp/pull/630)]
+
+### Bugs Fixed
+
+- Fixed an issue with Azure CLI executable path resolution on Windows. [[#611](https://github.com/Azure/azure-mcp/issues/611)]
+- Fixed a tool discovery timing issue when calling tools on fresh server instances. [[#604](https://github.com/Azure/azure-mcp/issues/604)]
+- Fixed issue where unrecognizable json would be sent to MCP clients in STDIO mode at startup. [[#644](https://github.com/Azure/azure-mcp/issues/644)]
+
+### Other Changes
+
+- Changed `engines.node` in `package.json` to require Node.js version `>=20.0.0`. [[#628](https://github.com/Azure/azure-mcp/pull/628)]
 
 ## 0.4.0 (2025-07-15)
 
@@ -34,6 +112,7 @@
 - Improved install reliability and error handling when missing platform packages on Ubuntu. [[#394](https://github.com/Azure/azure-mcp/pull/394)]
 
 ### Other Changes
+- Updated `engines.node` in `package.json` to require Node.js version `>=22.0.0`.
 
 #### Dependency Updates
 
