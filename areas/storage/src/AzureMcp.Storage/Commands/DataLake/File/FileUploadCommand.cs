@@ -35,6 +35,8 @@ public sealed class FileUploadCommand(ILogger<FileUploadCommand> logger) : BaseF
 
     public override string Title => CommandTitle;
 
+    public override object Metadata => new { Command = Name, Area = "Storage", Feature = "DataLake" };
+
     protected override void RegisterOptions(Command command)
     {
         base.RegisterOptions(command);

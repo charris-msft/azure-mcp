@@ -25,6 +25,8 @@ public sealed class SubscriptionListCommand(ILogger<SubscriptionListCommand> log
 
     public override string Title => CommandTitle;
 
+    public override object Metadata => new { Command = Name, Area = "Subscription" };
+
     [McpServerTool(Destructive = false, ReadOnly = true, Title = CommandTitle)]
     public override async Task<CommandResponse> ExecuteAsync(CommandContext context, ParseResult parseResult)
     {

@@ -28,6 +28,8 @@ public sealed class BlobListCommand(ILogger<BlobListCommand> logger) : BaseConta
 
     public override string Title => CommandTitle;
 
+    public override object Metadata => new { Command = Name, Area = "Storage" };
+
     [McpServerTool(Destructive = false, ReadOnly = true, Title = CommandTitle)]
     public override async Task<CommandResponse> ExecuteAsync(CommandContext context, ParseResult parseResult)
     {

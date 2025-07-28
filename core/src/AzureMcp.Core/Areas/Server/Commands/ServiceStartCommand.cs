@@ -40,6 +40,8 @@ public sealed class ServiceStartCommand : BaseCommand
     /// </summary>
     public override string Title => CommandTitle;
 
+    public override object Metadata => new { Command = Name, Area = "Server" };
+
     public static Action<IServiceCollection> ConfigureServices { get; set; } = _ => { };
 
     /// <summary>

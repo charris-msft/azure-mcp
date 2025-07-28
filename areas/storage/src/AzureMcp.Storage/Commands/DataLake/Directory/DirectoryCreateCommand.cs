@@ -30,6 +30,8 @@ public sealed class DirectoryCreateCommand(ILogger<DirectoryCreateCommand> logge
 
     public override string Title => CommandTitle;
 
+    public override object Metadata => new { Command = Name, Area = "Storage" };
+
     protected override void RegisterOptions(Command command)
     {
         base.RegisterOptions(command);

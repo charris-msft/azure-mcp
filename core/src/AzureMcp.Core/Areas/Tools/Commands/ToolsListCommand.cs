@@ -23,6 +23,8 @@ public sealed class ToolsListCommand(ILogger<ToolsListCommand> logger) : BaseCom
 
     public override string Title => CommandTitle;
 
+    public override object Metadata => new { Command = Name, Area = "Tools" };
+
     [McpServerTool(Destructive = false, ReadOnly = true, Title = CommandTitle)]
     public override async Task<CommandResponse> ExecuteAsync(CommandContext context, ParseResult parseResult)
     {
