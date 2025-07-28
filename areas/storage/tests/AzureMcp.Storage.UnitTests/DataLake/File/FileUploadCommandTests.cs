@@ -203,8 +203,8 @@ public class FileUploadCommandTests
             false);
 
         _storageService.UploadFile(
-            "testaccount",
-            "testfs",
+            "test-account",
+            "test-fs",
             "data/test-file.txt",
             "/local/test-file.txt",
             false,
@@ -215,8 +215,8 @@ public class FileUploadCommandTests
 
         var parseResult = _parser.Parse([
             "--subscription", "test-subscription",
-            "--account-name", "testaccount",
-            "--file-system-name", "testfs",
+            "--account-name", "test-account",
+            "--file-system-name", "test-fs",
             "--file-path", "data/test-file.txt",
             "--source-file-path", "/local/test-file.txt"
         ]);
@@ -230,8 +230,8 @@ public class FileUploadCommandTests
 
         // Verify the service was called with correct parameters
         await _storageService.Received(1).UploadFile(
-            "testaccount",
-            "testfs",
+            "test-account",
+            "test-fs",
             "data/test-file.txt",
             "/local/test-file.txt",
             false,

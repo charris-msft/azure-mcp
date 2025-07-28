@@ -237,5 +237,122 @@ namespace AzureMcp.Storage.LiveTests
             Assert.Equal(directoryPath, name);
             Assert.Equal("directory", type);
         }
+
+        [Fact]
+        public async Task Should_upload_file_to_datalake()
+        {
+            // Create a temporary test file
+            var tempFile = Path.GetTempFileName();
+            var testContent = "This is a test file for Data Lake upload.";
+            await File.WriteAllTextAsync(tempFile, testContent);
+
+            try
+            {
+                var filePath = "test-upload/test-file.txt";
+
+                var result = await CallToolAsync(
+                    "azmcp_storage_datalake_file_upload",
+                    new()
+                    {
+                        { "subscription", Settings.SubscriptionName },
+                        { "account-name", Settings.ResourceBaseName },
+                        { "file-system-name", "testfilesystem" },
+                        { "file-path", filePath },
+                        { "source-file-path", tempFile }
+                    });
+
+                var uploadResult = result.AssertProperty("result");
+                Assert.Equal(JsonValueKind.Object, uploadResult.ValueKind);
+
+                var uploadedFilePath = uploadResult.GetProperty("filePath").GetString();
+                var fileSize = uploadResult.GetProperty("fileSize").GetInt64();
+                var status = uploadResult.GetProperty("status").GetString();
+
+                Assert.Equal(filePath, uploadedFilePath);
+                Assert.Equal(testContent.Length, fileSize);
+                Assert.Equal("Created", status);
+            }
+            finally
+            {
+                // Clean up the temporary file
+                if (File.Exists(tempFile))
+                {
+                    File.Delete(tempFile);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task Should_upload_file_to_datalake_with_overwrite()
+        {
+            // Create a temporary test file
+            var tempFile = Path.GetTempFileName();
+            var testContent = "This is a test file for Data Lake overwrite test.";
+            await File.WriteAllTextAsync(tempFile, testContent);
+
+            try
+            {
+                var filePath = "test-overwrite/test-file.txt";
+
+                // First upload
+                await CallToolAsync(
+                    "azmcp_storage_datalake_file_upload",
+                    new()
+                    {
+                        { "subscription", Settings.SubscriptionName },
+                        { "account-name", Settings.ResourceBaseName },
+                        { "file-system-name", "testfilesystem" },
+                        { "file-path", filePath },
+                        { "source-file-path", tempFile }
+                    });
+
+                // Second upload with overwrite
+                var result = await CallToolAsync(
+                    "azmcp_storage_datalake_file_upload",
+                    new()
+                    {
+                        { "subscription", Settings.SubscriptionName },
+                        { "account-name", Settings.ResourceBaseName },
+                        { "file-system-name", "testfilesystem" },
+                        { "file-path", filePath },
+                        { "source-file-path", tempFile },
+                        { "overwrite", "true" }
+                    });
+
+                var uploadResult = result.AssertProperty("result");
+                Assert.Equal(JsonValueKind.Object, uploadResult.ValueKind);
+
+                var status = uploadResult.GetProperty("status").GetString();
+                Assert.Equal("Overwritten", status);
+            }
+            finally
+            {
+                // Clean up the temporary file
+                if (File.Exists(tempFile))
+                {
+                    File.Delete(tempFile);
+                }
+            }
+        }
+
+        [Theory]
+        [InlineData("--subscription sub", new string[0])]
+        [InlineData("--subscription", new[] { "sub", "--account-name", "account" })]
+        [InlineData("--subscription", new[] { "sub", "--account-name", "account", "--file-system-name", "fs" })]
+        public async Task Should_Return400_WithInvalidInput_ForFileUpload(string firstArg, string[] remainingArgs)
+        {
+            var allArgs = new[] { firstArg }.Concat(remainingArgs);
+            var argsString = string.Join(" ", allArgs);
+
+            var result = await CallToolAsync(
+                "azmcp_storage_datalake_file_upload",
+                new()
+                {
+                    { "args", argsString }
+                });
+
+            // Should return validation error
+            Assert.NotEqual(200, result.Status);
+        }
     }
 }
