@@ -4,6 +4,7 @@
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using AzureMcp.Core.Commands;
+using AzureMcp.Core.Models.Command;
 using AzureMcp.Storage.Commands.DataLake.File;
 using AzureMcp.Storage.Models;
 using AzureMcp.Storage.Services;
