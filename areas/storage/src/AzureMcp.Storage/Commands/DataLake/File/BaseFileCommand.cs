@@ -4,6 +4,7 @@
 using System.Diagnostics.CodeAnalysis;
 using AzureMcp.Core.Commands;
 using AzureMcp.Storage.Commands;
+using AzureMcp.Storage.Options;
 using AzureMcp.Storage.Options.DataLake;
 
 namespace AzureMcp.Storage.Commands.DataLake.File;
