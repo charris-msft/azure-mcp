@@ -447,7 +447,7 @@ public class StorageService(ISubscriptionService subscriptionService, ITenantSer
 
             // Get file info for the result
             var fileInfo = new FileInfo(sourceFilePath);
-            
+
             // Upload the file
             using var fileStream = File.OpenRead(sourceFilePath);
             var uploadResponse = await fileClient.UploadAsync(fileStream, overwrite);

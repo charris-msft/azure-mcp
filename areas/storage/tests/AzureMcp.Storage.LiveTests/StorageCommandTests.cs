@@ -244,7 +244,7 @@ namespace AzureMcp.Storage.LiveTests
             // Create a temporary test file
             var tempFile = Path.GetTempFileName();
             var testContent = "This is a test file for Data Lake upload.";
-            await File.WriteAllTextAsync(tempFile, testContent);
+            await File.WriteAllTextAsync(tempFile, testContent, TestContext.Current.CancellationToken);
 
             try
             {
@@ -288,7 +288,7 @@ namespace AzureMcp.Storage.LiveTests
             // Create a temporary test file
             var tempFile = Path.GetTempFileName();
             var testContent = "This is a test file for Data Lake overwrite test.";
-            await File.WriteAllTextAsync(tempFile, testContent);
+            await File.WriteAllTextAsync(tempFile, testContent, TestContext.Current.CancellationToken);
 
             try
             {
