@@ -264,8 +264,8 @@ public class FileUploadCommandTests
 
         var parseResult = _parser.Parse([
             "--subscription", "test-subscription",
-            "--account-name", "testaccount",
-            "--file-system-name", "testfs",
+            "--account-name", "account123",
+            "--file-system-name", "filesystem123",
             "--file-path", "data/test-file.txt",
             "--source-file-path", "/local/test-file.txt",
             "--overwrite"
