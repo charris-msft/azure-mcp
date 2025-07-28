@@ -60,7 +60,6 @@
     <PackageReference Include="Azure.Identity.Broker" />
     <PackageReference Include="Azure.Messaging.ServiceBus" />
     <PackageReference Include="Azure.Monitor.Query" />
-    <PackageReference Include="Azure.ResourceManager" />
     <PackageReference Include="Azure.ResourceManager.AppConfiguration" />
     <PackageReference Include="Azure.ResourceManager.Authorization" />
     <PackageReference Include="Azure.ResourceManager.CognitiveServices" />
