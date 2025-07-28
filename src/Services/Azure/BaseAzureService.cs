@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using System.Runtime.Versioning;
+using System.Text.Json;
 using Azure.Core;
 using Azure.ResourceManager;
 using Azure.ResourceManager.Resources;
@@ -121,32 +122,6 @@ public abstract class BaseAzureService(ITenantService? tenantService = null, ILo
     }
 
     /// <summary>
-    /// Gets a TenantResource instance based on the input tenant parameter
-    /// </summary>
-    /// <param name="tenant">Optional Azure tenant ID or name</param>
-    /// <returns>TenantResource instance or null if not found</returns>
-    protected async Task<TenantResource?> GetTenantResourceAsync(string? tenant = null)
-    {
-        if (_tenantService == null)
-        {
-            return null;
-        }
-
-        if (string.IsNullOrEmpty(tenant))
-        {
-            var tenants = await _tenantService.GetTenants();
-            return tenants.FirstOrDefault();
-        }
-        else
-        {
-            var resolvedTenantId = await _tenantService.GetTenantId(tenant);
-            var tenants = await _tenantService.GetTenants();
-            return tenants.FirstOrDefault(t => 
-                t.Data.TenantId?.ToString().Equals(resolvedTenantId, StringComparison.OrdinalIgnoreCase) == true);
-        }
-    }
-
-    /// <summary>
     /// Validates that the provided parameters are not null or empty
     /// </summary>
     /// <param name="parameters">Array of parameters to validate</param>
@@ -157,5 +132,112 @@ public abstract class BaseAzureService(ITenantService? tenantService = null, ILo
         {
             ArgumentException.ThrowIfNullOrEmpty(param);
         }
+    }
+
+    /// <summary>
+    /// Gets a JSON property from a JsonElement
+    /// </summary>
+    /// <param name="element">The JsonElement to search</param>
+    /// <param name="propertyName">The name of the property to get</param>
+    /// <returns>The JsonElement property or default if not found</returns>
+    protected static JsonElement GetProperty(JsonElement element, string propertyName)
+    {
+        if (element.ValueKind != JsonValueKind.Undefined && element.TryGetProperty(propertyName, out var property))
+        {
+            return property;
+        }
+        return default;
+    }
+
+    /// <summary>
+    /// Gets an integer value from a JSON property
+    /// </summary>
+    /// <param name="element">The JsonElement to search</param>
+    /// <param name="propertyName">The name of the property to get</param>
+    /// <returns>The integer value or null if not found or not a number</returns>
+    protected static int? GetPropertyIntValue(JsonElement element, string propertyName)
+    {
+        if (element.ValueKind != JsonValueKind.Undefined && element.TryGetProperty(propertyName, out var property))
+        {
+            return property.ValueKind switch
+            {
+                JsonValueKind.Number => property.GetInt32(),
+                _ => null
+            };
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Gets a string value from a JSON property
+    /// </summary>
+    /// <param name="element">The JsonElement to search</param>
+    /// <param name="propertyName">The name of the property to get</param>
+    /// <returns>The string value or null if not found</returns>
+    protected static string? GetPropertyStringValue(JsonElement element, string propertyName)
+    {
+        if (element.ValueKind != JsonValueKind.Undefined && element.TryGetProperty(propertyName, out var property))
+        {
+            return property.ValueKind switch
+            {
+                JsonValueKind.String => property.GetString(),
+                JsonValueKind.Number => property.GetRawText(),
+                JsonValueKind.True => "true",
+                JsonValueKind.False => "false",
+                JsonValueKind.Null => null,
+                _ => property.GetRawText()
+            };
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Gets a boolean value from a JSON property
+    /// </summary>
+    /// <param name="element">The JsonElement to search</param>
+    /// <param name="propertyName">The name of the property to get</param>
+    /// <returns>The boolean value or null if not found or not a boolean</returns>
+    protected static bool? GetPropertyBooleanValue(JsonElement element, string propertyName)
+    {
+        if (element.ValueKind != JsonValueKind.Undefined && element.TryGetProperty(propertyName, out var property))
+        {
+            return property.ValueKind switch
+            {
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                JsonValueKind.Null => null,
+                _ => null
+            };
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Gets a dictionary of tags from a JSON property
+    /// </summary>
+    /// <param name="tagsElement">The JsonElement containing the tags</param>
+    /// <returns>A dictionary of string key-value pairs or null if no tags found</returns>
+    protected static Dictionary<string, string>? GetPropertyTagsValue(JsonElement tagsElement)
+    {
+        var tags = new Dictionary<string, string>();
+
+        if (tagsElement.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var tag in tagsElement.EnumerateObject())
+            {
+                var value = tag.Value.ValueKind switch
+                {
+                    JsonValueKind.String => tag.Value.GetString() ?? string.Empty,
+                    JsonValueKind.Number => tag.Value.GetRawText(),
+                    JsonValueKind.True => "true",
+                    JsonValueKind.False => "false",
+                    JsonValueKind.Null => string.Empty,
+                    _ => tag.Value.GetRawText()
+                };
+                tags[tag.Name] = value;
+            }
+        }
+
+        return tags.Count > 0 ? tags : null;
     }
 }

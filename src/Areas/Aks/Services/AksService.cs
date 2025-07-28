@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
+using Azure.Core;
 using Azure.ResourceManager.ResourceGraph;
 using Azure.ResourceManager.ResourceGraph.Models;
 using Azure.ResourceManager.Resources;
@@ -21,6 +22,7 @@ public sealed class AksService(
 {
     private readonly ISubscriptionService _subscriptionService = subscriptionService ?? throw new ArgumentNullException(nameof(subscriptionService));
     private readonly ICacheService _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+    private readonly ITenantService _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
 
     private const string CacheGroup = "aks";
     private const string AksClustersCacheKey = "clusters";
@@ -48,9 +50,14 @@ public sealed class AksService(
         var subscriptionResource = await _subscriptionService.GetSubscription(subscription, tenant, retryPolicy);
         var clusters = new List<Cluster>();
 
+        var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
+        if (tenantResource == null)
+        {
+            return clusters; // Return empty list if no tenant found
+        }
+
         try
         {
-            var tenantResource = await GetTenantResourceAsync(tenant);
             var queryContent = new ResourceQueryContent("Resources | where type =~ 'Microsoft.ContainerService/managedClusters' | project id, name, type, location, tags, sku, properties | limit 20")
             {
                 Subscriptions = { subscriptionResource.Data.SubscriptionId }
@@ -60,27 +67,18 @@ public sealed class AksService(
             {
                 return clusters; // Return empty list if no clusters found
             }
-#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
-            var list = result.Data.ToObjectFromJson<List<IDictionary<string, string>>>();
-            if (list == null || list.Count == 0)
+
+            using var jsonDocument = JsonDocument.Parse(result.Data);
+            var dataArray = jsonDocument.RootElement;
+            if (dataArray.ValueKind != JsonValueKind.Array)
             {
-                return clusters; // Return empty list if no clusters found
+                return clusters; // Return empty list if data is not an array
             }
-            foreach (var item in list)
+            foreach (var item in dataArray.EnumerateArray())
             {
                 clusters.Add(ConvertToClusterModel(item));
             }
-#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
-            /*
-            await foreach (var cluster in subscriptionResource.GetGenericResourcesAsync(filter: "resourceType eq 'Microsoft.ContainerService/managedClusters'"))
-            {
-                if (cluster?.Data != null)
-                {
-                    var resource = await cluster.GetAsync();
-                    clusters.Add(ConvertToClusterModel(resource));
-                }
-            }
-            */
+
             // Cache the results
             await _cacheService.SetAsync(CacheGroup, cacheKey, clusters, s_cacheDuration);
         }
@@ -92,84 +90,46 @@ public sealed class AksService(
         return clusters;
     }
 
-    private static Cluster ConvertToClusterModel(IDictionary<string, string> item)
+    private static Cluster ConvertToClusterModel(JsonElement item)
     {
-        var clusterProperties = AksClusterProperties.FromJson(BinaryData.FromString(item["properties"]));
-        var agentPool = clusterProperties?.AgentPoolProfiles?.FirstOrDefault();
+        var properties = item.TryGetProperty("properties", out var props) ? props : default;
+        // Agent pool
+        var agentPoolProfiles = GetProperty(properties, "agentPoolProfiles");
+        int? nodeCount = null;
+        string? nodeVmSize = null;
+        if (agentPoolProfiles.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var agentPool in agentPoolProfiles.EnumerateArray())
+            {
+                nodeCount = GetPropertyIntValue(agentPool, "count");
+                nodeVmSize = GetPropertyStringValue(agentPool, "vmSize");
+                break;  
+            }
+        }
+        // Resource identity
+        var id = new ResourceIdentifier(GetPropertyStringValue(item, "id")??string.Empty);
 
         return new Cluster
         {
-            Name = item["name"]?.ToString(),
-            SubscriptionId = item["subscriptionId"]?.ToString(),
-            ResourceGroupName = item["resourceGroupName"]?.ToString(),
-            Location = item["location"]?.ToString(),
-            IdentityType = item["identityType"]?.ToString(),
-            ProvisioningState = clusterProperties?.ProvisioningState,
-            SkuTier = item["Sku"]?.ToString(),
-            Tags = ConvertToTagsDictionary(item["tags"]),
-            KubernetesVersion = clusterProperties?.KubernetesVersion,
-            PowerState = clusterProperties?.PowerState?.Code,
-            DnsPrefix = clusterProperties?.DnsPrefix,
-            Fqdn = clusterProperties?.Fqdn,
-            NodeCount = agentPool?.Count,
-            NodeVmSize = agentPool?.VmSize,
-            EnableRbac = clusterProperties?.EnableRbac,
-            NetworkPlugin = clusterProperties?.NetworkProfile?.NetworkPlugin?.ToString(),
-            NetworkPolicy = clusterProperties?.NetworkProfile?.NetworkPolicy?.ToString(),
-            ServiceCidr = clusterProperties?.NetworkProfile?.ServiceCidr,
-            DnsServiceIP = clusterProperties?.NetworkProfile?.DnsServiceIP?.ToString()
-        };
-    }
-
-    private static Dictionary<string, string> ConvertToTagsDictionary(string? tagsString)
-    {
-        if (string.IsNullOrEmpty(tagsString))
-            return new Dictionary<string, string>();
-
-        try
-        {
-#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
-#pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
-            var tags = JsonSerializer.Deserialize<Dictionary<string, string>>(tagsString, new JsonSerializerOptions { });
-#pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
-#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
-            return tags ?? new Dictionary<string, string>();
-        }
-        catch
-        {
-            return new Dictionary<string, string>();
-        }
-    }
-
-    private static Cluster ConvertToClusterModel(GenericResource clusterResource)
-    {
-        // Retrieve all information about the resource
-        var data = clusterResource.Get().Value.Data;
-
-        var clusterProperties = AksClusterProperties.FromJson(data.Properties);
-        var agentPool = clusterProperties?.AgentPoolProfiles?.FirstOrDefault();
-
-        return new Cluster
-        {
-            Name = data.Name,
-            SubscriptionId = clusterResource.Id.SubscriptionId,
-            ResourceGroupName = clusterResource.Id.ResourceGroupName,
-            Location = data.Location.ToString(),
-            IdentityType = data.Identity?.ManagedServiceIdentityType.ToString(),
-            ProvisioningState = clusterProperties?.ProvisioningState,
-            SkuTier = data.Sku?.Tier?.ToString(),
-            Tags = data.Tags?.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
-            KubernetesVersion = clusterProperties?.KubernetesVersion,
-            PowerState = clusterProperties?.PowerState?.Code,
-            DnsPrefix = clusterProperties?.DnsPrefix,
-            Fqdn = clusterProperties?.Fqdn,
-            NodeCount = agentPool?.Count,
-            NodeVmSize = agentPool?.VmSize,
-            EnableRbac = clusterProperties?.EnableRbac,
-            NetworkPlugin = clusterProperties?.NetworkProfile?.NetworkPlugin?.ToString(),
-            NetworkPolicy = clusterProperties?.NetworkProfile?.NetworkPolicy?.ToString(),
-            ServiceCidr = clusterProperties?.NetworkProfile?.ServiceCidr,
-            DnsServiceIP = clusterProperties?.NetworkProfile?.DnsServiceIP?.ToString()
+            Name = GetPropertyStringValue(item, "name"),
+            SubscriptionId = id.SubscriptionId,
+            ResourceGroupName = id.ResourceGroupName,
+            Location = GetPropertyStringValue(item, "location"),
+            IdentityType = GetPropertyStringValue(item, "identityType"),
+            ProvisioningState = GetPropertyStringValue(properties, "provisioningState"),
+            SkuTier = GetPropertyStringValue(item, "sku"),
+            Tags = GetPropertyTagsValue(item.TryGetProperty("tags", out var tags) ? tags : default),
+            KubernetesVersion = GetPropertyStringValue(properties, "kubernetesVersion"),
+            PowerState = GetPropertyStringValue(GetProperty(properties, "powerState"), "code"),
+            DnsPrefix = GetPropertyStringValue(properties, "dnsPrefix"),
+            Fqdn = GetPropertyStringValue(properties, "fqdn"),
+            NodeCount = nodeCount,
+            NodeVmSize = nodeVmSize,
+            EnableRbac = GetPropertyBooleanValue(properties, "enableRBAC"),
+            NetworkPlugin = GetPropertyStringValue(GetProperty(properties, "networkProfile"), "networkPlugin"),
+            NetworkPolicy = GetPropertyStringValue(GetProperty(properties, "networkProfile"), "networkPolicy"),
+            ServiceCidr = GetPropertyStringValue(GetProperty(properties, "networkProfile"), "serviceCidr"),
+            DnsServiceIP = GetPropertyStringValue(GetProperty(properties, "networkProfile"), "dnsServiceIP")
         };
     }
 }
