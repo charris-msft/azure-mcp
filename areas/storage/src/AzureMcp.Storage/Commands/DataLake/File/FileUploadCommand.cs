@@ -41,7 +41,7 @@ public sealed class FileUploadCommand(ILogger<FileUploadCommand> logger) : BaseF
 
     public override ToolMetadata Metadata => new()
     {
-        Destructive = false,    // File upload is not destructive (creates new content)
+        Destructive = true,     // File upload can overwrite existing content
         ReadOnly = false        // This modifies storage by uploading content
     };
 
