@@ -2,24 +2,30 @@
 // Licensed under the MIT License.
 
 using AzureMcp.CloudArchitect.Options;
-using AzureMcp.CloudArchitect.Options.Design;
 using AzureMcp.CloudArchitect.Services;
 using AzureMcp.Core.Commands;
+using AzureMcp.Core.Helpers;
 using AzureMcp.Core.Models;
 using Microsoft.Extensions.Logging;
 using System.CommandLine;
 using System.CommandLine.Parsing;
+using System.Reflection;
 
 namespace AzureMcp.CloudArchitect.Commands.Design;
 
-public sealed class DesignCommand(ILogger<DesignCommand> logger) : BaseCloudArchitectCommand<DesignOptions>
+public sealed class DesignCommand(ILogger<DesignCommand> logger) : BaseCloudArchitectCommand<ArchitectureDesignToolOptions>
 {
     private const string CommandTitle = "Design Azure cloud architectures through guided questions";
     private readonly ILogger<DesignCommand> _logger = logger;
-    private readonly CloudArchitectService _cloudArchitectService = cloudArchitectService;
 
-    // Define options from OptionDefinitions
-    private readonly Option<string> _architectureDesignToolOptions = CloudArchitectOptionDefinitions.ArchitectureDesignToolOptions;
+    private readonly Option<string> _questionOption = CloudArchitectOptionDefinitions.Question;
+    private readonly Option<int> _questionNumberOption = CloudArchitectOptionDefinitions.QuestionNumber;
+    private readonly Option<int> _questionTotalQuestions = CloudArchitectOptionDefinitions.TotalQuestions;
+    private readonly Option<string> _answerOption = CloudArchitectOptionDefinitions.Answer;
+    private readonly Option<bool> _nextQuestionNeededOption = CloudArchitectOptionDefinitions.NextQuestionNeeded;
+    private readonly Option<double> _confidenceScoreOption = CloudArchitectOptionDefinitions.ConfidenceScore;
+    private readonly Option<string> _architectureComponentOption = CloudArchitectOptionDefinitions.ArchitectureComponent;
+
 
     private static readonly string s_designArchitectureText = LoadArchitectureDesignText();
 
@@ -49,13 +55,25 @@ public sealed class DesignCommand(ILogger<DesignCommand> logger) : BaseCloudArch
     protected override void RegisterOptions(Command command)
     {
         base.RegisterOptions(command);
-        command.AddOption(_architectureDesignToolOptions);
+        command.AddOption(_questionOption);
+        command.AddOption(_questionNumberOption);
+        command.AddOption(_questionTotalQuestions);
+        command.AddOption(_answerOption);
+        command.AddOption(_nextQuestionNeededOption);
+        command.AddOption(_confidenceScoreOption);
+        command.AddOption(_architectureComponentOption);
     }
 
-    protected override DesignOptions BindOptions(ParseResult parseResult)
+    protected override ArchitectureDesignToolOptions BindOptions(ParseResult parseResult)
     {
         var options = base.BindOptions(parseResult);
-        options.ArchitectDesignTool = parseResult.GetValueForOption(_architectureDesignToolOptions);
+        options.Question = parseResult.GetValueForOption(_questionOption);
+        options.QuestionNumber = parseResult.GetValueForOption(_questionNumberOption);
+        options.TotalQuestions = parseResult.GetValueForOption(_questionTotalQuestions);
+        options.Answer = parseResult.GetValueForOption(_answerOption);
+        options.NextQuestionNeeded = parseResult.GetValueForOption(_nextQuestionNeededOption);
+        options.ConfidenceScore = parseResult.GetValueForOption(_confidenceScoreOption);
+        options.ArchitectureComponent = parseResult.GetValueForOption(_architectureComponentOption);
         return options;
     }
 
