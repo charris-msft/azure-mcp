@@ -47,15 +47,15 @@ public sealed class AksService(
 
         var subscriptionResource = await _subscriptionService.GetSubscription(subscription, tenant, retryPolicy);
         var clusters = new List<Cluster>();
-
-        var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
-        if (tenantResource == null)
-        {
-            return clusters; // Return empty list if no tenant found
-        }
-
+        
         try
         {
+            var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
+            if (tenantResource == null)
+            {
+                return clusters; // Return empty list if no tenant found
+            }
+
             var queryContent = new ResourceQueryContent("Resources | where type =~ 'Microsoft.ContainerService/managedClusters' | project id, name, type, location, tags, sku, properties")
             {
                 Subscriptions = { subscriptionResource.Data.SubscriptionId }
