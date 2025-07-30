@@ -56,7 +56,7 @@ public sealed class AksService(
 
         try
         {
-            var queryContent = new ResourceQueryContent("Resources | where type =~ 'Microsoft.ContainerService/managedClusters' | project id, name, type, location, tags, sku, properties | limit 20")
+            var queryContent = new ResourceQueryContent("Resources | where type =~ 'Microsoft.ContainerService/managedClusters' | project id, name, type, location, tags, sku, properties")
             {
                 Subscriptions = { subscriptionResource.Data.SubscriptionId }
             };
