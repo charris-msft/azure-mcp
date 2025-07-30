@@ -67,7 +67,7 @@ public sealed class DesignCommand(ILogger<DesignCommand> logger) : BaseCloudArch
     protected override ArchitectureDesignToolOptions BindOptions(ParseResult parseResult)
     {
         var options = base.BindOptions(parseResult);
-        options.Question = parseResult.GetValueForOption(_questionOption);
+        options.Question = parseResult.GetValueForOption(_questionOption) ?? string.Empty;
         options.QuestionNumber = parseResult.GetValueForOption(_questionNumberOption);
         options.TotalQuestions = parseResult.GetValueForOption(_questionTotalQuestions);
         options.Answer = parseResult.GetValueForOption(_answerOption);
