@@ -173,7 +173,7 @@ Update your mcp.json to point to the locally built azmcp executable:
 
 Optional `--namespace` and `--mode` parameters can be used to configure different server modes:
 
-**Default Mode (Namespace)** - namespace-level tools (default behavior):
+**Namespace Mode** - namespace-level tools (default behavior):
 ```json
 {
   "servers": {
@@ -239,7 +239,7 @@ Optional `--namespace` and `--mode` parameters can be used to configure differen
 ```
 
 > **Server Mode Summary:**
-> - **Default Mode (Namespace)**: No additional parameters - exposes namespace-level tools (recommended for VS Code's 128 tool limit)
+> - **Namespace Mode**: No additional parameters - exposes namespace-level tools (recommended for VS Code's 128 tool limit)
 > - **All Tools Mode**: `--mode all` - expose all individual tools (pre-v0.5.0 behavior)
 > - **Namespace Filtering**: `--namespace <service-name>` - expose specific services only
 > - **Single Tool Mode**: `--mode single` - single "azure" tool with internal routing

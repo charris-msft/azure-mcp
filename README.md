@@ -22,7 +22,7 @@ The Azure MCP Server implements the [MCP specification](https://modelcontextprot
     - 👉 [Open an issue in the public repository](https://github.com/Azure/azure-mcp/issues/new/choose)
 
 > [!IMPORTANT]
-> **Default Behavior Change (v0.5.0)**: The default `azmcp server start` command now exposes namespace-level tools (~25 tools) instead of individual tools (~128 tools). This change helps prevent VS Code from hitting the 128 tool limit. To restore the previous behavior with all individual tools, use `azmcp server start --mode all`.
+> **Default Behavior Change (v0.5.0)**: The default `azmcp server start` command now exposes namespace-level tools (~25 tools) instead of individual tools (~128 tools). This change helps prevent VS Code from hitting the 128 tool limit. To restore the previous behavior with all individual tools, use `azmcp server start --mode all`. For more details on server modes, see the [command reference](docs/azmcp-commands.md#server-operations).
 
 
 ## ✨ What can you do with the Azure MCP Server?
