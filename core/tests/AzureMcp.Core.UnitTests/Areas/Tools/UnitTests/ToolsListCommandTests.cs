@@ -7,6 +7,7 @@ using AzureMcp.Core.Areas;
 using AzureMcp.Core.Areas.Tools.Commands;
 using AzureMcp.Core.Commands;
 using AzureMcp.Core.Models.Command;
+using AzureMcp.Core.Services.Telemetry;
 using AzureMcp.Core.UnitTests.Areas.Server;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -319,12 +320,13 @@ public class ToolsListCommandTests
         var collection = new ServiceCollection();
         collection.AddLogging();
         
-        // Create an empty command factory with no area setups
-        var logger = collection.BuildServiceProvider().GetRequiredService<ILogger<CommandFactory>>();
-        var telemetryService = new CommandFactoryHelpers.NoOpTelemetryService();
+        // Create an empty command factory with minimal dependencies
+        var serviceProvider = collection.BuildServiceProvider();
+        var logger = serviceProvider.GetRequiredService<ILogger<CommandFactory>>();
+        var telemetryService = Substitute.For<ITelemetryService>();
         var emptyAreaSetups = Array.Empty<IAreaSetup>();
         
-        var emptyCommandFactory = new CommandFactory(collection.BuildServiceProvider(), emptyAreaSetups, telemetryService, logger);
+        var emptyCommandFactory = new CommandFactory(serviceProvider, emptyAreaSetups, telemetryService, logger);
         collection.AddSingleton(emptyCommandFactory);
         
         var emptyServiceProvider = collection.BuildServiceProvider();
