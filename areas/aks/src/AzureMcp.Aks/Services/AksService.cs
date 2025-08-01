@@ -47,7 +47,7 @@ public sealed class AksService(
 
         var subscriptionResource = await _subscriptionService.GetSubscription(subscription, tenant, retryPolicy);
         var clusters = new List<Cluster>();
-        
+
         try
         {
             var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
@@ -166,11 +166,11 @@ public sealed class AksService(
             {
                 nodeCount = GetPropertyIntValue(agentPool, "count");
                 nodeVmSize = GetPropertyStringValue(agentPool, "vmSize");
-                break;  
+                break;
             }
         }
         // Resource identity
-        var id = new ResourceIdentifier(GetPropertyStringValue(item, "id")??string.Empty);
+        var id = new ResourceIdentifier(GetPropertyStringValue(item, "id") ?? string.Empty);
 
         return new Cluster
         {
