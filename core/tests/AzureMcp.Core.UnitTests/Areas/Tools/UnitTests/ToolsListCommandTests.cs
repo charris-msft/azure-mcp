@@ -6,11 +6,8 @@ using System.Text.Json;
 using AzureMcp.Core.Areas;
 using AzureMcp.Core.Areas.Tools.Commands;
 using AzureMcp.Core.Commands;
-using AzureMcp.Core.Models;
 using AzureMcp.Core.Models.Command;
-using AzureMcp.Core.Models.Option;
 using AzureMcp.Core.UnitTests.Areas.Server;
-using AzureMcp.Tests;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -20,6 +17,10 @@ namespace AzureMcp.Core.UnitTests.Areas.Tools.UnitTests;
 
 public class ToolsListCommandTests
 {
+    private const int SuccessStatusCode = 200;
+    private const int ErrorStatusCode = 500;
+    private const int MinimumExpectedCommands = 3;
+    
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<ToolsListCommand> _logger;
     private readonly CommandContext _context;
@@ -41,6 +42,20 @@ public class ToolsListCommandTests
         _parser = new(_command.GetCommand());
     }
 
+    /// <summary>
+    /// Helper method to deserialize response results to CommandInfo list
+    /// </summary>
+    private static List<CommandInfo> DeserializeResults(object results)
+    {
+        var json = JsonSerializer.Serialize(results);
+        return JsonSerializer.Deserialize<List<CommandInfo>>(json) ?? new List<CommandInfo>();
+    }
+
+    /// <summary>
+    /// Verifies that the command returns a valid list of CommandInfo objects
+    /// when executed with a properly configured context.
+    /// </summary>
+
     [Fact]
     public async Task ExecuteAsync_WithValidContext_ReturnsCommandInfoList()
     {
@@ -54,8 +69,7 @@ public class ToolsListCommandTests
         Assert.NotNull(response);
         Assert.NotNull(response.Results);
 
-        var json = JsonSerializer.Serialize(response.Results);
-        var result = JsonSerializer.Deserialize<List<CommandInfo>>(json);
+        var result = DeserializeResults(response.Results);
 
         Assert.NotNull(result);
         Assert.NotEmpty(result);
@@ -74,12 +88,15 @@ public class ToolsListCommandTests
                 {
                     Assert.False(string.IsNullOrWhiteSpace(option.Name), "Option name should not be empty");
                     Assert.False(string.IsNullOrWhiteSpace(option.Description), "Option description should not be empty");
-                    Assert.True(option.Required || !option.Required, "Option should have a valid Required property");
                 }
             }
         }
     }
     
+    /// <summary>
+    /// Verifies that JSON serialization and deserialization works correctly
+    /// and preserves data integrity during round-trip operations.
+    /// </summary>
     [Fact]
     public async Task ExecuteAsync_JsonSerializationStressTest_HandlesLargeResults()
     {
@@ -97,7 +114,7 @@ public class ToolsListCommandTests
         Assert.False(string.IsNullOrWhiteSpace(json));
         
         // Ensure JSON is valid and can be deserialized
-        var result = JsonSerializer.Deserialize<List<CommandInfo>>(json);
+        var result = DeserializeResults(response.Results);
         Assert.NotNull(result);
         
         // Verify JSON round-trip preserves all data
@@ -105,6 +122,10 @@ public class ToolsListCommandTests
         Assert.Equal(json, reserializedJson);
     }
 
+    /// <summary>
+    /// Verifies that the command properly filters out hidden commands
+    /// and only returns visible commands in the results.
+    /// </summary>
     [Fact]
     public async Task ExecuteAsync_WithValidContext_FiltersHiddenCommands()
     {
@@ -118,8 +139,7 @@ public class ToolsListCommandTests
         Assert.NotNull(response);
         Assert.NotNull(response.Results);
 
-        var json = JsonSerializer.Serialize(response.Results);
-        var result = JsonSerializer.Deserialize<List<CommandInfo>>(json);
+        var result = DeserializeResults(response.Results);
 
         Assert.NotNull(result);
 
@@ -129,6 +149,10 @@ public class ToolsListCommandTests
         
     }
 
+    /// <summary>
+    /// Verifies that commands include their options with proper validation
+    /// and that option properties are correctly populated.
+    /// </summary>
     [Fact]
     public async Task ExecuteAsync_WithValidContext_IncludesOptionsForCommands()
     {
@@ -142,8 +166,7 @@ public class ToolsListCommandTests
         Assert.NotNull(response);
         Assert.NotNull(response.Results);
 
-        var json = JsonSerializer.Serialize(response.Results);
-        var result = JsonSerializer.Deserialize<List<CommandInfo>>(json);
+        var result = DeserializeResults(response.Results);
 
         Assert.NotNull(result);
         
@@ -155,9 +178,12 @@ public class ToolsListCommandTests
         var option = commandWithOptions.Options.First();
         Assert.NotNull(option.Name);
         Assert.NotNull(option.Description);
-        Assert.True(option.Required || !option.Required);
     }
 
+    /// <summary>
+    /// Verifies that the command handles null service provider gracefully
+    /// and returns appropriate error response.
+    /// </summary>
     [Fact]
     public async Task ExecuteAsync_WithNullServiceProvider_HandlesGracefully()
     {
@@ -170,10 +196,14 @@ public class ToolsListCommandTests
 
         // Assert
         Assert.NotNull(response);
-        Assert.Equal(500, response.Status);
+        Assert.Equal(ErrorStatusCode, response.Status);
         Assert.Contains("cannot be null", response.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Verifies that the command handles corrupted command factory gracefully
+    /// and returns appropriate error response with error details.
+    /// </summary>
     [Fact]
     public async Task ExecuteAsync_WithCorruptedCommandFactory_HandlesGracefully()
     {
@@ -190,10 +220,14 @@ public class ToolsListCommandTests
 
         // Assert
         Assert.NotNull(response);
-        Assert.Equal(500, response.Status);
+        Assert.Equal(ErrorStatusCode, response.Status);
         Assert.Contains("Corrupted command factory", response.Message);
     }
 
+    /// <summary>
+    /// Verifies that the command returns specific known commands from different areas
+    /// and validates the structure and content of returned commands.
+    /// </summary>
     [Fact]
     public async Task ExecuteAsync_ReturnsSpecificKnownCommands()
     {
@@ -207,13 +241,12 @@ public class ToolsListCommandTests
         Assert.NotNull(response);
         Assert.NotNull(response.Results);
 
-        var json = JsonSerializer.Serialize(response.Results);
-        var result = JsonSerializer.Deserialize<List<CommandInfo>>(json);
+        var result = DeserializeResults(response.Results);
 
         Assert.NotNull(result);
         Assert.NotEmpty(result);
 
-        Assert.True(result.Count >= 3, $"Expected at least 3 commands, got {result.Count}");
+        Assert.True(result.Count >= MinimumExpectedCommands, $"Expected at least {MinimumExpectedCommands} commands, got {result.Count}");
         
         var allCommands = result.Select(cmd => cmd.Command).ToList();
         
@@ -243,6 +276,10 @@ public class ToolsListCommandTests
         }
     }
 
+    /// <summary>
+    /// Verifies that command paths are properly formatted without extra spaces
+    /// and follow consistent formatting conventions.
+    /// </summary>
     [Fact]
     public async Task ExecuteAsync_CommandPathFormattingIsCorrect()
     {
@@ -256,8 +293,7 @@ public class ToolsListCommandTests
         Assert.NotNull(response);
         Assert.NotNull(response.Results);
 
-        var json = JsonSerializer.Serialize(response.Results);
-        var result = JsonSerializer.Deserialize<List<CommandInfo>>(json);
+        var result = DeserializeResults(response.Results);
 
         Assert.NotNull(result);
         
@@ -272,6 +308,10 @@ public class ToolsListCommandTests
         }
     }
 
+    /// <summary>
+    /// Verifies that the command handles empty command factory gracefully
+    /// and returns empty results when no commands are available.
+    /// </summary>
     [Fact]
     public async Task ExecuteAsync_WithEmptyCommandFactory_ReturnsEmptyResults()
     {
@@ -296,13 +336,27 @@ public class ToolsListCommandTests
 
         // Assert
         Assert.NotNull(response);
-        Assert.Equal(200, response.Status);
+        Assert.Equal(SuccessStatusCode, response.Status);
         
-        var json = JsonSerializer.Serialize(response.Results);
-        var result = JsonSerializer.Deserialize<List<CommandInfo>>(json);
+        var result = DeserializeResults(response.Results!);
         
         Assert.NotNull(result);
         Assert.Empty(result); // Should be empty when no commands are available
+    }
+
+    /// <summary>
+    /// Verifies that the command metadata indicates it is non-destructive and read-only.
+    /// </summary>
+    [Fact]
+    public void Metadata_IndicatesNonDestructiveAndReadOnly()
+    {
+        // Act
+        var metadata = _command.Metadata;
+
+        // Assert
+        Assert.NotNull(metadata);
+        Assert.False(metadata.Destructive, "Tool list command should not be destructive");
+        Assert.True(metadata.ReadOnly, "Tool list command should be read-only");
     }
 
 }
