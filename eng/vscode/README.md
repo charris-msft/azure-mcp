@@ -1,8 +1,8 @@
-# 🌟 Azure MCP Server
+# 🌟 Azure MCP Server - VS Code Extension
 
 The Azure MCP Server implements the [MCP specification](https://modelcontextprotocol.io) to create a seamless connection between AI agents and Azure services.  Azure MCP Server can be used alone or with the [GitHub Copilot for Azure extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azure-github-copilot) in VS Code.  This project is in Public Preview and implementation may significantly change prior to our General Availability.
 
-### ✅ VS Code Install Guide (Recommended)
+### ✅ VS Code Install Guide
 
 1. Install either the stable or Insiders release of VS Code:
    * [💫 Stable release](https://code.visualstudio.com/download)
@@ -248,24 +248,7 @@ Agents and models can discover and learn best practices and usage guidelines for
 
 For detailed command documentation and examples, see [Azure MCP Commands](https://github.com/Azure/azure-mcp/blob/main/docs/azmcp-commands.md).
 
-## 🔄️ Upgrading Existing Installs to the Latest Version
-
-<details>
-<summary>How to stay current with releases of Azure MCP Server</summary>
-
-#### NPX
-
-If you use the default package spec of `@azure/mcp@latest`, npx will look for a new version on each server start. If you use just `@azure/mcp`, npx will continue to use its cached version until its cache is cleared.
-
-#### NPM
-
-If you globally install the cli via `npm install -g @azure/mcp` it will use the installed version until you manually update it with `npm update -g @azure/mcp`.
-
-#### Docker
-
-There is no version update built into the docker image.  To update, just pull the latest from the repo and repeat the [docker installation instructions](#docker-install).
-
-#### VS Code
+## 🔄️ Upgrading Existing Installs to the Latest Version in VS Code
 
 Installation in VS Code should be in one of the previous forms and the update instructions are the same. If you installed the mcp server with the `npx` command and  `-y @azure/mcp@latest` args, npx will check for package updates each time VS Code starts the server. Using a docker container in VS Code has the same no-update limitation described above.
 </details>
