@@ -23,58 +23,62 @@ The Azure MCP Server implements the [MCP specification](https://modelcontextprot
 
 
 ## ✨ What can you do with the Azure MCP Server?
-
 The Azure MCP Server supercharges your agents with Azure context. Here are some cool prompts you can try:
 
-### 🔎 Azure AI Search
-
-* "What indexes do I have in my Azure AI Search service 'mysvc'?"
-* "Let's search this index for 'my search query'"
-
-### ⚙️ Azure App Configuration
-
-* "List my App Configuration stores"
-* "Show my key-value pairs in App Config"
-
-### ☸️ Azure Kubernetes Service (AKS)
-
-* "List my AKS clusters in my subscription"
-* "Show me all my Azure Kubernetes Service clusters"
-
-### 📊 Azure Cosmos DB
-
-* "Show me all my Cosmos DB databases"
-* "List containers in my Cosmos DB database"
-
-### 🧮 Azure Data Explorer
-
-* "Get Azure Data Explorer databases in cluster 'mycluster'"
-* "Sample 10 rows from table 'StormEvents' in Azure Data Explorer database 'db1'"
-
-### 📊 Azure Monitor
-
-* "Query my Log Analytics workspace"
-
-### 🗄️ Azure SQL Database
-
-* "Show me details about my Azure SQL database 'mydb'"
-* "List all databases in my Azure SQL server 'myserver'"
-* "List Active Directory administrators for my Azure SQL server 'myserver'"
-* "List all firewall rules for my Azure SQL server 'myserver'"
-* "List all elastic pools in my Azure SQL server 'myserver'"
-
-### 🔧 Azure Resource Management
-
-* "List my resource groups"
-* "List my Azure CDN endpoints"
+### Initialize and deploy your project
 * "Help me build an Azure application using Node.js"
 
-### 💾 Azure Storage
+### Manage your resources
+* "List my...
+   * App Configuration stores
+   * AKS clusters in my subscription
+   * resource groups
+   * Azure CDN endpoints
+   * Azure storage accounts
+   * etc.
+* Show me...
+   * all my Azure Kubernetes Service clusters
+   * all my Cosmos DB databases
+   * etc. 
+* "What indexes do I have in my Azure AI Search service 'mysvc'?"
 
-* "List my Azure storage accounts"
-* "Show me the tables in my Storage account"
-* "Get details about my Storage container"
-* "List paths in my Data Lake file system"
+
+### Get details of any resource
+* "Show me...
+   * my key-value pairs in App Config"
+   * details about my Azure SQL database 'mydb'
+   * the tables in my Storage account"
+   * details about my Storage container"
+* "List...
+   * containers in my Cosmos DB database"
+   * all databases in my Azure SQL server 'myserver'"
+   * Active Directory administrators for my Azure SQL server 'myserver'"
+   * all firewall rules for my Azure SQL server 'myserver'"
+   * all elastic pools in my Azure SQL server 'myserver'"
+   * paths in my Data Lake file system"
+
+
+### Monitor your projects
+* "Get Azure Data Explorer databases in cluster 'mycluster'"
+* "Sample 10 rows from table 'StormEvents' in Azure Data Explorer database 'db1'"
+* "Query my Log Analytics workspace"
+
+
+
+## Azure Resources Available through the Azure MCP
+
+* 🔎 Azure AI Search
+* ⚙️ Azure App Configuration
+* ☸️ Azure Kubernetes Service (AKS)
+* 📊 Azure Cosmos DB
+* 🧮 Azure Data Explorer
+* 📊 Azure Monitor
+* 🗄️ Azure SQL Database
+* 🔧 Azure Resource Management
+* 💾 Azure Storage
+
+
+
 
 ## 🛠️ Currently Supported Tools
 
