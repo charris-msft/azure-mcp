@@ -153,6 +153,7 @@
                 "testareas",
                 "testcontainer",
                 "testdb",
+                "testfilesystem",
                 "testpool",
                 "testproxy",
                 "testrg",
@@ -163,6 +164,7 @@
                 "vectorizable",
                 "vectorizer",
                 "vsix",
+                "vsixtarget",
                 "VSTEST",
                 "Xunit"
             ]
