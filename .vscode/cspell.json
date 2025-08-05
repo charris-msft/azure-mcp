@@ -108,6 +108,8 @@
                 "hotmail",
                 "Intune",
                 "kcsb",
+                "kubelet",
+                "kubenet",
                 "LASTEXITCODE",
                 "locproj",
                 "logissue",
@@ -324,7 +326,6 @@
         "timechart",
         "myapp",
         "mygroup",
-        "myworkbook",
-        "Kubelet"
+        "myworkbook"
     ]
 }
