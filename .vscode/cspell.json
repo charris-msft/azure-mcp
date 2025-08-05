@@ -324,6 +324,7 @@
         "timechart",
         "myapp",
         "mygroup",
-        "myworkbook"
+        "myworkbook",
+        "Kubelet"
     ]
 }

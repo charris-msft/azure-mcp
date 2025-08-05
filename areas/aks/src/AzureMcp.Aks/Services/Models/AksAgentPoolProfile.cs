@@ -54,7 +54,7 @@ namespace AzureMcp.Aks.Services
         /// <summary> Whether to enable auto-scaler. </summary>
         [JsonPropertyName("enableAutoScaling")]
         public bool? EnableAutoScaling { get; set; }
-        /// <summary> This also effects the cluster autoscaler behavior. If not specified, it defaults to Delete. </summary>
+        /// <summary> This also effects the cluster auto-scaler behavior. If not specified, it defaults to Delete. </summary>
         [JsonPropertyName("scaleDownMode")]
         public string ScaleDownMode { get; set; }
         /// <summary> The type of Agent Pool. </summary>
