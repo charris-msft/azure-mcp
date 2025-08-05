@@ -155,44 +155,33 @@ public sealed class AksService(
 
     private static Cluster ConvertToClusterModel(JsonElement item)
     {
-        var properties = item.TryGetProperty("properties", out var props) ? props : default;
-        // Agent pool
-        var agentPoolProfiles = GetProperty(properties, "agentPoolProfiles");
-        int? nodeCount = null;
-        string? nodeVmSize = null;
-        if (agentPoolProfiles.ValueKind == JsonValueKind.Array)
-        {
-            foreach (var agentPool in agentPoolProfiles.EnumerateArray())
-            {
-                nodeCount = GetPropertyIntValue(agentPool, "count");
-                nodeVmSize = GetPropertyStringValue(agentPool, "vmSize");
-                break;
-            }
-        }
+        AksCluster aksCluster = AksCluster.FromJson(item);
+        var agentPool = aksCluster.Properties.AgentPoolProfiles?.FirstOrDefault();
+
         // Resource identity
-        var id = new ResourceIdentifier(GetPropertyStringValue(item, "id") ?? string.Empty);
+        var id = new ResourceIdentifier(aksCluster.ResourceId);
 
         return new Cluster
         {
-            Name = GetPropertyStringValue(item, "name"),
+            Name = aksCluster.ResourceName,
             SubscriptionId = id.SubscriptionId,
             ResourceGroupName = id.ResourceGroupName,
-            Location = GetPropertyStringValue(item, "location"),
-            IdentityType = GetPropertyStringValue(item, "identityType"),
-            ProvisioningState = GetPropertyStringValue(properties, "provisioningState"),
-            SkuTier = GetPropertyStringValue(item, "sku"),
-            Tags = GetPropertyTagsValue(item.TryGetProperty("tags", out var tags) ? tags : default),
-            KubernetesVersion = GetPropertyStringValue(properties, "kubernetesVersion"),
-            PowerState = GetPropertyStringValue(GetProperty(properties, "powerState"), "code"),
-            DnsPrefix = GetPropertyStringValue(properties, "dnsPrefix"),
-            Fqdn = GetPropertyStringValue(properties, "fqdn"),
-            NodeCount = nodeCount,
-            NodeVmSize = nodeVmSize,
-            EnableRbac = GetPropertyBooleanValue(properties, "enableRBAC"),
-            NetworkPlugin = GetPropertyStringValue(GetProperty(properties, "networkProfile"), "networkPlugin"),
-            NetworkPolicy = GetPropertyStringValue(GetProperty(properties, "networkProfile"), "networkPolicy"),
-            ServiceCidr = GetPropertyStringValue(GetProperty(properties, "networkProfile"), "serviceCidr"),
-            DnsServiceIP = GetPropertyStringValue(GetProperty(properties, "networkProfile"), "dnsServiceIP")
+            Location = aksCluster.Location,
+            IdentityType = aksCluster.IdentityType,
+            ProvisioningState = aksCluster.Properties.ProvisioningState,
+            SkuTier = aksCluster.Sku.Tier,
+            Tags = aksCluster.Tags,
+            KubernetesVersion = aksCluster.Properties.KubernetesVersion,
+            PowerState = aksCluster.Properties.PowerState.Code,
+            DnsPrefix = aksCluster.Properties.DnsPrefix,
+            Fqdn = aksCluster.Properties.Fqdn,
+            NodeCount = agentPool?.Count,
+            NodeVmSize = agentPool?.VmSize,
+            EnableRbac = aksCluster.Properties.EnableRbac,
+            NetworkPlugin = aksCluster.Properties.NetworkProfile?.NetworkPlugin,
+            NetworkPolicy = aksCluster.Properties.NetworkProfile?.NetworkPolicy,
+            ServiceCidr = aksCluster.Properties.NetworkProfile?.ServiceCidr,
+            DnsServiceIP = aksCluster.Properties.NetworkProfile?.DnsServiceIP
         };
     }
 }
