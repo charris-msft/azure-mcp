@@ -288,7 +288,8 @@ public class GetSchemaTests
                 ],
                 "name": "Microsoft.ApiManagement/service/diagnostics/loggers"
               },
-              "scopeType": "ResourceGroup",
+              "writableScopes": "ResourceGroup",
+              "readableScopes": "ResourceGroup",
               "name": "Microsoft.ApiManagement/service/diagnostics/loggers@2018-01-01"
             }
           ]

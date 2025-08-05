@@ -82,7 +82,7 @@ public class EntitySerializationTests
             ],
             "name": "Microsoft.ApiManagement/gateways"
           },
-          "scopeType": "ResourceGroup",
+          "writableScopes": "ResourceGroup",
           "name": "Microsoft.ApiManagement/gateways@2024-05-01"
         }
         """;
@@ -142,8 +142,7 @@ public class EntitySerializationTests
             ],
             "name": "Microsoft.ApiManagement/gateways"
           },
-          "flags": "None",
-          "scopeType": "ResourceGroup",
+          "writableScopes": "ResourceGroup",
           "name": "Microsoft.ApiManagement/gateways@2024-05-01"
         }
         """;
@@ -180,7 +179,7 @@ public class EntitySerializationTests
             ],
             "name": "Microsoft.ApiManagement/gateways"
           },
-          "scopeType": "ResourceGroup",
+          "writableScopes": "ResourceGroup",
           "name": "Microsoft.ApiManagement/gateways@2024-05-01"
         }
         """;
