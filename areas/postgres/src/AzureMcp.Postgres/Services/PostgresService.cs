@@ -213,6 +213,119 @@ public class PostgresService : BaseAzureService, IPostgresService
         }
     }
 
+    public async Task<string> GetReplicationStatusAsync(string subscriptionId, string resourceGroup, string user, string server)
+    {
+        var rg = await _resourceGroupService.GetResourceGroupResource(subscriptionId, resourceGroup);
+        if (rg == null)
+        {
+            throw new Exception($"Resource group '{resourceGroup}' not found.");
+        }
+        var pgServer = await rg.GetPostgreSqlFlexibleServerAsync(server);
+
+        // Get replication-related parameters
+        var walLevelTask = GetServerParameterValueAsync(pgServer.Value, "wal_level");
+        var maxWalSendersTask = GetServerParameterValueAsync(pgServer.Value, "max_wal_senders");
+        var maxReplicationSlotsTask = GetServerParameterValueAsync(pgServer.Value, "max_replication_slots");
+
+        await Task.WhenAll(walLevelTask, maxWalSendersTask, maxReplicationSlotsTask);
+
+        var walLevel = walLevelTask.Result;
+        var maxWalSenders = maxWalSendersTask.Result;
+        var maxReplicationSlots = maxReplicationSlotsTask.Result;
+
+        // Analyze replication status
+        var isReplicationEnabled = IsReplicationEnabled(walLevel);
+        var replicationStatus = isReplicationEnabled ? "ENABLED" : "NOT ENABLED";
+
+        var result = $"PostgreSQL Server {server} Replication Status\n\n";
+        result += $"Based on the parameter checks for your PostgreSQL server {server} in resource group {resourceGroup}, here's the replication configuration:\n\n";
+        
+        if (isReplicationEnabled)
+        {
+            result += "✅ Replication is ENABLED\n\n";
+            result += "Key Replication Parameters:\n\n";
+            result += $"1. wal_level: {walLevel}\n";
+            result += "   ○ This setting enables replication functionality\n";
+            
+            if (walLevel.Equals("replica", StringComparison.OrdinalIgnoreCase))
+            {
+                result += "   ○ 'replica' level allows for streaming replication and point-in-time recovery\n\n";
+            }
+            else if (walLevel.Equals("logical", StringComparison.OrdinalIgnoreCase))
+            {
+                result += "   ○ 'logical' level allows for logical replication in addition to streaming replication\n\n";
+            }
+
+            if (int.TryParse(maxWalSenders, out var walSenders) && walSenders > 0)
+            {
+                result += $"2. max_wal_senders: {maxWalSenders}\n";
+                result += $"   ○ Allows up to {maxWalSenders} concurrent WAL sender processes\n";
+                result += $"   ○ This means the server can support up to {maxWalSenders} replica connections\n\n";
+            }
+
+            if (int.TryParse(maxReplicationSlots, out var replicationSlots) && replicationSlots > 0)
+            {
+                result += $"3. max_replication_slots: {maxReplicationSlots}\n";
+                result += $"   ○ Supports up to {maxReplicationSlots} replication slots\n";
+                result += "   ○ Replication slots ensure WAL files are retained for replicas\n\n";
+            }
+
+            result += "Summary\n\n";
+            result += $"Your PostgreSQL server {server} has replication enabled and properly configured. The server is set up to:\n\n";
+            result += "• Support streaming replication\n";
+            if (walSenders > 0)
+            {
+                result += $"• Handle up to {walSenders} concurrent replica connections\n";
+            }
+            if (replicationSlots > 0)
+            {
+                result += $"• Maintain replication slots for reliable replica synchronization\n";
+            }
+
+            if (walLevel.Equals("replica", StringComparison.OrdinalIgnoreCase))
+            {
+                result += $"\nThe wal_level = {walLevel} setting is the key indicator that replication is enabled on your PostgreSQL server.";
+            }
+        }
+        else
+        {
+            result += "❌ Replication is NOT ENABLED\n\n";
+            result += "Current Configuration:\n\n";
+            result += $"• wal_level: {walLevel}\n";
+            result += "  ○ Current level does not support replication\n";
+            result += "  ○ For replication, wal_level should be set to 'replica' or 'logical'\n\n";
+            
+            result += "To enable replication:\n\n";
+            result += "1. Set wal_level to 'replica' for streaming replication\n";
+            result += "2. Configure max_wal_senders (typically 3-10)\n";
+            result += "3. Set max_replication_slots if needed\n";
+            result += "4. Restart the PostgreSQL server\n\n";
+            
+            result += $"Use the parameter update tools to modify wal_level from '{walLevel}' to 'replica' to enable replication.";
+        }
+
+        return result;
+    }
+
+    private async Task<string> GetServerParameterValueAsync(PostgreSqlFlexibleServerResource pgServer, string paramName)
+    {
+        try
+        {
+            var configResponse = await pgServer.GetPostgreSqlFlexibleServerConfigurationAsync(paramName);
+            return configResponse?.Value?.Data?.Value ?? "unknown";
+        }
+        catch
+        {
+            return "unknown";
+        }
+    }
+
+    private static bool IsReplicationEnabled(string walLevel)
+    {
+        return walLevel.Equals("replica", StringComparison.OrdinalIgnoreCase) ||
+               walLevel.Equals("logical", StringComparison.OrdinalIgnoreCase);
+    }
+
     private sealed class PostgresResource : IAsyncDisposable
     {
         public NpgsqlConnection Connection { get; }

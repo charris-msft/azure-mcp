@@ -39,6 +39,7 @@ public class PostgresSetup : IAreaSetup
         server.AddCommand("list", new ServerListCommand(loggerFactory.CreateLogger<ServerListCommand>()));
         server.AddCommand("config", new GetConfigCommand(loggerFactory.CreateLogger<GetConfigCommand>()));
         server.AddCommand("param", new GetParamCommand(loggerFactory.CreateLogger<GetParamCommand>()));
+        server.AddCommand("replication-status", new ReplicationStatusCommand(loggerFactory.CreateLogger<ReplicationStatusCommand>()));
         server.AddCommand("setparam", new SetParamCommand(loggerFactory.CreateLogger<SetParamCommand>()));
     }
 }

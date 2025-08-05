@@ -12,6 +12,7 @@ namespace AzureMcp.Postgres.Commands;
 [JsonSerializable(typeof(DatabaseQueryCommand.DatabaseQueryCommandResult))]
 [JsonSerializable(typeof(GetConfigCommand.GetConfigCommandResult))]
 [JsonSerializable(typeof(GetParamCommand.GetParamCommandResult))]
+[JsonSerializable(typeof(ReplicationStatusCommand.ReplicationStatusCommandResult))]
 [JsonSerializable(typeof(SetParamCommand.SetParamCommandResult))]
 [JsonSerializable(typeof(ServerListCommand.ServerListCommandResult))]
 [JsonSerializable(typeof(GetSchemaCommand.GetSchemaCommandResult))]

@@ -18,7 +18,7 @@ public sealed class GetParamCommand(ILogger<GetParamCommand> logger) : BaseServe
     public override string Name => "param";
 
     public override string Description =>
-        "Retrieves a specific parameter of a PostgreSQL server.";
+        "Retrieves a specific parameter of a PostgreSQL server. Can analyze replication status when querying replication-related parameters like wal_level.";
 
     public override string Title => CommandTitle;
 
@@ -51,12 +51,49 @@ public sealed class GetParamCommand(ILogger<GetParamCommand> logger) : BaseServe
             context.Activity?.WithSubscriptionTag(options);
 
             IPostgresService pgService = context.GetService<IPostgresService>() ?? throw new InvalidOperationException("PostgreSQL service is not available.");
-            var parameterValue = await pgService.GetServerParameterAsync(options.Subscription!, options.ResourceGroup!, options.User!, options.Server!, options.Param!);
-            context.Response.Results = parameterValue?.Length > 0 ?
-                ResponseResult.Create(
-                    new GetParamCommandResult(parameterValue),
-                    PostgresJsonContext.Default.GetParamCommandResult) :
-                null;
+            
+            // Check if this is a replication-related query
+            if (IsReplicationQuery(options.Param))
+            {
+                var replicationStatus = await pgService.GetReplicationStatusAsync(options.Subscription!, options.ResourceGroup!, options.User!, options.Server!);
+                context.Response.Results = replicationStatus?.Length > 0 ?
+                    ResponseResult.Create(
+                        new GetParamCommandResult(replicationStatus),
+                        PostgresJsonContext.Default.GetParamCommandResult) :
+                    null;
+            }
+            else
+            {
+                // Try to get the specific parameter
+                try
+                {
+                    var parameterValue = await pgService.GetServerParameterAsync(options.Subscription!, options.ResourceGroup!, options.User!, options.Server!, options.Param!);
+                    context.Response.Results = parameterValue?.Length > 0 ?
+                        ResponseResult.Create(
+                            new GetParamCommandResult(parameterValue),
+                            PostgresJsonContext.Default.GetParamCommandResult) :
+                        null;
+                }
+                catch (Exception paramEx) when (paramEx.Message.Contains("not found"))
+                {
+                    // If the parameter wasn't found and it might be a replication query, 
+                    // try to provide replication analysis instead
+                    if (IsLikelyReplicationQuery(options.Param))
+                    {
+                        _logger.LogInformation("Parameter '{Param}' not found, providing replication analysis instead", options.Param);
+                        var replicationStatus = await pgService.GetReplicationStatusAsync(options.Subscription!, options.ResourceGroup!, options.User!, options.Server!);
+                        context.Response.Results = replicationStatus?.Length > 0 ?
+                            ResponseResult.Create(
+                                new GetParamCommandResult(replicationStatus),
+                                PostgresJsonContext.Default.GetParamCommandResult) :
+                            null;
+                    }
+                    else
+                    {
+                        throw; // Re-throw the original exception if it's not replication-related
+                    }
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -64,6 +101,30 @@ public sealed class GetParamCommand(ILogger<GetParamCommand> logger) : BaseServe
             HandleException(context, ex);
         }
         return context.Response;
+    }
+
+    private static bool IsReplicationQuery(string? param)
+    {
+        if (string.IsNullOrEmpty(param))
+            return false;
+
+        // Direct replication parameter checks
+        if (param.Equals("wal_level", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        // Check if the parameter name or description suggests replication analysis
+        var replicationKeywords = new[] { "replication", "replica", "streaming" };
+        return replicationKeywords.Any(keyword => param.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static bool IsLikelyReplicationQuery(string? param)
+    {
+        if (string.IsNullOrEmpty(param))
+            return false;
+
+        // More lenient check for queries that might be asking about replication but using different terms
+        var replicationIndicators = new[] { "replication", "replica", "enabled", "enable", "status", "wal" };
+        return replicationIndicators.Any(keyword => param.Contains(keyword, StringComparison.OrdinalIgnoreCase));
     }
 
     internal record GetParamCommandResult(string ParameterValue);

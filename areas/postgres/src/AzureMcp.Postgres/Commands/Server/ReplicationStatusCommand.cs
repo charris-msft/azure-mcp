@@ -10,12 +10,13 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureMcp.Postgres.Commands.Server;
 
-public sealed class GetConfigCommand(ILogger<GetConfigCommand> logger) : BaseServerCommand<GetConfigOptions>(logger)
+public sealed class ReplicationStatusCommand(ILogger<ReplicationStatusCommand> logger) : BaseServerCommand<GetConfigOptions>(logger)
 {
-    private const string CommandTitle = "Get PostgreSQL Server Configuration";
-    public override string Name => "config";
+    private const string CommandTitle = "Get PostgreSQL Server Replication Status";
+    public override string Name => "replication-status";
+
     public override string Description =>
-        "Retrieve the configuration of a PostgreSQL server. Includes replication-related configuration analysis.";
+        "Checks if replication is enabled on a PostgreSQL server by analyzing replication-related parameters.";
 
     public override string Title => CommandTitle;
 
@@ -34,19 +35,19 @@ public sealed class GetConfigCommand(ILogger<GetConfigCommand> logger) : BaseSer
             context.Activity?.WithSubscriptionTag(options);
 
             IPostgresService pgService = context.GetService<IPostgresService>() ?? throw new InvalidOperationException("PostgreSQL service is not available.");
-            var config = await pgService.GetServerConfigAsync(options.Subscription!, options.ResourceGroup!, options.User!, options.Server!);
-            context.Response.Results = config?.Length > 0 ?
+            var replicationStatus = await pgService.GetReplicationStatusAsync(options.Subscription!, options.ResourceGroup!, options.User!, options.Server!);
+            context.Response.Results = replicationStatus?.Length > 0 ?
                 ResponseResult.Create(
-                    new GetConfigCommandResult(config),
-                    PostgresJsonContext.Default.GetConfigCommandResult) :
+                    new ReplicationStatusCommandResult(replicationStatus),
+                    PostgresJsonContext.Default.ReplicationStatusCommandResult) :
                 null;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An exception occurred retrieving server configuration.");
+            _logger.LogError(ex, "An exception occurred retrieving replication status.");
             HandleException(context, ex);
         }
         return context.Response;
     }
-    internal record GetConfigCommandResult(string Configuration);
+    internal record ReplicationStatusCommandResult(string ReplicationStatus);
 }

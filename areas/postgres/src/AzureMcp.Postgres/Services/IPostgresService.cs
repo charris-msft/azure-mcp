@@ -15,5 +15,6 @@ public interface IPostgresService
     Task<string> GetServerConfigAsync(string subscriptionId, string resourceGroup, string user, string server);
     Task<string> GetServerParameterAsync(string subscriptionId, string resourceGroup, string user, string server, string param);
     Task<string> SetServerParameterAsync(string subscription, string resourceGroup, string user, string server, string param, string value);
+    Task<string> GetReplicationStatusAsync(string subscriptionId, string resourceGroup, string user, string server);
 
 }

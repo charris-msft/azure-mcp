@@ -71,6 +71,77 @@ public class GetParamCommandTests
         Assert.Null(response.Results);
     }
 
+    [Fact]
+    public async Task ExecuteAsync_ReturnsReplicationStatus_WhenParamIsReplicationRelated()
+    {
+        var expectedReplicationStatus = "PostgreSQL Server server123 Replication Status\n\nReplication is ENABLED";
+        _postgresService.GetReplicationStatusAsync("sub123", "rg1", "user1", "server123").Returns(expectedReplicationStatus);
+
+        var command = new GetParamCommand(_logger);
+        var args = command.GetCommand().Parse(["--subscription", "sub123", "--resource-group", "rg1", "--user-name", "user1", "--server", "server123", "--param", "replication enabled"]);
+        var context = new CommandContext(_serviceProvider);
+        var response = await command.ExecuteAsync(context, args);
+
+        Assert.NotNull(response);
+        Assert.Equal(200, response.Status);
+        Assert.Equal("Success", response.Message);
+        Assert.NotNull(response.Results);
+
+        var json = JsonSerializer.Serialize(response.Results);
+        var result = JsonSerializer.Deserialize<GetParamResult>(json);
+
+        Assert.NotNull(result);
+        Assert.Contains("Replication Status", result.Param);
+        Assert.Contains("ENABLED", result.Param);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ReturnsReplicationStatus_WhenParamIsWalLevel()
+    {
+        var expectedReplicationStatus = "PostgreSQL Server server123 Replication Status\n\nReplication is ENABLED";
+        _postgresService.GetReplicationStatusAsync("sub123", "rg1", "user1", "server123").Returns(expectedReplicationStatus);
+
+        var command = new GetParamCommand(_logger);
+        var args = command.GetCommand().Parse(["--subscription", "sub123", "--resource-group", "rg1", "--user-name", "user1", "--server", "server123", "--param", "wal_level"]);
+        var context = new CommandContext(_serviceProvider);
+        var response = await command.ExecuteAsync(context, args);
+
+        Assert.NotNull(response);
+        Assert.Equal(200, response.Status);
+        Assert.Equal("Success", response.Message);
+        Assert.NotNull(response.Results);
+
+        var json = JsonSerializer.Serialize(response.Results);
+        var result = JsonSerializer.Deserialize<GetParamResult>(json);
+
+        Assert.NotNull(result);
+        Assert.Contains("Replication Status", result.Param);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_ReturnsReplicationStatus_WhenParamNotFoundButReplicationRelated()
+    {
+        var expectedReplicationStatus = "PostgreSQL Server server123 Replication Status\n\nReplication is ENABLED";
+        _postgresService.GetServerParameterAsync("sub123", "rg1", "user1", "server123", "replication status").Throws(new Exception("Parameter 'replication status' not found."));
+        _postgresService.GetReplicationStatusAsync("sub123", "rg1", "user1", "server123").Returns(expectedReplicationStatus);
+
+        var command = new GetParamCommand(_logger);
+        var args = command.GetCommand().Parse(["--subscription", "sub123", "--resource-group", "rg1", "--user-name", "user1", "--server", "server123", "--param", "replication status"]);
+        var context = new CommandContext(_serviceProvider);
+        var response = await command.ExecuteAsync(context, args);
+
+        Assert.NotNull(response);
+        Assert.Equal(200, response.Status);
+        Assert.Equal("Success", response.Message);
+        Assert.NotNull(response.Results);
+
+        var json = JsonSerializer.Serialize(response.Results);
+        var result = JsonSerializer.Deserialize<GetParamResult>(json);
+
+        Assert.NotNull(result);
+        Assert.Contains("Replication Status", result.Param);
+    }
+
     [Theory]
     [InlineData("--subscription")]
     [InlineData("--resource-group")]
