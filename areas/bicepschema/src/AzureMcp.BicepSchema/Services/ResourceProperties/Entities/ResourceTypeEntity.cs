@@ -14,7 +14,7 @@ public class ResourceTypeEntity : ComplexType
     public required ComplexType BodyType { get; init; }
 
     [JsonPropertyName("writableScopes")]
-    public required string WritableScopes { get; init; }
+    public string WritableScopes { get; init; } = "Unknown";
 
     [JsonPropertyName("readableScopes")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
