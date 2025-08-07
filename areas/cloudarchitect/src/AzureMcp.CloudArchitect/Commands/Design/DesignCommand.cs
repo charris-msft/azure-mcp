@@ -51,7 +51,6 @@ public sealed class DesignCommand(ILogger<DesignCommand> logger) : BaseCloudArch
         return EmbeddedResourceHelper.ReadEmbeddedResource(assembly, resourceName);
     }
 
-
     protected override void RegisterOptions(Command command)
     {
         base.RegisterOptions(command);
