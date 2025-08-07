@@ -9,6 +9,8 @@ The Azure MCP Server updates automatically by default whenever a new release com
 
 - Read `AZURE_SUBSCRIPTION_ID` from the environment if the subscription is not provided. [[#533](https://github.com/Azure/azure-mcp/pull/533)]
 
+- Added new command for designing Azure Cloud Architecture through guided questions. [[#890]https://github.com/Azure/azure-mcp/pull/890]
+
 ### Breaking Changes
 
 ### Bugs Fixed
