@@ -5,9 +5,11 @@ using AzureMcp.Core.Areas;
 using AzureMcp.Core.Commands;
 using AzureMcp.Storage.Commands.Account;
 using AzureMcp.Storage.Commands.Blob;
+using AzureMcp.Storage.Commands.Blob.Batch;
 using AzureMcp.Storage.Commands.Blob.Container;
 using AzureMcp.Storage.Commands.DataLake.Directory;
 using AzureMcp.Storage.Commands.DataLake.FileSystem;
+using AzureMcp.Storage.Commands.Share.File;
 using AzureMcp.Storage.Commands.Table;
 using AzureMcp.Storage.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +40,10 @@ public class StorageSetup : IAreaSetup
         var blobs = new CommandGroup("blob", "Storage blob operations - Commands for uploading, downloading, and managing blob in your Azure Storage accounts.");
         storage.AddSubGroup(blobs);
 
+        // Create Batch subgroup under blobs
+        var batch = new CommandGroup("batch", "Storage batch operations - Commands for performing batch operations on multiple storage blobs efficiently.");
+        blobs.AddSubGroup(batch);
+
         // Create a containers subgroup under blobs
         var blobContainer = new CommandGroup("container", "Storage blob container operations - Commands for managing blob container in your Azure Storage accounts.");
         blobs.AddSubGroup(blobContainer);
@@ -54,6 +60,14 @@ public class StorageSetup : IAreaSetup
         var directory = new CommandGroup("directory", "Data Lake directory operations - Commands for managing directories in Azure Data Lake Storage Gen2.");
         dataLake.AddSubGroup(directory);
 
+        // Create file shares subgroup under storage
+        var shares = new CommandGroup("share", "File share operations - Commands for managing Azure Storage file shares and their contents.");
+        storage.AddSubGroup(shares);
+
+        // Create file subgroup under shares
+        var shareFiles = new CommandGroup("file", "File share file operations - Commands for managing files and directories within Azure Storage file shares.");
+        shares.AddSubGroup(shareFiles);
+
         // Register Storage commands
         storageAccount.AddCommand("list", new AccountListCommand(
             loggerFactory.CreateLogger<AccountListCommand>()));
@@ -61,6 +75,9 @@ public class StorageSetup : IAreaSetup
             loggerFactory.CreateLogger<TableListCommand>()));
 
         blobs.AddCommand("list", new BlobListCommand(loggerFactory.CreateLogger<BlobListCommand>()));
+
+        batch.AddCommand("set-tier", new BatchSetTierCommand(
+            loggerFactory.CreateLogger<BatchSetTierCommand>()));
 
         blobContainer.AddCommand("list", new ContainerListCommand(
             loggerFactory.CreateLogger<ContainerListCommand>()));
@@ -72,5 +89,8 @@ public class StorageSetup : IAreaSetup
 
         directory.AddCommand("create", new DirectoryCreateCommand(
             loggerFactory.CreateLogger<DirectoryCreateCommand>()));
+
+        shareFiles.AddCommand("list", new FileListCommand(
+            loggerFactory.CreateLogger<FileListCommand>()));
     }
 }

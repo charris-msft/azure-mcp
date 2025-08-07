@@ -8,7 +8,10 @@ using Azure.ResourceManager.Storage;
 using Azure.ResourceManager.Storage.Models;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using Azure.Storage.Files.DataLake;
+using Azure.Storage.Files.Shares;
+using Azure.Storage.Files.Shares.Models;
 using AzureMcp.Core.Options;
 using AzureMcp.Core.Services.Azure;
 using AzureMcp.Core.Services.Azure.Subscription;
@@ -313,10 +316,20 @@ public class StorageService(ISubscriptionService subscriptionService, ITenantSer
         return new DataLakeServiceClient(new Uri(uri), await GetCredential(tenant), options);
     }
 
+    private async Task<ShareServiceClient> CreateShareServiceClient(string accountName, string? tenant = null, RetryPolicyOptions? retryPolicy = null)
+    {
+        var uri = $"https://{accountName}.file.core.windows.net";
+        var options = ConfigureRetryPolicy(AddDefaultPolicies(new ShareClientOptions()), retryPolicy);
+        options.ShareTokenIntent = ShareTokenIntent.Backup; // Set the intent for file backup, needed for Manged Identity
+        return new ShareServiceClient(new Uri(uri), await GetCredential(tenant), options);
+    }
+
     public async Task<List<DataLakePathInfo>> ListDataLakePaths(
         string accountName,
         string fileSystemName,
+        bool recursive,
         string subscriptionId,
+        string? filterPath = null,
         string? tenant = null,
         RetryPolicyOptions? retryPolicy = null)
     {
@@ -328,7 +341,7 @@ public class StorageService(ISubscriptionService subscriptionService, ITenantSer
 
         try
         {
-            await foreach (var pathItem in fileSystemClient.GetPathsAsync())
+            await foreach (var pathItem in fileSystemClient.GetPathsAsync(filterPath, recursive))
             {
                 var pathInfo = new DataLakePathInfo(
                     pathItem.Name,
@@ -400,6 +413,115 @@ public class StorageService(ISubscriptionService subscriptionService, ITenantSer
         catch (Exception ex)
         {
             throw new Exception($"Error creating directory: {ex.Message}", ex);
+        }
+    }
+
+    public async Task<(List<string> SuccessfulBlobs, List<string> FailedBlobs)> SetBlobTierBatch(
+        string accountName,
+        string containerName,
+        string tier,
+        string[] blobNames,
+        string subscriptionId,
+        string? tenant = null,
+        RetryPolicyOptions? retryPolicy = null)
+    {
+        ValidateRequiredParameters(accountName, containerName, tier, subscriptionId);
+
+        if (blobNames == null || blobNames.Length == 0)
+        {
+            throw new ArgumentException("At least one blob name must be provided.", nameof(blobNames));
+        }
+
+        var blobServiceClient = await CreateBlobServiceClient(accountName, tenant, retryPolicy);
+        var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
+        var batchClient = blobServiceClient.GetBlobBatchClient();
+        var accessTier = new AccessTier(tier);
+
+        try
+        {
+            // Use Azure.Storage.Blobs.Batch for true batch operations
+            var batch = batchClient.CreateBatch();
+
+            // Add all blob tier operations to the batch
+            var batchOperations = new List<(string blobName, Response batchOperationResponse)>();
+            foreach (var blobName in blobNames)
+            {
+                var blobClient = containerClient.GetBlobClient(blobName);
+                var batchOperationResponse = batch.SetBlobAccessTier(blobClient.Uri, accessTier);
+                batchOperations.Add((blobName, batchOperationResponse));
+            }
+
+            // Submit the batch operation
+            var batchResponse = await batchClient.SubmitBatchAsync(batch);
+
+            // Process results
+            var successfulBlobs = new List<string>();
+            var failedBlobs = new List<string>();
+
+            for (int i = 0; i < batchOperations.Count; i++)
+            {
+                var (blobName, batchOperationResponse) = batchOperations[i];
+                try
+                {
+                    // Check if the individual operation succeeded
+                    if (batchOperationResponse.Status >= 200 && batchOperationResponse.Status < 300)
+                    {
+                        successfulBlobs.Add(blobName);
+                    }
+                    else
+                    {
+                        failedBlobs.Add($"{blobName}: HTTP {batchOperationResponse.Status}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    failedBlobs.Add($"{blobName}: {ex.Message}");
+                }
+            }
+
+            return (successfulBlobs, failedBlobs);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error setting blob tier batch: {ex.Message}", ex);
+        }
+    }
+
+    public async Task<List<FileShareItemInfo>> ListFilesAndDirectories(
+        string accountName,
+        string shareName,
+        string directoryPath,
+        string? prefix,
+        string subscriptionId,
+        string? tenant = null,
+        RetryPolicyOptions? retryPolicy = null)
+    {
+        ValidateRequiredParameters(accountName, shareName, directoryPath, subscriptionId);
+
+        var shareServiceClient = await CreateShareServiceClient(accountName, tenant, retryPolicy);
+
+        try
+        {
+            var shareClient = shareServiceClient.GetShareClient(shareName);
+            var directoryClient = shareClient.GetDirectoryClient(directoryPath);
+
+            var items = new List<FileShareItemInfo>();
+
+            await foreach (var item in directoryClient.GetFilesAndDirectoriesAsync(prefix: prefix))
+            {
+                items.Add(new FileShareItemInfo(
+                    item.Name,
+                    item.IsDirectory,
+                    item.FileSize,
+                    item.Properties.LastModified,
+                    item.Properties.ETag.ToString()));
+            }
+
+            return items;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error listing files and directories: {ex.Message}", ex);
         }
     }
 }

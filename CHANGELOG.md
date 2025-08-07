@@ -2,12 +2,9 @@
 
 The Azure MCP Server updates automatically by default whenever a new release comes out 🚀. We ship updates twice a week on Tuesdays and Thursdays 😊
 
-## 0.5.1 (Unreleased)
+## 0.5.4 (Unreleased)
 
 ### Features Added
-- Added support for listing SQL databases via the command: `azmcp-sql-db-list`. [[#746](https://github.com/Azure/azure-mcp/pull/746)]
-
-- Read `AZURE_SUBSCRIPTION_ID` from the environment if the subscription is not provided. [[#533](https://github.com/Azure/azure-mcp/pull/533)]
 
 - Added new command for designing Azure Cloud Architecture through guided questions. [[#890]https://github.com/Azure/azure-mcp/pull/890]
 
@@ -15,10 +12,96 @@ The Azure MCP Server updates automatically by default whenever a new release com
 
 ### Bugs Fixed
 
+- Fixed `ToolExecuted` telemetry activity being created twice. [[#741](https://github.com/Azure/azure-mcp/pull/741)]
+
 ### Other Changes
 
-- Broaden search for MAC address [[#759](https://github.com/Azure/azure-mcp/pull/759)]
-- Major repository structure change.
+## 0.5.3 (2025-08-05)
+
+### Features Added
+
+- Added support for providing the `--content-type` and `--tags` properties to the `azmcp-appconfig-kv-set` command. [[#459](https://github.com/Azure/azure-mcp/pull/459)]
+- Added `filter-path` and `recursive` capabilities to `azmcp-storage-datalake-file-system-list-paths`. [[#770](https://github.com/Azure/azure-mcp/issues/770)]
+- Added support for listing files and directories in Azure File Shares via the `azmcp-storage-share-file-list` command. This command recursively lists all items in a specified file share directory with metadata including size, last modified date, and content type. [[#793](https://github.com/Azure/azure-mcp/pull/793)]
+- Added support for Azure Virtual Desktop with new commands: [[#653](https://github.com/Azure/azure-mcp/pull/653)]
+  - `azmcp-virtualdesktop-hostpool-list` - List all host pools in a subscription
+  - `azmcp-virtualdesktop-sessionhost-list` - List all session hosts in a host pool
+  - `azmcp-virtualdesktop-sessionhost-usersession-list` - List all user sessions on a specific session host
+- Added support for creating and publishing DevDeviceId in telemetry. [[#810](https://github.com/Azure/azure-mcp/pull/810/)]
+
+### Breaking Changes
+
+- **Parameter Name Changes**: Removed unnecessary "-name" suffixes from command parameters across 25+ parameters in 12+ Azure service areas to improve consistency and usability. Users will need to update their command-line usage and scripts. [[#853](https://github.com/Azure/azure-mcp/pull/853)]
+  - **AppConfig**: `--account-name` → `--account`
+  - **Search**: `--service-name` → `--service`, `--index-name` → `--index`
+  - **Cosmos**: `--account-name` → `--account`, `--database-name` → `--database`, `--container-name` → `--container`
+  - **Kusto**: `--cluster-name` → `--cluster`, `--database-name` → `--database`, `--table-name` → `--table`
+  - **AKS**: `--cluster-name` → `--cluster`
+  - **Postgres**: `--user-name` → `--user`
+  - **ServiceBus**: `--queue-name` → `--queue`, `--topic-name` → `--topic`
+  - **Storage**: `--account-name` → `--account`, `--container-name` → `--container`, `--table-name` → `--table`, `--file-system-name` → `--file-system`, `--tier-name` → `--tier`
+  - **Monitor**: `--table-name` → `--table`, `--model` → `--health-model`, `--resource-name` → `--resource`
+  - **Foundry**: `--deployment-name` → `--deployment`, `--publisher-name` → `--publisher`, `--license-name` → `--license`, `--sku-name` → `--sku`, `--azure-ai-services-name` → `--azure-ai-services`
+
+### Bugs Fixed
+
+- Fixed an issue where the `azmcp-storage-blob-batch-set-tier` command did not correctly handle the `--tier` parameter when setting the access tier for multiple blobs. [[#808](https://github.com/Azure/azure-mcp/pull/808)]
+
+### Other Changes
+
+- Added caching for Cosmos DB databases and containers. [[813](https://github.com/Azure/azure-mcp/pull/813)]
+
+#### Dependency Updates
+
+- Updated the following dependencies to improve .NET Ahead-of-Time (AOT) compilation support. AOT will enable shipping Azure MCP Server as self-contained native executable.
+  - Azure.Core: `1.46.2` → `1.47.1`
+  - Azure.ResourceManager: `1.13.1` → `1.13.2`
+  - Azure.ResourceManager.ApplicationInsights: `1.0.1` → `1.1.0-beta.1`
+  - Azure.ResourceManager.AppConfiguration: `1.4.0` → `1.4.1`
+  - Azure.ResourceManager.Authorization: `1.1.4` → `1.1.5`
+  - Azure.ResourceManager.ContainerService: `1.2.3` → `1.2.5`
+  - Azure.ResourceManager.Kusto: `1.6.0` → `1.6.1`
+  - Azure.ResourceManager.CognitiveServices: `1.4.0` → `1.5.1`
+  - Azure.ResourceManager.Redis: `1.5.0` → `1.5.1`
+  - Azure.ResourceManager.RedisEnterprise: `1.1.0` → `1.2.1`
+  - Azure.ResourceManager.LoadTesting: `1.1.1` → `1.1.2`
+  - Azure.ResourceManager.Sql: `1.3.0` → `1.4.0-beta.3`
+  - Azure.ResourceManager.Datadog: `1.0.0-beta.5` → `1.0.0-beta.6`
+  - Azure.ResourceManager.CosmosDB: `1.3.2` → `1.4.0-beta.13`
+  - Azure.ResourceManager.OperationalInsights: `1.3.0` → `1.3.1`
+  - Azure.ResourceManager.Search: `1.2.3` → `1.3.0`
+  - Azure.ResourceManager.Storage: `1.4.2` → `1.4.4`
+  - Azure.ResourceManager.Grafana: `1.1.1` → `1.2.0-beta.2`
+  - Azure.ResourceManager.ResourceGraph: `1.1.0-beta.3` → `1.1.0-beta.4`
+
+## 0.5.2 (2025-07-31)
+
+### Features Added
+
+- Added support for batch setting access tier for multiple Azure Storage blobs via the `azmcp-storage-blob-batch-set-tier` command. This command efficiently changes the storage tier (Hot, Cool, Archive, etc) for multiple blobs simultaneously in a single operation. [[#735](https://github.com/Azure/azure-mcp/issues/735)]
+- Added descriptions to all Azure MCP command groups to improve discoverability and usability when running the server with `--mode single` or `--mode namespace`. [[#791](https://github.com/Azure/azure-mcp/pull/791)]
+
+### Breaking Changes
+
+- Removed `--partner-tenant-id` option from `azmcp-marketplace-product-get` command. [[#656](https://github.com/Azure/azure-mcp/pull/656)]
+
+## 0.5.1 (2025-07-29)
+
+### Features Added
+
+- Added support for listing SQL databases via the command: `azmcp-sql-db-list`. [[#746](https://github.com/Azure/azure-mcp/pull/746)]
+- Added support for reading `AZURE_SUBSCRIPTION_ID` from the environment variables if a subscription is not provided. [[#533](https://github.com/Azure/azure-mcp/pull/533)]
+
+### Breaking Changes
+
+- Removed the following Key Vault operations: [[#768](https://github.com/Azure/azure-mcp/pull/768)]
+  - `azmcp-keyvault-secret-get`
+  - `azmcp-keyvault-key-get`
+
+### Other Changes
+
+- Improved the MAC address search logic for telemetry by making it more robust in finding a valid network interface. [[#759](https://github.com/Azure/azure-mcp/pull/759)]
+- Major repository structure change:
   - Service areas moved from `/src/areas/{Area}` and `/tests/areas/{Area}` into `/areas/{area}/src` and `/areas/{area}/tests`
   - Common code moved into `/core/src` and `/core/tests`
 
