@@ -4,7 +4,6 @@
 using AzureMcp.Core.Areas;
 using AzureMcp.Core.Commands;
 using AzureMcp.CloudArchitect.Commands.Design;
-using AzureMcp.CloudArchitect.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -14,7 +13,6 @@ public class CloudArchitectSetup : IAreaSetup
 {
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddSingleton<ICloudArchitectService, CloudArchitectService>();
     }
 
     public void RegisterCommands(CommandGroup rootGroup, ILoggerFactory loggerFactory)

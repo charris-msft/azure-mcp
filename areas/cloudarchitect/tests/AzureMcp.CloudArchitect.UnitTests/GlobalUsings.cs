@@ -10,4 +10,3 @@ global using Xunit;
 global using AzureMcp.Core.Models;
 global using AzureMcp.Core.Models.Command;
 global using AzureMcp.CloudArchitect.Models;
-global using AzureMcp.CloudArchitect.Services;
