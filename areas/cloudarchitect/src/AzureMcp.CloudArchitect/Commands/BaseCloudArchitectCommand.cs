@@ -2,8 +2,8 @@
 // Licensed under the MIT License.
 
 using System.Diagnostics.CodeAnalysis;
-using AzureMcp.Core.Commands;
 using AzureMcp.CloudArchitect.Options;
+using AzureMcp.Core.Commands;
 
 namespace AzureMcp.CloudArchitect.Commands;
 

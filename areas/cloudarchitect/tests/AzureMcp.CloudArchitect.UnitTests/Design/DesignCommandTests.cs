@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using AzureMcp.CloudArchitect.Commands.Design;
-using AzureMcp.CloudArchitect.Options;
-using AzureMcp.CloudArchitect;
-using AzureMcp.Core.Models;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using NSubstitute;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Text;
 using System.Text.Json;
+using AzureMcp.CloudArchitect;
+using AzureMcp.CloudArchitect.Commands.Design;
+using AzureMcp.CloudArchitect.Options;
+using AzureMcp.Core.Models;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Xunit;
 
 namespace AzureMcp.CloudArchitect.UnitTests.Design;
@@ -156,6 +156,76 @@ public class DesignCommandTests
         Assert.NotNull(resultList);
         Assert.Single(resultList);
         Assert.NotEmpty(resultList[0]);
+    }
+
+    [Theory]
+    [InlineData("What's your app type?", "What's your app type?")]
+    [InlineData("How \"big\" is your app?", "How \"big\" is your app?")]
+    [InlineData("Is it a \"web app\" or \"mobile app\"?", "Is it a \"web app\" or \"mobile app\"?")]
+    [InlineData("What's the app's \"main purpose\"?", "What's the app's \"main purpose\"?")]
+    [InlineData("Use 'single quotes' here", "Use 'single quotes' here")]
+    [InlineData("Mixed \"quotes\" and 'apostrophes'", "Mixed \"quotes\" and 'apostrophes'")]
+    public async Task ExecuteAsync_HandlesQuotesAndEscapingProperly(string questionWithQuotes, string expectedQuestion)
+    {
+        // Arrange
+        var args = new[] { "--question", questionWithQuotes };
+        var parseResult = _parser.Parse(args);
+
+        // Act
+        var response = await _command.ExecuteAsync(_context, parseResult);
+
+        // Assert
+        Assert.Equal(200, response.Status);
+        Assert.NotNull(response.Results);
+        Assert.Empty(response.Message);
+
+        // Verify that the command executed successfully with the quoted input
+        string serializedResult = SerializeResponseResult(response.Results);
+        var resultList = JsonSerializer.Deserialize(serializedResult, CloudArchitectJsonContext.Default.ListString);
+        Assert.NotNull(resultList);
+        Assert.Single(resultList);
+        Assert.NotEmpty(resultList[0]);
+
+        // Verify the question was parsed correctly by checking if the command can access the option value
+        var questionOption = parseResult.GetValueForOption(_command.GetCommand().Options.First(o => o.Name == "question"));
+        Assert.Equal(expectedQuestion, questionOption);
+    }
+
+    [Fact]
+    public async Task ExecuteAsync_HandlesComplexEscapingScenarios()
+    {
+        // Arrange - Test multiple options with various escaping scenarios
+        var complexQuestion = "What is your \"primary\" application 'type' and how \"big\" will it be?";
+        var complexAnswer = "It's a \"web application\" with 'high' scalability requirements";
+        var complexComponent = "Frontend with \"React\" and 'TypeScript'";
+
+        var args = new[]
+        {
+            "--question", complexQuestion,
+            "--answer", complexAnswer,
+            "--architecture-component", complexComponent,
+            "--question-number", "2",
+            "--total-questions", "10"
+        };
+
+        var parseResult = _parser.Parse(args);
+
+        // Act
+        var response = await _command.ExecuteAsync(_context, parseResult);
+
+        // Assert
+        Assert.Equal(200, response.Status);
+        Assert.NotNull(response.Results);
+        Assert.Empty(response.Message);
+
+        // Verify all options were parsed correctly
+        var questionValue = parseResult.GetValueForOption(_command.GetCommand().Options.First(o => o.Name == "question"));
+        var answerValue = parseResult.GetValueForOption(_command.GetCommand().Options.First(o => o.Name == "answer"));
+        var componentValue = parseResult.GetValueForOption(_command.GetCommand().Options.First(o => o.Name == "architecture-component"));
+
+        Assert.Equal(complexQuestion, questionValue);
+        Assert.Equal(complexAnswer, answerValue);
+        Assert.Equal(complexComponent, componentValue);
     }
 
     [Fact]
