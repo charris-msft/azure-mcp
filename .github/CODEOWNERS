@@ -28,48 +28,42 @@
 # Services
 ##################
 # PRLabel: %area-AKS
-/areas/aks/src/                        @jongio @Azure/azure-mcp
-/areas/aks/tests/                      @jongio @Azure/azure-mcp
+/areas/aks/                            @jongio @Azure/azure-mcp
 
 # ServiceLabel: %area-AKS
 # ServiceOwners:                       @jongio
 
 
 # PRLabel: %area-AppConfig
-/areas/appconfig/src/                  @JonathanCrd @conniey @Azure/azure-mcp
-/areas/appconfig/tests/                @JonathanCrd @conniey @Azure/azure-mcp
+/areas/appconfig/                      @JonathanCrd @conniey @Azure/azure-mcp
 
 # ServiceLabel: %area-AppConfig
 # ServiceOwners:                       @shenmuxiaosen @avanigupta
 
 
 # PRLabel: %area-BestPractices
-/areas/azurebestpractices/src/         @g2vinay @conniey @Azure/azure-mcp
-/areas/azurebestpractices/tests/       @g2vinay @conniey @Azure/azure-mcp
+/areas/azurebestpractices/             @g2vinay @conniey @Azure/azure-mcp
 
 # ServiceLabel: %area-BestPractices
 # ServiceOwners:                       @g2vinay @conniey
 
 
 # PRLabel: %area-CosmosDB
-/areas/cosmos/src/                     @sajeetharan @xiangyan99 @Azure/azure-mcp
-/areas/cosmos/tests/                   @sajeetharan @xiangyan99 @Azure/azure-mcp
+/areas/cosmos/                         @sajeetharan @xiangyan99 @Azure/azure-mcp
 
 # ServiceLabel: %area-CosmosDB
 # ServiceOwners:                       @sajeetharan @xiangyan99
 
 
 # PRLabel: %area-Azd
-/areas/extension/src/                  @wbreza @jongio @Azure/azure-mcp
-/areas/extension/tests/                @wbreza @jongio @Azure/azure-mcp
+/areas/extension/                      @wbreza @jongio @Azure/azure-mcp
 
 # ServiceLabel: %area-Azd
 # ServiceOwners:                        @wbreza @jongio
 
 
 # PRLabel: %area-Foundry
-/areas/foundry/src/                   @jayzzh @xiangyan99 @Azure/azure-mcp
-/areas/foundry/tests/                 @jayzzh @xiangyan99 @Azure/azure-mcp
+/areas/foundry/                        @jayzzh @xiangyan99 @Azure/azure-mcp
 
 # ServiceLabel: %area-Foundry
 # ServiceOwners:                      @jayzzh @xiangyan99
@@ -82,132 +76,114 @@
 # ServiceOwners:                      @ArthurMa1978 @jongio
 
 # PRLabel: %area-Grafana
-/areas/grafana/src/                   @weng5e @xiangyan99 @Azure/azure-mcp
-/areas/grafana/tests/                 @weng5e @xiangyan99 @Azure/azure-mcp
+/areas/grafana/                        @weng5e @xiangyan99 @Azure/azure-mcp
 
 # ServiceLabel: %area-Grafana
 # ServiceOwners:                      @weng5e @xiangyan99
 
 # PRLabel: %area-KeyVault
-/areas/keyvault/src/                   @vcolin7 @JonathanCrd @Azure/azure-mcp
-/areas/keyvault/tests/                 @vcolin7 @JonathanCrd @Azure/azure-mcp
+/areas/keyvault/                       @vcolin7 @JonathanCrd @Azure/azure-mcp
 
 # ServiceLabel: %area-KeyVault
 # ServiceOwners:                       @vcolin7 @JonathanCrd
 
 # PRLabel: %area-ISV
-/areas/azureisv/src/                   @jayanthjj @pachaturevedi
-/areas/azureisv/tests/                 @jayanthjj @pachaturevedi
+/areas/azureisv/                       @jayanthjj @pachaturevedi
 
 # ServiceLabel: %area-ISV
 # ServiceOwners:                       @jayanthjj @pachaturevedi
 
 # PRLabel: %area-Kusto
-/areas/kusto/src/                      @danield137 @xiangyan99 @Azure/azure-mcp
-/areas/kusto/tests/                    @danield137 @xiangyan99 @Azure/azure-mcp
+/areas/kusto/                          @danield137 @xiangyan99 @Azure/azure-mcp
 
 # ServiceLabel: %area-Kusto
 # ServiceOwners:                       @danield137
 
 
 # PRLabel: %area-Marketplace
-/areas/marketplace/src/                @meirloichter @Azure/azure-mcp
-/areas/marketplace/tests/              @meirloichter @Azure/azure-mcp
+/areas/marketplace/                    @meirloichter @Azure/azure-mcp
 
 # ServiceLabel: %area-Marketplace
 # ServiceOwners:                       @meirloichter
 
 
 # PRLabel: %area-Monitor
-/areas/monitor/src/                    @smritiy @srnagar @jongio @Azure/azure-mcp
-/areas/monitor/tests/                  @smritiy @srnagar @jongio @Azure/azure-mcp
+/areas/monitor/                        @smritiy @srnagar @jongio @Azure/azure-mcp
 
 # ServiceLabel: %area-Monitor
 # ServiceOwners:                       @smritiy @srnagar @jongio
 
 
 # PRLabel: %area-Postgres
-/areas/postgres/src/                   @kk-src @shreyaaithal @maxluk @xiangyan99 @Azure/azure-mcp
-/areas/postgres/tests/                 @kk-src @shreyaaithal @maxluk @xiangyan99 @Azure/azure-mcp
+/areas/postgres/                       @kk-src @shreyaaithal @maxluk @xiangyan99 @Azure/azure-mcp
 
 # ServiceLabel: %area-Postgres
 # ServiceOwners:                       @kk-src @shreyaaithal @maxluk
 
 
 # PRLabel: %area-Search
-/areas/search/src/                     @pablocastro @jongio @Azure/azure-mcp
-/areas/search/tests/                   @pablocastro @jongio @Azure/azure-mcp
+/areas/search/                         @pablocastro @jongio @Azure/azure-mcp
 
 # ServiceLabel: %area-Search
 # ServiceOwners:                       @pablocastro
 
 
 # PRLabel: %area-ServiceBus
-/areas/servicebus/src/                 @anuchandy @conniey @Azure/azure-mcp
-/areas/servicebus/tests/               @anuchandy @conniey @Azure/azure-mcp
+/areas/servicebus/                     @anuchandy @conniey @Azure/azure-mcp
 
 # ServiceLabel: %area-ServiceBus
 # ServiceOwners:                       @shankarsama @EldertGrootenboer
 
 # PRLabel: %area-Redis
-/areas/redis/src/                      @philon-msft @xiangyan99 @Azure/azure-mcp
-/areas/redis/tests/                    @philon-msft @xiangyan99 @Azure/azure-mcp
+/areas/redis/                          @philon-msft @xiangyan99 @Azure/azure-mcp
 
 # ServiceLabel: %area-Redis
 # ServiceOwners:                       @philon-msft @carldc
 
 # PRLabel: %area-Storage
-/areas/storage/src/                    @alzimmermsft @jongio @Azure/azure-mcp
-/areas/storage/tests/                  @alzimmermsft @jongio @Azure/azure-mcp
+/areas/storage/                        @alzimmermsft @jongio @Azure/azure-mcp
 
 # ServiceLabel: %area-Storage
 # ServiceOwners:                       @alzimmermsft  @jongio
 
 # PRLabel: %area-Authorization
-/areas/authorization/src/              @vurhanau @jongio @xiangyan99 @Azure/azure-mcp
-/areas/authorization/tests/            @vurhanau @jongio @xiangyan99 @Azure/azure-mcp
+/areas/authorization/                  @vurhanau @jongio @xiangyan99 @Azure/azure-mcp
 
 # ServiceLabel: %area-Authorization
 # ServiceOwners:                       @vurhanau
 
 # PRLabel: %area-LoadTesting
-/areas/loadtesting/src/                  @nishtha489 @knarayanana @krchanda @johnsta @Azure/azure-mcp
-/areas/loadtesting/tests/                @nishtha489 @knarayanana @krchanda @johnsta @Azure/azure-mcp
+/areas/loadtesting/                    @nishtha489 @knarayanana @krchanda @johnsta @Azure/azure-mcp
 
 # ServiceLabel: %area-LoadTesting
 # ServiceOwners:                       @nishtha489 @knarayanana @krchanda @johnsta
 
 # PRLabel: %area-VirtualDesktop
-/areas/virtualdesktop/src/             @vladimisms @Azure/azure-mcp
-/areas/virtualdesktop/tests/           @vladimisms @Azure/azure-mcp
+/areas/virtualdesktop/                 @vladimisms @Azure/azure-mcp
 
 # ServiceLabel: %area-VirtualDesktop
 # ServiceOwners:                       @vladimisms
 
 # PRLabel: %area-AzureTerraformBestPractices
-/areas/azureterraformbestpractices/src/   @Azure/azure-mcp
-/areas/azureterraformbestpractices/tests/ @Azure/azure-mcp
+/areas/azureterraformbestpractices/    @Azure/azure-mcp
 
 # ServiceLabel: %area-AzureTerraformBestPractices
 # ServiceOwners:                       @Azure/azure-mcp
 
 # PRLabel: %area-BicepSchema
-/areas/bicepschema/src/                @Azure/azure-mcp
-/areas/bicepschema/tests/              @Azure/azure-mcp
+/areas/bicepschema/                    @Azure/azure-mcp
 
 # ServiceLabel: %area-BicepSchema
 # ServiceOwners:                       @Azure/azure-mcp
 
 # PRLabel: %area-SQL
-/areas/sql/src/                        @Azure/azure-mcp
-/areas/sql/tests/                      @Azure/azure-mcp
+/areas/sql/                            @Azure/azure-mcp
 
 # ServiceLabel: %area-SQL
 # ServiceOwners:                       @Azure/azure-mcp
 
 # PRLabel: %area-Workbooks
-/areas/workbooks/src/                  @Azure/azure-mcp
-/areas/workbooks/tests/                @Azure/azure-mcp
+/areas/workbooks/                      @Azure/azure-mcp
 
 # ServiceLabel: %area-Workbooks
 # ServiceOwners:                       @Azure/azure-mcp
