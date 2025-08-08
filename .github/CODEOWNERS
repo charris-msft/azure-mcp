@@ -74,6 +74,13 @@
 # ServiceLabel: %area-Foundry
 # ServiceOwners:                      @jayzzh @xiangyan99
 
+# PRLabel: %area-ARM
+/core/src/AzureMcp.Core/Areas/Group/            @ArthurMa1978 @jongio @Azure/azure-mcp
+/core/tests/AzureMcp.Core.UnitTests/Areas/Group/ @ArthurMa1978 @jongio @Azure/azure-mcp
+
+# ServiceLabel: %area-ARM
+# ServiceOwners:                      @ArthurMa1978 @jongio
+
 # PRLabel: %area-Grafana
 /areas/grafana/src/                   @weng5e @xiangyan99 @Azure/azure-mcp
 /areas/grafana/tests/                 @weng5e @xiangyan99 @Azure/azure-mcp
