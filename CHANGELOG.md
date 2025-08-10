@@ -78,7 +78,6 @@
   - Azure.ResourceManager.Authorization: `1.1.4` → `1.1.5`
   - Azure.ResourceManager.ContainerService: `1.2.3` → `1.2.5`
   - Azure.ResourceManager.Kusto: `1.6.0` → `1.6.1`
-  - Azure.ResourceManager.CognitiveServices: `1.4.0` → `1.5.1`
   - Azure.ResourceManager.Redis: `1.5.0` → `1.5.1`
   - Azure.ResourceManager.RedisEnterprise: `1.1.0` → `1.2.1`
   - Azure.ResourceManager.LoadTesting: `1.1.1` → `1.1.2`
