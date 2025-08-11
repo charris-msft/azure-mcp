@@ -19,7 +19,7 @@
 
 #### Dependency Updates
 
-- Romved the following dependencies to reduce the size of Azure MCP Server.
+- Removed the following dependencies to reduce the size of Azure MCP Server.
   - Azure.ResourceManager.CognitiveServices
 
 ## 0.5.4 (2025-08-07)
