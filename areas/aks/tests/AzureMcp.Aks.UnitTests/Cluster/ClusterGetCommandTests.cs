@@ -111,7 +111,7 @@ public class ClusterGetCommandTests
         _aksService.GetCluster("test-subs", "test-cluster", "test-rg", null, Arg.Any<AzureMcp.Core.Options.RetryPolicyOptions>())
             .Returns(expectedCluster);
 
-        var parseResult = _parser.Parse(["--subscription", "test-subs", "--resource-group", "test-rg", "--cluster-name", "test-cluster"]);
+        var parseResult = _parser.Parse(["--subscription", "test-subs", "--resource-group", "test-rg", "--cluster", "test-cluster"]);
 
         // Act
         var response = await _command.ExecuteAsync(_context, parseResult);
