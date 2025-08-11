@@ -5,6 +5,7 @@
 ### Features Added
 
 - Added support for creating Azure Storage accounts via the `azmcp-storage-account-create` command. This command enables programmatic creation of storage accounts with configurable SKU, kind, access tier, and security settings including HTTPS-only traffic and Data Lake Storage Gen2 support.
+- Added support for retrieving detailed information about specific Azure Storage accounts via the `azmcp-storage-account-details` command. This command returns comprehensive storage account properties including name, location, kind, SKU, and feature flags such as hierarchical namespace (Data Lake Gen2) support.
 - Added support for sending messages to Azure Storage queues via the `azmcp-storage-queue-message-send` command. This command enables asynchronous messaging by adding messages to storage queues with configurable time-to-live and visibility timeout settings. [[#794](https://github.com/Azure/azure-mcp/pull/794)]
 - Added support for retrieving Azure Storage blob details via the `azmcp-storage-blob-details` command. This command returns comprehensive blob properties including metadata, content information, access tier, lease status, and other blob-specific configuration details.
 

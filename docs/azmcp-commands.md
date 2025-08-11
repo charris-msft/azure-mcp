@@ -742,6 +742,11 @@ azmcp sql server entra-admin list --subscription <subscription> \
 # List Storage accounts in a subscription
 azmcp storage account list --subscription <subscription>
 
+# Get detailed information about a specific Storage account
+azmcp storage account details --subscription <subscription> \
+                              --account <account-name> \
+                              [--tenant <tenant>]
+
 # Create a new Storage account with custom configuration
 azmcp storage account create --subscription <subscription> \
                              --account-name <unique-account-name> \
