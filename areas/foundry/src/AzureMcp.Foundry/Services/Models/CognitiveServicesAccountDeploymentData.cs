@@ -30,10 +30,10 @@ namespace AzureMcp.Foundry.Services.Models
         public CognitiveServicesSku Sku { get; set; }
         /// <summary> Resource Etag. </summary>
         [JsonPropertyName("etag")]
-        public ETag ETag { get; }
+        public ETag ETag { get; set; }
         /// <summary> Resource tags. </summary>
         [JsonPropertyName("tags")]
-        public IDictionary<string, string> Tags { get; }
+        public IDictionary<string, string> Tags { get; set; }
         /// <summary> Properties of Cognitive Services account deployment. </summary>
         [JsonPropertyName("properties")]
         public CognitiveServicesAccountDeploymentProperties Properties { get; set; }

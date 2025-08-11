@@ -12,21 +12,21 @@ namespace AzureMcp.Foundry.Services.Models
     {
         /// <summary> Gets the key. </summary>
         [JsonPropertyName("key")]
-        public string Key { get; }
+        public string Key { get; set; }
         /// <summary> Gets the renewal period. </summary>
         [JsonPropertyName("renewalPeriod")]
-        public float? RenewalPeriod { get; }
+        public float? RenewalPeriod { get; set; }
         /// <summary> Gets the count. </summary>
         [JsonPropertyName("count")]
-        public float? Count { get; }
+        public float? Count { get; set; }
         /// <summary> Gets the min count. </summary>
         [JsonPropertyName("minCount")]
-        public float? MinCount { get; }
+        public float? MinCount { get; set; }
         /// <summary> Gets the is dynamic throttling enabled. </summary>
         [JsonPropertyName("dynamicThrottlingEnabled")]
-        public bool? IsDynamicThrottlingEnabled { get; }
+        public bool? IsDynamicThrottlingEnabled { get; set; }
         /// <summary> Gets the match patterns. </summary>
         [JsonPropertyName("matchPatterns")]
-        public IReadOnlyList<ServiceAccountThrottlingMatchPattern> MatchPatterns { get; }
+        public IReadOnlyList<ServiceAccountThrottlingMatchPattern> MatchPatterns { get; set; }
     }
 }

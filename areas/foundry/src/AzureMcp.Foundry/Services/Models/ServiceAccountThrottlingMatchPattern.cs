@@ -12,9 +12,9 @@ namespace AzureMcp.Foundry.Services.Models
     {
         /// <summary> Gets the path. </summary>
         [JsonPropertyName("path")]
-        public string Path { get; }
+        public string Path { get; set; }
         /// <summary> Gets the method. </summary>
         [JsonPropertyName("method")]
-        public string Method { get; }
+        public string Method { get; set; }
     }
 }

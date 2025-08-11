@@ -12,12 +12,12 @@ namespace AzureMcp.Foundry.Services.Models
     {
         /// <summary> The count value of Call Rate Limit. </summary>
         [JsonPropertyName("count")]
-        public float? Count { get; }
+        public float? Count { get; set; }
         /// <summary> The renewal period in seconds of Call Rate Limit. </summary>
         [JsonPropertyName("renewalPeriod")]
-        public float? RenewalPeriod { get; }
+        public float? RenewalPeriod { get; set; }
         /// <summary> Gets the rules. </summary>
         [JsonPropertyName("rules")]
-        public IReadOnlyList<ServiceAccountThrottlingRule> Rules { get; }
+        public IReadOnlyList<ServiceAccountThrottlingRule> Rules { get; set; }
     }
 }

@@ -166,18 +166,19 @@ public class FoundryService(IHttpClientService httpClientService, ITenantService
 
         try
         {
+            // Create ArmClient for deployments
             var options = new ArmClientOptions();
             options.SetApiVersion("Microsoft.CognitiveServices/accounts/deployments", "2025-06-01");
             ArmClient armClient = await CreateArmClientAsync(null, retryPolicy, options);
 
-            var subscription =
-                armClient.GetSubscriptionResource(SubscriptionResource.CreateResourceIdentifier(subscriptionId));
+            // Retrieve the Cognitive Services account
             var genericResources = armClient.GetGenericResources();
             var cognitiveServicesAccount = await genericResources.GetAsync(
                 new ResourceIdentifier($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.CognitiveServices/accounts/{azureAiServicesName}"));
-            if(!cognitiveServicesAccount.Value.HasData)
+            if (!cognitiveServicesAccount.Value.HasData)
                 throw new InvalidOperationException($"Services account '{azureAiServicesName}' not found in resource group '{resourceGroup}'.");
 
+            // Prepare data for the deployment
             ResourceIdentifier id = new ResourceIdentifier($"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.CognitiveServices/accounts/{azureAiServicesName}/deployments/{deploymentName}");
             var deploymentData = new CognitiveServicesAccountDeploymentData
             {
@@ -191,12 +192,10 @@ public class FoundryService(IHttpClientService httpClientService, ITenantService
                     }
                 }
             };
-
             if (!string.IsNullOrEmpty(modelSource))
             {
                 deploymentData.Properties.Model.Source = modelSource;
             }
-
             if (!string.IsNullOrEmpty(skuName))
             {
                 deploymentData.Sku = new CognitiveServicesSku()
@@ -208,7 +207,6 @@ public class FoundryService(IHttpClientService httpClientService, ITenantService
                     deploymentData.Sku.Capacity = skuCapacity;
                 }
             }
-
             if (!string.IsNullOrEmpty(scaleType))
             {
                 deploymentData.Properties.ScaleSettings = new CognitiveServicesAccountDeploymentScaleSettings
@@ -218,13 +216,13 @@ public class FoundryService(IHttpClientService httpClientService, ITenantService
                 };
             }
 
-            // First serialize deploymentData to JSON, then create GenericResourceData from it
+            // Convert from CognitiveServicesAccountDeploymentData to GenericResourceData
             byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(deploymentData, FoundryJsonContext.Default.CognitiveServicesAccountDeploymentData);
             var reader = new Utf8JsonReader(jsonBytes);
             var dataModel = (IJsonModel<GenericResourceData>)new GenericResourceData(cognitiveServicesAccount.Value.Data.Location);
-            GenericResourceData data = dataModel.Create(ref reader, new ModelReaderWriterOptions("W")) 
+            GenericResourceData data = dataModel.Create(ref reader, new ModelReaderWriterOptions("W"))
                 ?? throw new InvalidOperationException("Failed to create deployment data");
-
+            // Create the deployment
             var createResult = await armClient.GetGenericResources().CreateOrUpdateAsync(WaitUntil.Completed, id, data);
             if (!createResult.Value.HasData)
             {

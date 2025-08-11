@@ -14,7 +14,7 @@ namespace AzureMcp.Foundry.Services.Models
     {
         /// <summary> Gets the status of the resource at the time the operation was called. </summary>
         [JsonPropertyName("provisioningState")]
-        public string ProvisioningState { get; }
+        public string ProvisioningState { get; set; }
         /// <summary> Properties of Cognitive Services account deployment model. </summary>
         [JsonPropertyName("model")]
         public CognitiveServicesAccountDeploymentModel Model { get; set; }
@@ -23,22 +23,22 @@ namespace AzureMcp.Foundry.Services.Models
         public CognitiveServicesAccountDeploymentScaleSettings ScaleSettings { get; set; }
         /// <summary> The capabilities. </summary>
         [JsonPropertyName("capabilities")]
-        public IReadOnlyDictionary<string, string> Capabilities { get; }
+        public IReadOnlyDictionary<string, string> Capabilities { get; set; }
         /// <summary> The name of RAI policy. </summary>
         [JsonPropertyName("raiPolicyName")]
         public string RaiPolicyName { get; set; }
         /// <summary> The call rate limit Cognitive Services account. </summary>
         [JsonPropertyName("callRateLimit")]
-        public ServiceAccountCallRateLimit CallRateLimit { get; }
+        public ServiceAccountCallRateLimit CallRateLimit { get; set; }
         /// <summary> Gets the rate limits. </summary>
         [JsonPropertyName("rateLimits")]
-        public IReadOnlyList<ServiceAccountThrottlingRule> RateLimits { get; }
+        public IReadOnlyList<ServiceAccountThrottlingRule> RateLimits { get; set; }
         /// <summary> Deployment model version upgrade option. </summary>
         [JsonPropertyName("versionUpgradeOption")]
         public string VersionUpgradeOption { get; set; }
         /// <summary> If the dynamic throttling is enabled. </summary>
         [JsonPropertyName("dynamicThrottlingEnabled")]
-        public bool? IsDynamicThrottlingEnabled { get; }
+        public bool? IsDynamicThrottlingEnabled { get; set; }
         /// <summary> The current capacity. </summary>
         [JsonPropertyName("currentCapacity")]
         public int? CurrentCapacity { get; set; }

@@ -32,6 +32,6 @@ namespace AzureMcp.Foundry.Services.Models
         public ResourceIdentifier SourceAccount { get; set; }
         /// <summary> The call rate limit Cognitive Services account. </summary>
         [JsonPropertyName("callRateLimit")]
-        public ServiceAccountCallRateLimit CallRateLimit { get; }
+        public ServiceAccountCallRateLimit CallRateLimit { get; set; }
     }
 }

@@ -18,6 +18,6 @@ namespace AzureMcp.Foundry.Services.Models
         public int? Capacity { get; set; }
         /// <summary> Deployment active capacity. This value might be different from `capacity` if customer recently updated `capacity`. </summary>
         [JsonPropertyName("activeCapacity")]
-        public int? ActiveCapacity { get; }
+        public int? ActiveCapacity { get; set; }
     }
 }
