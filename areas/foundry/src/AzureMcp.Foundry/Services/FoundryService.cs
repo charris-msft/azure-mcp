@@ -218,10 +218,10 @@ public class FoundryService(IHttpClientService httpClientService, ITenantService
                 };
             }
 
-            // First serialize deploymentData to JSON string, then create GenericResourceData from it
-            string jsonString = JsonSerializer.Serialize(deploymentData, FoundryJsonContext.Default.CognitiveServicesAccountDeploymentData);
-            var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(jsonString));
-            IJsonModel<GenericResourceData> dataModel = new GenericResourceData(cognitiveServicesAccount.Value.Data.Location);
+            // First serialize deploymentData to JSON, then create GenericResourceData from it
+            byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(deploymentData, FoundryJsonContext.Default.CognitiveServicesAccountDeploymentData);
+            var reader = new Utf8JsonReader(jsonBytes);
+            var dataModel = (IJsonModel<GenericResourceData>)new GenericResourceData(cognitiveServicesAccount.Value.Data.Location);
             GenericResourceData data = dataModel.Create(ref reader, new ModelReaderWriterOptions("W")) 
                 ?? throw new InvalidOperationException("Failed to create deployment data");
 
