@@ -33,7 +33,7 @@ public sealed class DesignCommand(ILogger<DesignCommand> logger) : BaseCloudArch
     public override string Name => "design";
 
     public override string Description =>
-        "A tool for designing Azure cloud architectures through guided questions.";
+        "Design and architect comprehensive Azure cloud solutions for applications and services. This interactive assistant helps create scalable cloud architectures for file upload systems, web applications, APIs, e-commerce platforms, financial services, transaction systems, data processing services, and enterprise solutions. Through guided questions, provides tailored Azure architecture recommendations covering storage, compute, networking, databases, security, and application services to create robust user-facing cloud services and applications.";
 
     public override string Title => CommandTitle;
 
