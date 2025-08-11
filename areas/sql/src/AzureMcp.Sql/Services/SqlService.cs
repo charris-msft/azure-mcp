@@ -1,13 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Azure.ResourceManager.Sql;
+using Azure.Core;
+using Azure.ResourceManager.ResourceGraph;
+using Azure.ResourceManager.ResourceGraph.Models;
+using Azure.ResourceManager.Resources;
 using AzureMcp.Core.Options;
 using AzureMcp.Core.Services.Azure;
 using AzureMcp.Core.Services.Azure.Subscription;
 using AzureMcp.Core.Services.Azure.Tenant;
 using AzureMcp.Sql.Models;
+using AzureMcp.Sql.Services.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AzureMcp.Sql.Services;
 
@@ -15,6 +20,7 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
 {
     private readonly ISubscriptionService _subscriptionService = subscriptionService ?? throw new ArgumentNullException(nameof(subscriptionService));
     private readonly ILogger<SqlService> _logger = logger;
+    private readonly ITenantService _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
 
     public async Task<SqlDatabase?> GetDatabaseAsync(
         string serverName,
@@ -27,43 +33,26 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
         try
         {
             var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
+            var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
 
-            var resourceGroupResource = await subscriptionResource
-                .GetResourceGroupAsync(resourceGroup, cancellationToken);
-
-            var sqlServerResource = await resourceGroupResource.Value
-                .GetSqlServers()
-                .GetAsync(serverName);
-
-            var databaseResource = await sqlServerResource.Value
-                .GetSqlDatabases()
-                .GetAsync(databaseName);
-
-            var database = databaseResource.Value.Data;
-
-            return new SqlDatabase(
-                Name: database.Name,
-                Id: database.Id.ToString(),
-                Type: database.ResourceType.ToString(),
-                Location: database.Location.ToString(),
-                Sku: database.Sku != null ? new DatabaseSku(
-                    Name: database.Sku.Name,
-                    Tier: database.Sku.Tier,
-                    Capacity: database.Sku.Capacity,
-                    Family: database.Sku.Family,
-                    Size: database.Sku.Size
-                ) : null,
-                Status: database.Status?.ToString(),
-                Collation: database.Collation,
-                CreationDate: database.CreatedOn,
-                MaxSizeBytes: database.MaxSizeBytes,
-                ServiceLevelObjective: database.CurrentServiceObjectiveName,
-                Edition: database.CurrentSku?.Name,
-                ElasticPoolName: database.ElasticPoolId?.ToString().Split('/').LastOrDefault(),
-                EarliestRestoreDate: database.EarliestRestoreOn,
-                ReadScale: database.ReadScale?.ToString(),
-                ZoneRedundant: database.IsZoneRedundant
-            );
+            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/databases' and resourceGroup =~ '{resourceGroup}' and name =~ '{databaseName}' | project id, name, type, location, sku, kind, managedBy, identity, tags, properties")
+            {
+                Subscriptions = { subscriptionResource.Data.SubscriptionId }
+            };
+            ResourceQueryResult result = await tenantResource.GetResourcesAsync(queryContent);
+            if (result != null && result.Count > 0)
+            {
+                using var jsonDocument = JsonDocument.Parse(result.Data);
+                var dataArray = jsonDocument.RootElement;
+                var item = dataArray.ValueKind == JsonValueKind.Array && dataArray.GetArrayLength() > 0
+                    ? dataArray[0]
+                    : default;
+                if (item.ValueKind == JsonValueKind.Object)
+                {
+                    return ConvertToSqlDatabaseModel(item);
+                }
+            }
+            throw new Exception($"SQL database '{databaseName}' not found in resource group '{resourceGroup}' for subscription '{subscription}'.");
         }
         catch (Exception ex)
         {
@@ -83,46 +72,28 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
     {
         try
         {
-            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
-
-            var resourceGroupResource = await subscriptionResource
-                .GetResourceGroupAsync(resourceGroup, cancellationToken);
-
-            var sqlServerResource = await resourceGroupResource.Value
-                .GetSqlServers()
-                .GetAsync(serverName);
-
             var databases = new List<SqlDatabase>();
 
-            await foreach (var databaseResource in sqlServerResource.Value.GetSqlDatabases().GetAllAsync())
+            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
+            var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
+
+            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/databases' and resourceGroup =~ '{resourceGroup}' | project id, name, type, location, sku, kind, managedBy, identity, tags, properties")
             {
-                var database = databaseResource.Data;
-
-                databases.Add(new SqlDatabase(
-                    Name: database.Name,
-                    Id: database.Id.ToString(),
-                    Type: database.ResourceType.ToString(),
-                    Location: database.Location.ToString(),
-                    Sku: database.Sku != null ? new DatabaseSku(
-                        Name: database.Sku.Name,
-                        Tier: database.Sku.Tier,
-                        Capacity: database.Sku.Capacity,
-                        Family: database.Sku.Family,
-                        Size: database.Sku.Size
-                    ) : null,
-                    Status: database.Status?.ToString(),
-                    Collation: database.Collation,
-                    CreationDate: database.CreatedOn,
-                    MaxSizeBytes: database.MaxSizeBytes,
-                    ServiceLevelObjective: database.CurrentServiceObjectiveName,
-                    Edition: database.CurrentSku?.Name,
-                    ElasticPoolName: database.ElasticPoolId?.ToString().Split('/').LastOrDefault(),
-                    EarliestRestoreDate: database.EarliestRestoreOn,
-                    ReadScale: database.ReadScale?.ToString(),
-                    ZoneRedundant: database.IsZoneRedundant
-                ));
+                Subscriptions = { subscriptionResource.Data.SubscriptionId }
+            };
+            ResourceQueryResult result = await tenantResource.GetResourcesAsync(queryContent);
+            if (result != null && result.Count > 0)
+            {
+                using var jsonDocument = JsonDocument.Parse(result.Data);
+                var dataArray = jsonDocument.RootElement;
+                if (dataArray.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var item in dataArray.EnumerateArray())
+                    {
+                        databases.Add(ConvertToSqlDatabaseModel(item));
+                    }
+                }
             }
-
             return databases;
         }
         catch (Exception ex)
@@ -143,30 +114,27 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
     {
         try
         {
-            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
-
-            var resourceGroupResource = await subscriptionResource
-                .GetResourceGroupAsync(resourceGroup, cancellationToken);
-
-            var sqlServerResource = await resourceGroupResource.Value
-                .GetSqlServers()
-                .GetAsync(serverName);
-
             var entraAdministrators = new List<SqlServerEntraAdministrator>();
 
-            await foreach (var adminResource in sqlServerResource.Value.GetSqlServerAzureADAdministrators().GetAllAsync(cancellationToken))
+            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
+            var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
+
+            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/administrators' and resourceGroup =~ '{resourceGroup}' and id contains '/servers/{serverName}/' | project id, name, type, location, sku, kind, managedBy, identity, tags, properties")
             {
-                var admin = adminResource.Data;
-                entraAdministrators.Add(new SqlServerEntraAdministrator(
-                    Name: admin.Name,
-                    Id: admin.Id.ToString(),
-                    Type: admin.ResourceType.ToString(),
-                    AdministratorType: admin.AdministratorType?.ToString(),
-                    Login: admin.Login,
-                    Sid: admin.Sid?.ToString(),
-                    TenantId: admin.TenantId?.ToString(),
-                    AzureADOnlyAuthentication: admin.IsAzureADOnlyAuthenticationEnabled
-                ));
+                Subscriptions = { subscriptionResource.Data.SubscriptionId }
+            };
+            ResourceQueryResult result = await tenantResource.GetResourcesAsync(queryContent);
+            if (result != null && result.Count > 0)
+            {
+                using var jsonDocument = JsonDocument.Parse(result.Data);
+                var dataArray = jsonDocument.RootElement;
+                if (dataArray.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var item in dataArray.EnumerateArray())
+                    {
+                        entraAdministrators.Add(ConvertToSqlServerEntraAdministratorModel(item));
+                    }
+                }
             }
 
             return entraAdministrators;
@@ -283,5 +251,50 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
                 serverName, resourceGroup, subscription);
             throw;
         }
+    }
+
+    private static SqlDatabase ConvertToSqlDatabaseModel(JsonElement item)
+    {
+        SqlDatabaseData sqlDatabase = SqlDatabaseData.FromJson(item);
+
+        return new SqlDatabase(
+                Name: sqlDatabase.ResourceName,
+                Id: sqlDatabase.ResourceId,
+                Type: sqlDatabase.ResourceType,
+                Location: sqlDatabase.Location,
+                Sku: sqlDatabase.Sku != null ? new DatabaseSku(
+                    Name: sqlDatabase.Sku.Name,
+                    Tier: sqlDatabase.Sku.Tier,
+                    Capacity: sqlDatabase.Sku.Capacity,
+                    Family: sqlDatabase.Sku.Family,
+                    Size: sqlDatabase.Sku.Size
+                ) : null,
+                Status: sqlDatabase.Properties.Status,
+                Collation: sqlDatabase.Properties.Collation,
+                CreationDate: sqlDatabase.Properties.CreatedOn,
+                MaxSizeBytes: sqlDatabase.Properties.MaxSizeBytes,
+                ServiceLevelObjective: sqlDatabase.Properties.CurrentServiceObjectiveName,
+                Edition: sqlDatabase.Properties.CurrentSku?.Name,
+                ElasticPoolName: sqlDatabase.Properties.ElasticPoolId?.ToString().Split('/').LastOrDefault(),
+                EarliestRestoreDate: sqlDatabase.Properties.EarliestRestoreOn,
+                ReadScale: sqlDatabase.Properties.ReadScale,
+                ZoneRedundant: sqlDatabase.Properties.IsZoneRedundant
+            );
+    }
+    
+    private static SqlServerEntraAdministrator ConvertToSqlServerEntraAdministratorModel(JsonElement item)
+    {
+        SqlServerAadAdministratorData admin = SqlServerAadAdministratorData.FromJson(item);
+
+        return new SqlServerEntraAdministrator(
+                    Name: admin.ResourceName,
+                    Id: admin.ResourceId,
+                    Type: admin.ResourceType,
+                    AdministratorType: admin.Properties.AdministratorType,
+                    Login: admin.Properties.Login,
+                    Sid: admin.Properties.Sid?.ToString(),
+                    TenantId: admin.Properties.TenantId?.ToString(),
+                    AzureADOnlyAuthentication: admin.Properties.IsAzureADOnlyAuthenticationEnabled
+                );
     }
 }
