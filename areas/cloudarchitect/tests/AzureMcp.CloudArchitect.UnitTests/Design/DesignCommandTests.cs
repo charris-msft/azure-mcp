@@ -42,7 +42,7 @@ public class DesignCommandTests
         Assert.Equal("design", command.Name);
         Assert.NotNull(command.Description);
         Assert.NotEmpty(command.Description);
-        Assert.Contains("A tool for designing Azure cloud architectures through guided questions", command.Description);
+        Assert.Contains("Design and architect comprehensive Azure cloud solutions for applications and services. This interactive assistant helps create scalable cloud architectures for file upload systems, web applications, APIs, e-commerce platforms, financial services, transaction systems, data processing services, and enterprise solutions. Through guided questions, provides tailored Azure architecture recommendations covering storage, compute, networking, databases, security, and application services to create robust user-facing cloud services and applications.", command.Description);
     }
 
     [Fact]
