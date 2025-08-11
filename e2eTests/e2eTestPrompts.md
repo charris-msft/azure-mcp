@@ -83,15 +83,15 @@ This file contains prompts used for end-to-end testing to ensure each tool is in
 | azmcp-postgres-database-list | List all PostgreSQL databases in server \<server> |
 | azmcp-postgres-database-list | Show me the PostgreSQL databases in server \<server> |
 | azmcp-postgres-database-query | Show me all items that contain the word \<search_term> in the PostgreSQL database \<database> in server \<server> |
-| azmcp-postgres-server-config | Show me the configuration of PostgreSQL server \<server> |
+| azmcp-postgres-server-config-get | Show me the configuration of PostgreSQL server \<server> |
 | azmcp-postgres-server-list | List all PostgreSQL servers in my subscription |
 | azmcp-postgres-server-list | Show me my PostgreSQL servers |
 | azmcp-postgres-server-list | Show me the PostgreSQL servers in my subscription |
 | azmcp-postgres-server-param | Show me if the parameter my PostgreSQL server \<server> has replication enabled |
-| azmcp-postgres-server-setparam | Enable replication for my PostgreSQL server \<server> |
+| azmcp-postgres-server-param-set | Enable replication for my PostgreSQL server \<server> |
 | azmcp-postgres-table-list | List all tables in the PostgreSQL database \<database> in server \<server> |
 | azmcp-postgres-table-list | Show me the tables in the PostgreSQL database \<database> in server \<server> |
-| azmcp-postgres-table-schema | Show me the schema of table \<table> in the PostgreSQL database \<database> in server \<server> |
+| azmcp-postgres-table-schema-get | Show me the schema of table \<table> in the PostgreSQL database \<database> in server \<server> |
 
 ## Azure Developer CLI
 
@@ -159,8 +159,10 @@ This file contains prompts used for end-to-end testing to ensure each tool is in
 |:----------|:----------|
 | azmcp-bestpractices-get | Fetch the latest Azure code generation best practices|
 | azmcp-bestpractices-get | Fetch the latest Azure deployment best practices|
+| azmcp-bestpractices-get | Fetch the latest Azure best practices|
 | azmcp-bestpractices-get | Fetch the latest Azure Functions code generation best practices |
 | azmcp-bestpractices-get | Fetch the latest Azure Functions deployment best practices|
+| azmcp-bestpractices-get | Fetch the latest Azure Functions best practices|
 | azmcp-bestpractices-get | Fetch the latest Azure Static Web Apps best practices |
 
 ## Azure Monitor
@@ -272,9 +274,9 @@ This file contains prompts used for end-to-end testing to ensure each tool is in
 
 | Tool Name | Test Prompt |
 |:----------|:----------|
-| azmcp-storage-account-list | List all storage accounts in my subscription |
-| azmcp-storage-account-list | Show me my storage accounts |
-| azmcp-storage-account-list | Show me the storage accounts in my subscription |
+| azmcp-storage-account-list | List all storage accounts in my subscription including their location and SKU |
+| azmcp-storage-account-list | Show me my storage accounts with whether hierarchical namespace (HNS) is enabled |
+| azmcp-storage-account-list | Show me the storage accounts in my subscription and include HTTPS-only and public blob access settings |
 | azmcp-storage-blob-batch-set-tier | Set access tier to Cool for multiple blobs in the container <container_name> in the storage account <account_name> |
 | azmcp-storage-blob-batch-set-tier | Change the access tier to Archive for blobs file1.txt and file2.txt in the container <container_name> in the storage account <account_name> |
 | azmcp-storage-blob-container-details | Show me the properties of the storage container files in the storage account <account_name> |
