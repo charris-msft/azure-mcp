@@ -3,7 +3,6 @@
 
 using System.Text.Json.Serialization;
 using Azure.ResourceManager.Resources.Models;
-using AzureMcp.Foundry.Services.Models;
 
 namespace AzureMcp.Foundry.Models;
 
@@ -28,5 +27,5 @@ public record ModelDeploymentResult
     public IDictionary<string, string>? Tags { get; init; }
 
     [JsonPropertyName("properties")]
-    public CognitiveServicesAccountDeploymentProperties? Properties { get; init; }
+    public IDictionary<string, object>? Properties { get; init; }
 }

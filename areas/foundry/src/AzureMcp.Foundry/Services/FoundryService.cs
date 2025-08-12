@@ -240,7 +240,7 @@ public class FoundryService(IHttpClientService httpClientService, ITenantService
                 Type = deployment.Data.ResourceType.ToString(),
                 Sku = deployment.Data.Sku,
                 Tags = deployment.Data.Tags,
-                Properties = deployment.Data.Properties?.ToObjectFromJson(FoundryJsonContext.Default.CognitiveServicesAccountDeploymentProperties)
+                Properties = deployment.Data.Properties?.ToObjectFromJson(FoundryJsonContext.Default.IDictionaryStringObject)
             };
         }
         catch (Exception ex)

@@ -3,18 +3,14 @@
 
 #nullable disable
 
-using System.Text.Json.Serialization;
-
 namespace AzureMcp.Foundry.Services.Models
 {
     /// <summary> The ServiceAccountThrottlingMatchPattern. </summary>
-    public sealed class ServiceAccountThrottlingMatchPattern
+    internal sealed class ServiceAccountThrottlingMatchPattern
     {
         /// <summary> Gets the path. </summary>
-        [JsonPropertyName("path")]
         public string Path { get; set; }
         /// <summary> Gets the method. </summary>
-        [JsonPropertyName("method")]
         public string Method { get; set; }
     }
 }
