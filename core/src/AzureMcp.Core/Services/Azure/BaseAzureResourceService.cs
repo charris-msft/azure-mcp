@@ -21,9 +21,9 @@ public abstract class BaseAzureResourceService : BaseAzureService
     private readonly ITenantService _tenantService;
 
     protected BaseAzureResourceService(
-        ISubscriptionService subscriptionService, 
-        ITenantService tenantService, 
-        ILoggerFactory? loggerFactory = null) 
+        ISubscriptionService subscriptionService,
+        ITenantService tenantService,
+        ILoggerFactory? loggerFactory = null)
         : base(tenantService, loggerFactory)
     {
         _subscriptionService = subscriptionService ?? throw new ArgumentNullException(nameof(subscriptionService));
@@ -43,10 +43,10 @@ public abstract class BaseAzureResourceService : BaseAzureService
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of resources converted to the specified type</returns>
     protected async Task<List<T>> ExecuteResourceQueryAsync<T>(
-        string resourceType, 
-        string resourceGroup, 
-        string subscription, 
-        RetryPolicyOptions? retryPolicy, 
+        string resourceType,
+        string resourceGroup,
+        string subscription,
+        RetryPolicyOptions? retryPolicy,
         Func<JsonElement, T> converter,
         string? additionalFilter = null,
         CancellationToken cancellationToken = default)
@@ -55,7 +55,7 @@ public abstract class BaseAzureResourceService : BaseAzureService
         ArgumentNullException.ThrowIfNull(converter);
 
         var results = new List<T>();
-        
+
         var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
         var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
 
@@ -64,7 +64,7 @@ public abstract class BaseAzureResourceService : BaseAzureService
             throw new InvalidOperationException($"No accessible tenant found for subscription '{subscription}'");
         }
 
-        var queryFilter = $"Resources | where type =~ '{resourceType}' and resourceGroup =~ '{resourceGroup}'";
+        var queryFilter = $"Resources | where type =~ '{EscapeKqlString(resourceType)}' and resourceGroup =~ '{EscapeKqlString(resourceGroup)}'";
         if (!string.IsNullOrEmpty(additionalFilter))
         {
             queryFilter += $" and {additionalFilter}";
@@ -105,10 +105,10 @@ public abstract class BaseAzureResourceService : BaseAzureService
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Single resource converted to the specified type, or null if not found</returns>
     protected async Task<T?> ExecuteSingleResourceQueryAsync<T>(
-        string resourceType, 
-        string resourceGroup, 
-        string subscription, 
-        RetryPolicyOptions? retryPolicy, 
+        string resourceType,
+        string resourceGroup,
+        string subscription,
+        RetryPolicyOptions? retryPolicy,
         Func<JsonElement, T> converter,
         string? additionalFilter = null,
         CancellationToken cancellationToken = default) where T : class

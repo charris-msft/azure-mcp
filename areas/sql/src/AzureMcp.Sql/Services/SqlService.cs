@@ -32,12 +32,12 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
                 subscription,
                 retryPolicy,
                 ConvertToSqlDatabaseModel,
-                $"name =~ '{databaseName}'",
+                $"name =~ '{EscapeKqlString(databaseName)}'",
                 cancellationToken);
 
             if (result == null)
             {
-                throw new Exception($"SQL database '{databaseName}' not found in resource group '{resourceGroup}' for subscription '{subscription}'.");
+                throw new KeyNotFoundException($"SQL database '{databaseName}' not found in resource group '{resourceGroup}' for subscription '{subscription}'.");
             }
 
             return result;
@@ -92,7 +92,7 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
                 subscription,
                 retryPolicy,
                 ConvertToSqlServerEntraAdministratorModel,
-                $"id contains '/servers/{serverName}/'",
+                $"id contains '/servers/{EscapeKqlString(serverName)}/'",
                 cancellationToken);
         }
         catch (Exception ex)
