@@ -9,10 +9,10 @@ using AzureMcp.Sql.Commands;
 namespace AzureMcp.Sql.Services.Models
 {
     /// <summary>
-    /// A class representing the SqlDatabase data model.
-    /// A database resource.
+    /// A class representing the ElasticPool data model.
+    /// An elastic pool.
     /// </summary>
-    internal sealed class SqlDatabaseData
+    internal sealed class SqlElasticPoolData
     {
         /// <summary> The resource ID for the resource. </summary>
         [JsonPropertyName("id")]
@@ -27,21 +27,17 @@ namespace AzureMcp.Sql.Services.Models
         public string Location { get; set; }
         /// <summary> The database SKU. </summary>
         public SqlSku Sku { get; set; }
-        /// <summary> Kind of database. This is metadata used for the Azure portal experience. </summary>
-        public string Kind { get; }
-        /// <summary> Resource that manages the database. </summary>
-        public string ManagedBy { get; }
-        /// <summary> The Azure Active Directory identity of the database. </summary>
-        public DatabaseIdentity Identity { get; set; }
+        /// <summary> Kind of elastic pool. This is metadata used for the Azure portal experience. </summary>
+        public string Kind { get; set; }
         /// <summary> The tags of the resource. </summary>
         public IDictionary<string, string> Tags { get; set; }
-        /// <summary> Properties of the Sql database. </summary>
-        public SqlDatabaseProperties Properties { get; set; }
+        /// <summary> The properties of elastic pool. </summary>
+        public SqlElasticPoolProperties Properties { get; set; }
 
         // Read the JSON response content and create a model instance from it.
-        public static SqlDatabaseData FromJson(JsonElement source)
+        public static SqlElasticPoolData FromJson(JsonElement source)
         {
-            return JsonSerializer.Deserialize<SqlDatabaseData>(source, SqlJsonContext.Default.SqlDatabaseData);
+            return JsonSerializer.Deserialize<SqlElasticPoolData>(source, SqlJsonContext.Default.SqlElasticPoolData);
         }
     }
 }

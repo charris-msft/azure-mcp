@@ -1,10 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Azure.Core;
 using Azure.ResourceManager.ResourceGraph;
 using Azure.ResourceManager.ResourceGraph.Models;
-using Azure.ResourceManager.Resources;
 using AzureMcp.Core.Options;
 using AzureMcp.Core.Services.Azure;
 using AzureMcp.Core.Services.Azure.Subscription;
@@ -12,7 +10,6 @@ using AzureMcp.Core.Services.Azure.Tenant;
 using AzureMcp.Sql.Models;
 using AzureMcp.Sql.Services.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace AzureMcp.Sql.Services;
 
@@ -35,7 +32,7 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
             var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
             var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
 
-            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/databases' and resourceGroup =~ '{resourceGroup}' and name =~ '{databaseName}' | project id, name, type, location, sku, kind, managedBy, identity, tags, properties")
+            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/databases' and resourceGroup =~ '{resourceGroup}' and name =~ '{databaseName}'")
             {
                 Subscriptions = { subscriptionResource.Data.SubscriptionId }
             };
@@ -77,7 +74,7 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
             var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
             var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
 
-            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/databases' and resourceGroup =~ '{resourceGroup}' | project id, name, type, location, sku, kind, managedBy, identity, tags, properties")
+            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/databases' and resourceGroup =~ '{resourceGroup}'")
             {
                 Subscriptions = { subscriptionResource.Data.SubscriptionId }
             };
@@ -119,7 +116,7 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
             var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
             var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
 
-            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/administrators' and resourceGroup =~ '{resourceGroup}' and id contains '/servers/{serverName}/' | project id, name, type, location, sku, kind, managedBy, identity, tags, properties")
+            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/administrators' and resourceGroup =~ '{resourceGroup}' and id contains '/servers/{serverName}/'")
             {
                 Subscriptions = { subscriptionResource.Data.SubscriptionId }
             };
@@ -157,46 +154,27 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
     {
         try
         {
-            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
-
-            var resourceGroupResource = await subscriptionResource
-                .GetResourceGroupAsync(resourceGroup, cancellationToken);
-
-            var sqlServerResource = await resourceGroupResource.Value
-                .GetSqlServers()
-                .GetAsync(serverName);
-
             var elasticPools = new List<SqlElasticPool>();
 
-            await foreach (var poolResource in sqlServerResource.Value.GetElasticPools().GetAllAsync())
+            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
+            var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
+
+            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/elasticPools' and resourceGroup =~ '{resourceGroup}'")
             {
-                var pool = poolResource.Data;
-                elasticPools.Add(new SqlElasticPool(
-                    Name: pool.Name,
-                    Id: pool.Id.ToString(),
-                    Type: pool.ResourceType.ToString(),
-                    Location: pool.Location.ToString(),
-                    Sku: pool.Sku != null ? new ElasticPoolSku(
-                        Name: pool.Sku.Name,
-                        Tier: pool.Sku.Tier,
-                        Capacity: pool.Sku.Capacity,
-                        Family: pool.Sku.Family,
-                        Size: pool.Sku.Size
-                    ) : null,
-                    State: pool.State?.ToString(),
-                    CreationDate: pool.CreatedOn,
-                    MaxSizeBytes: pool.MaxSizeBytes,
-                    PerDatabaseSettings: pool.PerDatabaseSettings != null ? new ElasticPoolPerDatabaseSettings(
-                        MinCapacity: pool.PerDatabaseSettings.MinCapacity,
-                        MaxCapacity: pool.PerDatabaseSettings.MaxCapacity
-                    ) : null,
-                    ZoneRedundant: pool.IsZoneRedundant,
-                    LicenseType: pool.LicenseType?.ToString(),
-                    DatabaseDtuMin: null, // DTU properties not available in current SDK
-                    DatabaseDtuMax: null,
-                    Dtu: null,
-                    StorageMB: null
-                ));
+                Subscriptions = { subscriptionResource.Data.SubscriptionId }
+            };
+            ResourceQueryResult result = await tenantResource.GetResourcesAsync(queryContent);
+            if (result != null && result.Count > 0)
+            {
+                using var jsonDocument = JsonDocument.Parse(result.Data);
+                var dataArray = jsonDocument.RootElement;
+                if (dataArray.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var item in dataArray.EnumerateArray())
+                    {
+                        elasticPools.Add(ConvertToSqlElasticPoolModel(item));
+                    }
+                }
             }
 
             return elasticPools;
@@ -219,27 +197,27 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
     {
         try
         {
-            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
-
-            var resourceGroupResource = await subscriptionResource
-                .GetResourceGroupAsync(resourceGroup, cancellationToken);
-
-            var sqlServerResource = await resourceGroupResource.Value
-                .GetSqlServers()
-                .GetAsync(serverName);
-
             var firewallRules = new List<SqlServerFirewallRule>();
 
-            await foreach (var firewallRuleResource in sqlServerResource.Value.GetSqlFirewallRules().GetAllAsync(cancellationToken))
+            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
+            var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
+
+            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/firewallRules' and resourceGroup =~ '{resourceGroup}'")
             {
-                var rule = firewallRuleResource.Data;
-                firewallRules.Add(new SqlServerFirewallRule(
-                    Name: rule.Name,
-                    Id: rule.Id.ToString(),
-                    Type: rule.ResourceType.ToString() ?? "Unknown",
-                    StartIpAddress: rule.StartIPAddress,
-                    EndIpAddress: rule.EndIPAddress
-                ));
+                Subscriptions = { subscriptionResource.Data.SubscriptionId }
+            };
+            ResourceQueryResult result = await tenantResource.GetResourcesAsync(queryContent);
+            if (result != null && result.Count > 0)
+            {
+                using var jsonDocument = JsonDocument.Parse(result.Data);
+                var dataArray = jsonDocument.RootElement;
+                if (dataArray.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var item in dataArray.EnumerateArray())
+                    {
+                        firewallRules.Add(ConvertToSqlFirewallRuleModel(item));
+                    }
+                }
             }
 
             return firewallRules;
@@ -281,7 +259,7 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
                 ZoneRedundant: sqlDatabase.Properties.IsZoneRedundant
             );
     }
-    
+
     private static SqlServerEntraAdministrator ConvertToSqlServerEntraAdministratorModel(JsonElement item)
     {
         SqlServerAadAdministratorData admin = SqlServerAadAdministratorData.FromJson(item);
@@ -296,5 +274,48 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
                     TenantId: admin.Properties.TenantId?.ToString(),
                     AzureADOnlyAuthentication: admin.Properties.IsAzureADOnlyAuthenticationEnabled
                 );
+    }
+
+    private static SqlElasticPool ConvertToSqlElasticPoolModel(JsonElement item)
+    {
+        SqlElasticPoolData elasticPool = SqlElasticPoolData.FromJson(item);
+        return new SqlElasticPool(
+                    Name: elasticPool.ResourceName,
+                    Id: elasticPool.ResourceId,
+                    Type: elasticPool.ResourceType,
+                    Location: elasticPool.Location,
+                    Sku: elasticPool.Sku != null ? new ElasticPoolSku(
+                        Name: elasticPool.Sku.Name,
+                        Tier: elasticPool.Sku.Tier,
+                        Capacity: elasticPool.Sku.Capacity,
+                        Family: elasticPool.Sku.Family,
+                        Size: elasticPool.Sku.Size
+                    ) : null,
+                    State: elasticPool.Properties.State,
+                    CreationDate: elasticPool.Properties.CreatedOn,
+                    MaxSizeBytes: elasticPool.Properties.MaxSizeBytes,
+                    PerDatabaseSettings: elasticPool.Properties.PerDatabaseSettings != null ? new ElasticPoolPerDatabaseSettings(
+                        MinCapacity: elasticPool.Properties.PerDatabaseSettings.MinCapacity,
+                        MaxCapacity: elasticPool.Properties.PerDatabaseSettings.MaxCapacity
+                    ) : null,
+                    ZoneRedundant: elasticPool.Properties.IsZoneRedundant,
+                    LicenseType: elasticPool.Properties.LicenseType,
+                    DatabaseDtuMin: null, // DTU properties not available in current SDK
+                    DatabaseDtuMax: null,
+                    Dtu: null,
+                    StorageMB: null
+                );
+    }
+
+    private static SqlServerFirewallRule ConvertToSqlFirewallRuleModel(JsonElement item)
+    {
+        SqlFirewallRuleData firewallRule = SqlFirewallRuleData.FromJson(item);
+        return new SqlServerFirewallRule(
+            Name: firewallRule.ResourceName,
+            Id: firewallRule.ResourceId,
+            Type: firewallRule.ResourceType,
+            StartIpAddress: firewallRule.Properties.StartIPAddress,
+            EndIpAddress: firewallRule.Properties.EndIPAddress
+        );
     }
 }
