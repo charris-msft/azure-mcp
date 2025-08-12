@@ -11,8 +11,8 @@ namespace AzureMcp.Sql.Services.Models
     internal sealed class SqlUserAssignedIdentity
     {
         /// <summary> The principal ID of the assigned identity. </summary>
-        public Guid? PrincipalId { get; }
+        public Guid? PrincipalId { get; set; }
         /// <summary> The client ID of the assigned identity. </summary>
-        public Guid? ClientId { get; }
+        public Guid? ClientId { get; set; }
     }
 }

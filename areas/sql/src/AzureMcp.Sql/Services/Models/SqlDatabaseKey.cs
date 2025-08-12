@@ -12,15 +12,15 @@ namespace AzureMcp.Sql.Services.Models
     {
         /// <summary> The database key type. Only supported value is 'AzureKeyVault'. </summary>
         [JsonPropertyName("type")]
-        public string KeyType { get; }
+        public string KeyType { get; set; }
         /// <summary> Thumbprint of the database key. </summary>
-        public string Thumbprint { get; }
+        public string Thumbprint { get; set; }
         /// <summary> The database key creation date. </summary>
         [JsonPropertyName("creationDate")]
-        public DateTimeOffset? CreatedOn { get; }
+        public DateTimeOffset? CreatedOn { get; set; }
         /// <summary> Subregion of the server key. </summary>
-        public string Subregion { get; }
+        public string Subregion { get; set; }
         /// <summary> The database key's version. </summary>
-        public string KeyVersion { get; }
+        public string KeyVersion { get; set; }
     }
 }

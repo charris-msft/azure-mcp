@@ -23,6 +23,6 @@ namespace AzureMcp.Sql.Services.Models
         public Guid? TenantId { get; set; }
         /// <summary> Azure Active Directory only Authentication enabled. </summary>
         [JsonPropertyName("azureADOnlyAuthentication")]
-        public bool? IsAzureADOnlyAuthenticationEnabled { get; }
+        public bool? IsAzureADOnlyAuthenticationEnabled { get; set; }
     }
 }
