@@ -2,7 +2,9 @@
 
 ## How to use the Azure MCP
 
-Azure MCP is a set of tools that empower your AI to connect with Azure services—helping engineers and operators build, deploy, and troubleshoot applications. For more information on Azure MCP, head over to [learn.microsoft.com][learn-doc] or check out [get started][azmcp-link] before building your own Azure applications.
+The Azure MCP is a comprehensive set of tools that empower your AI with knowledge of Azure and the ability to connect to your Azure services. Build, deploy, and troubleshoot solutions directly from VS Code, other coding tools, or agents like the GitHub Copilot coding agent.
+
+For more information on Azure MCP, head over to [learn.microsoft.com][learn-doc] or check out [get started][azmcp-link] before building your own Azure applications.
 
 ## How to file issues and get help  
 
