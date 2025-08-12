@@ -54,8 +54,8 @@ namespace AzureMcp.Storage.LiveTests
             var skuName = account.GetProperty("skuName");
             Assert.Equal("Standard_LRS", skuName.GetString());
 
-            var isHnsEnabled = account.GetProperty("isHnsEnabled");
-            Assert.True(isHnsEnabled.GetBoolean());
+            var hnsEnabled = account.GetProperty("hnsEnabled");
+            Assert.True(hnsEnabled.GetBoolean());
         }
 
         [Fact]
