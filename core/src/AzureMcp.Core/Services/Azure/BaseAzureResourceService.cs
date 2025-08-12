@@ -15,20 +15,13 @@ namespace AzureMcp.Core.Services.Azure;
 /// Base class for Azure services that need to query Azure Resource Graph for resource management operations.
 /// Provides common methods for executing resource queries against Azure Resource Manager resources.
 /// </summary>
-public abstract class BaseAzureResourceService : BaseAzureService
+public abstract class BaseAzureResourceService(
+    ISubscriptionService subscriptionService,
+    ITenantService tenantService,
+    ILoggerFactory? loggerFactory = null) : BaseAzureService(tenantService, loggerFactory)
 {
-    private readonly ISubscriptionService _subscriptionService;
-    private readonly ITenantService _tenantService;
-
-    protected BaseAzureResourceService(
-        ISubscriptionService subscriptionService,
-        ITenantService tenantService,
-        ILoggerFactory? loggerFactory = null)
-        : base(tenantService, loggerFactory)
-    {
-        _subscriptionService = subscriptionService ?? throw new ArgumentNullException(nameof(subscriptionService));
-        _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
-    }
+    private readonly ISubscriptionService _subscriptionService = subscriptionService ?? throw new ArgumentNullException(nameof(subscriptionService));
+    private readonly ITenantService _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
 
     /// <summary>
     /// Executes a Resource Graph query and returns a list of resources of the specified type.
