@@ -24,7 +24,6 @@ Support for Azure MCP is limited to the resources listed above.
 [contribute]: https://github.com/Azure/azure-mcp/blob/main/CONTRIBUTING.md
 [azmcp-link]: https://learn.microsoft.com/en-us/azure/developer/azure-mcp-server/get-started
 [learn-doc]: https://learn.microsoft.com/en-us/azure/developer/azure-mcp-server/overview
-[gh-template]: https://aka.ms/azure-mcp/templates
 
 ## Troubleshoot the Azure MCP
 
