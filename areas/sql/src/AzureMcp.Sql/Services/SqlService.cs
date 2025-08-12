@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-using Azure.ResourceManager.ResourceGraph;
-using Azure.ResourceManager.ResourceGraph.Models;
+using System.Text.Json;
 using AzureMcp.Core.Options;
 using AzureMcp.Core.Services.Azure;
 using AzureMcp.Core.Services.Azure.Subscription;
@@ -13,11 +12,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AzureMcp.Sql.Services;
 
-public class SqlService(ISubscriptionService subscriptionService, ITenantService tenantService, ILogger<SqlService> logger) : BaseAzureService(tenantService), ISqlService
+public class SqlService(ISubscriptionService subscriptionService, ITenantService tenantService, ILogger<SqlService> logger) : BaseAzureResourceService(subscriptionService, tenantService), ISqlService
 {
-    private readonly ISubscriptionService _subscriptionService = subscriptionService ?? throw new ArgumentNullException(nameof(subscriptionService));
     private readonly ILogger<SqlService> _logger = logger;
-    private readonly ITenantService _tenantService = tenantService ?? throw new ArgumentNullException(nameof(tenantService));
 
     public async Task<SqlDatabase?> GetDatabaseAsync(
         string serverName,
@@ -29,27 +26,21 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
     {
         try
         {
-            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
-            var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
+            var result = await ExecuteSingleResourceQueryAsync(
+                "Microsoft.Sql/servers/databases",
+                resourceGroup,
+                subscription,
+                retryPolicy,
+                ConvertToSqlDatabaseModel,
+                $"name =~ '{databaseName}'",
+                cancellationToken);
 
-            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/databases' and resourceGroup =~ '{resourceGroup}' and name =~ '{databaseName}'")
+            if (result == null)
             {
-                Subscriptions = { subscriptionResource.Data.SubscriptionId }
-            };
-            ResourceQueryResult result = await tenantResource.GetResourcesAsync(queryContent);
-            if (result != null && result.Count > 0)
-            {
-                using var jsonDocument = JsonDocument.Parse(result.Data);
-                var dataArray = jsonDocument.RootElement;
-                var item = dataArray.ValueKind == JsonValueKind.Array && dataArray.GetArrayLength() > 0
-                    ? dataArray[0]
-                    : default;
-                if (item.ValueKind == JsonValueKind.Object)
-                {
-                    return ConvertToSqlDatabaseModel(item);
-                }
+                throw new Exception($"SQL database '{databaseName}' not found in resource group '{resourceGroup}' for subscription '{subscription}'.");
             }
-            throw new Exception($"SQL database '{databaseName}' not found in resource group '{resourceGroup}' for subscription '{subscription}'.");
+
+            return result;
         }
         catch (Exception ex)
         {
@@ -69,29 +60,13 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
     {
         try
         {
-            var databases = new List<SqlDatabase>();
-
-            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
-            var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
-
-            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/databases' and resourceGroup =~ '{resourceGroup}'")
-            {
-                Subscriptions = { subscriptionResource.Data.SubscriptionId }
-            };
-            ResourceQueryResult result = await tenantResource.GetResourcesAsync(queryContent);
-            if (result != null && result.Count > 0)
-            {
-                using var jsonDocument = JsonDocument.Parse(result.Data);
-                var dataArray = jsonDocument.RootElement;
-                if (dataArray.ValueKind == JsonValueKind.Array)
-                {
-                    foreach (var item in dataArray.EnumerateArray())
-                    {
-                        databases.Add(ConvertToSqlDatabaseModel(item));
-                    }
-                }
-            }
-            return databases;
+            return await ExecuteResourceQueryAsync(
+                "Microsoft.Sql/servers/databases",
+                resourceGroup,
+                subscription,
+                retryPolicy,
+                ConvertToSqlDatabaseModel,
+                cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {
@@ -111,30 +86,14 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
     {
         try
         {
-            var entraAdministrators = new List<SqlServerEntraAdministrator>();
-
-            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
-            var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
-
-            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/administrators' and resourceGroup =~ '{resourceGroup}' and id contains '/servers/{serverName}/'")
-            {
-                Subscriptions = { subscriptionResource.Data.SubscriptionId }
-            };
-            ResourceQueryResult result = await tenantResource.GetResourcesAsync(queryContent);
-            if (result != null && result.Count > 0)
-            {
-                using var jsonDocument = JsonDocument.Parse(result.Data);
-                var dataArray = jsonDocument.RootElement;
-                if (dataArray.ValueKind == JsonValueKind.Array)
-                {
-                    foreach (var item in dataArray.EnumerateArray())
-                    {
-                        entraAdministrators.Add(ConvertToSqlServerEntraAdministratorModel(item));
-                    }
-                }
-            }
-
-            return entraAdministrators;
+            return await ExecuteResourceQueryAsync(
+                "Microsoft.Sql/servers/administrators",
+                resourceGroup,
+                subscription,
+                retryPolicy,
+                ConvertToSqlServerEntraAdministratorModel,
+                $"id contains '/servers/{serverName}/'",
+                cancellationToken);
         }
         catch (Exception ex)
         {
@@ -154,30 +113,13 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
     {
         try
         {
-            var elasticPools = new List<SqlElasticPool>();
-
-            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
-            var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
-
-            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/elasticPools' and resourceGroup =~ '{resourceGroup}'")
-            {
-                Subscriptions = { subscriptionResource.Data.SubscriptionId }
-            };
-            ResourceQueryResult result = await tenantResource.GetResourcesAsync(queryContent);
-            if (result != null && result.Count > 0)
-            {
-                using var jsonDocument = JsonDocument.Parse(result.Data);
-                var dataArray = jsonDocument.RootElement;
-                if (dataArray.ValueKind == JsonValueKind.Array)
-                {
-                    foreach (var item in dataArray.EnumerateArray())
-                    {
-                        elasticPools.Add(ConvertToSqlElasticPoolModel(item));
-                    }
-                }
-            }
-
-            return elasticPools;
+            return await ExecuteResourceQueryAsync(
+                "Microsoft.Sql/servers/elasticPools",
+                resourceGroup,
+                subscription,
+                retryPolicy,
+                ConvertToSqlElasticPoolModel,
+                cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {
@@ -197,30 +139,13 @@ public class SqlService(ISubscriptionService subscriptionService, ITenantService
     {
         try
         {
-            var firewallRules = new List<SqlServerFirewallRule>();
-
-            var subscriptionResource = await _subscriptionService.GetSubscription(subscription, null, retryPolicy);
-            var tenantResource = (await _tenantService.GetTenants()).FirstOrDefault(t => t.Data.TenantId == subscriptionResource.Data.TenantId);
-
-            var queryContent = new ResourceQueryContent($"Resources | where type =~ 'Microsoft.Sql/servers/firewallRules' and resourceGroup =~ '{resourceGroup}'")
-            {
-                Subscriptions = { subscriptionResource.Data.SubscriptionId }
-            };
-            ResourceQueryResult result = await tenantResource.GetResourcesAsync(queryContent);
-            if (result != null && result.Count > 0)
-            {
-                using var jsonDocument = JsonDocument.Parse(result.Data);
-                var dataArray = jsonDocument.RootElement;
-                if (dataArray.ValueKind == JsonValueKind.Array)
-                {
-                    foreach (var item in dataArray.EnumerateArray())
-                    {
-                        firewallRules.Add(ConvertToSqlFirewallRuleModel(item));
-                    }
-                }
-            }
-
-            return firewallRules;
+            return await ExecuteResourceQueryAsync(
+                "Microsoft.Sql/servers/firewallRules",
+                resourceGroup,
+                subscription,
+                retryPolicy,
+                ConvertToSqlFirewallRuleModel,
+                cancellationToken: cancellationToken);
         }
         catch (Exception ex)
         {
