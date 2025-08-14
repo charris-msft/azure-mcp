@@ -20,10 +20,10 @@ Support for Azure MCP is limited to the resources listed above.
 
 [gh-issue]: https://github.com/Azure/azure-mcp/issues/new/choose
 [exist-issue]: https://github.com/Azure/azure-mcp/issues
-[docs]: https://learn.microsoft.com/en-us/azure/developer/azure-mcp-server/overview
+[docs]: https://learn.microsoft.com/azure/developer/azure-mcp-server/overview
 [contribute]: https://github.com/Azure/azure-mcp/blob/main/CONTRIBUTING.md
-[azmcp-link]: https://learn.microsoft.com/en-us/azure/developer/azure-mcp-server/get-started
-[learn-doc]: https://learn.microsoft.com/en-us/azure/developer/azure-mcp-server/overview
+[azmcp-link]: https://learn.microsoft.com/azure/developer/azure-mcp-server/get-started
+[learn-doc]: https://learn.microsoft.com/azure/developer/azure-mcp-server/overview
 
 ## Troubleshoot the Azure MCP
 
